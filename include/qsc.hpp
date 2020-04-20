@@ -1,0 +1,3 @@
+namespace qsc {
+  void hw();
+}
