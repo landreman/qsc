@@ -1,5 +1,5 @@
-#import <iostream>
-#import "qsc.hpp"
+#include <iostream>
+#include "qsc.hpp"
 
 int main(int argc, char* argv[]) {
   qsc::hw();
