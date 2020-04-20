@@ -56,3 +56,21 @@ set_property(TARGET unitTests PROPERTY EXCLUDE_FROM_ALL 1)
 # Set up "make test" so it runs the scripts I want it to run.
 # See https://cmake.org/cmake/help/latest/command/add_custom_target.html
 add_custom_target(test COMMAND ./runTests WORKING_DIRECTORY tests DEPENDS unitTests)
+
+# Figure out the command to submit mpi jobs.
+# First, see if "srun" exists for this system.
+execute_process(COMMAND "which srun" OUTPUT_VARIABLE WHICH_SRUN)
+message("Result of 'which srun': ${WHICH_SRUN}")
+string(FIND WHICH_SRUN "srun" SRUN_FOUND)
+if (SRUN_FOUND GREATER 0)
+  message("srun detected")
+  set(QSC_COMMAND_TO_SUBMIT_JOB "srun -n NUM_PROCS")
+else()
+  message("srun not detected")
+  set(QSC_COMMAND_TO_SUBMIT_JOB "mpiexec -n NUM_PROCS")
+endif()
+
+#set(CMAKE_MODULE_PATH cmake)
+include(cmake/specificHosts.cmake)
+
+message("QSC_COMMAND_TO_SUBMIT_JOB is ${QSC_COMMAND_TO_SUBMIT_JOB}")
