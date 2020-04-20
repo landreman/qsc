@@ -10,7 +10,8 @@ pwd
 ls
 env
 which mpicc
-which mpiexec
+#which mpiexec
+which mpirun
 
 cmake --version
 
@@ -20,4 +21,4 @@ make
 
 bin/qsc_driver
 
-mpiexec -n 2 bin/qsc_driver
+mpirun -n 2 bin/qsc_driver

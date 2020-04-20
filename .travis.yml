@@ -12,7 +12,6 @@ dist: bionic
 addons:
   apt:
     packages:
-      - cmake
       - libopenmpi-dev
       - python3-numpy
       - libeigen3-dev
