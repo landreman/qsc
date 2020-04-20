@@ -17,3 +17,7 @@ cmake --version
 cmake .
 
 make
+
+bin/qsc_driver
+
+mpiexec -n 2 bin/qsc_driver
