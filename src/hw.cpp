@@ -1,7 +1,7 @@
-#include "qsc.hpp"
 #include <iostream>
 #include <mpi.h>
 #include <stdexcept>
+#include "qsc.hpp"
 
 void qsc::hw() {
   std::cout << "Hello world!!!" << std::endl;
@@ -15,4 +15,8 @@ void qsc::hw() {
   }
 
   MPI_Finalize();
+}
+
+int qsc::return5() {
+  return 5;
 }
