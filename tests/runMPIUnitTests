@@ -15,24 +15,21 @@ import os
 
 if not os.path.isfile("unitTests"):
     print("The executable `unitTests' does not appear to be present in the qsc/tests/ directory")
-    print("You need to run `make unitTests' from the main QSC directory to build the unitTests executable.")
+    print("You need to run `make unitTests' from the QSC build directory to build the unitTests executable.")
     exit(1)
 
 #####################################################################
 # Get QSC_COMMAND_TO_SUBMIT_JOB
 #####################################################################
 
+filename = "commandToSubmitJob"
 try:
-    submitCommand = os.environ["QSC_COMMAND_TO_SUBMIT_JOB"]
+    f = open(filename,"r")
 except:
-    submitCommand = ""
-
-# If QSC_COMMAND_TO_SUBMIT_JOB is not set, try getting it by running make in the parent directory:
-if submitCommand == "":
-    print('Running make to try to get QSC_COMMAND_TO_SUBMIT_JOB')
-    make_results = subprocess.run(['make','--directory=..','print_command_to_submit_job'],capture_output=True)
-    # The 'decode' in the next line is needed to convert the byte sequence returned by subprocess into a regular python string.
-    submitCommand = make_results.stdout.decode('utf-8').strip()
+    print("Error! Unable to open the file "+filename+" in the tests directory.")
+    exit(1)
+submitCommand = f.read()
+f.close()
 
 print("QSC_COMMAND_TO_SUBMIT_JOB=",submitCommand)
 
