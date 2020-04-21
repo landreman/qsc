@@ -65,12 +65,21 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR)
   message("Building in root directory, so not copying files from source to build location.")
 else()
   message("Copying files from source to build location.")
-  file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTests ${CMAKE_CURRENT_BINARY_DIR}/tests/runTests COPY_ON_ERROR SYMBOLIC)
-  file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/tests/runMPIUnitTests ${CMAKE_CURRENT_BINARY_DIR}/tests/runMPIUnitTests COPY_ON_ERROR SYMBOLIC)
+  message("CMake version: ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}")
+  # It is preferable to create links, but CMake only introduced links in version 3.14
+  if ((CMAKE_MAJOR_VERSION GREATER 3) OR (CMAKE_MINOR_VERSION GREATER 13))
+    message("  using links")
+    file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTests ${CMAKE_CURRENT_BINARY_DIR}/tests/runTests COPY_ON_ERROR SYMBOLIC)
+    file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/tests/runMPIUnitTests ${CMAKE_CURRENT_BINARY_DIR}/tests/runMPIUnitTests COPY_ON_ERROR SYMBOLIC)
+  else()
+    message("  using copy")
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/tests)
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tests/runMPIUnitTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/tests)
+  endif()
 endif()
 
 
-# Figure out the command to submit mpi jobs.
+# Figure out the command to submit mpi jobs. It should be either srun or mpiexec. Other batch systems besides Slurm are not supported.
 # First, see if the system uses slurm by checking for the "sinfo" command.
 execute_process(COMMAND "sinfo" RESULT_VARIABLE SINFO_RESULT OUTPUT_QUIET ERROR_QUIET)
 message("Result of 'sinfo': ${SINFO_RESULT}")

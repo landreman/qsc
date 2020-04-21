@@ -22,7 +22,4 @@ bin/qsc_driver
 
 mpiexec -n 2 bin/qsc_driver
 
-# Eventually this next line should possibly be set via the build system?
-export QSC_COMMAND_TO_SUBMIT_JOB="mpiexec -n NUM_PROCS --mca btl_base_warn_component_unused 0 --mca orte_base_help_aggregate 0"
-
 make test
