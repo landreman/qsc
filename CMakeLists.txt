@@ -58,16 +58,21 @@ set_property(TARGET unitTests PROPERTY EXCLUDE_FROM_ALL 1)
 add_custom_target(test COMMAND ./runTests WORKING_DIRECTORY tests DEPENDS unitTests)
 
 # Figure out the command to submit mpi jobs.
-# First, see if "srun" exists for this system.
-execute_process(COMMAND "which srun" OUTPUT_VARIABLE WHICH_SRUN)
-message("Result of 'which srun': ${WHICH_SRUN}")
-string(FIND WHICH_SRUN "srun" SRUN_FOUND)
-if (SRUN_FOUND GREATER 0)
+# First, see if the system uses slurm by checking for the "sinfo" command.
+execute_process(COMMAND "sinfo" RESULT_VARIABLE SINFO_RESULT OUTPUT_QUIET ERROR_QUIET)
+message("Result of 'sinfo': ${SINFO_RESULT}")
+# If sinfo ran successfully, the "result_variable" SINFO_RESULT will be 0.
+# Next, see if mpiexec exists:
+execute_process(COMMAND "mpiexec --version" RESULT_VARIABLE MPIEXEC_RESULT OUTPUT_QUIET ERROR_QUIET)
+message("Result of 'mpiexec --version': ${MPIEXEC_RESULT}")
+if (SINFO_RESULT EQUAL 0)
   message("srun detected")
   set(QSC_COMMAND_TO_SUBMIT_JOB "srun -n NUM_PROCS")
-else()
-  message("srun not detected")
+elseif (MPIEXEC_RESULT EQUAL 0)
+  message("srun not detected. mpiexec detected")
   set(QSC_COMMAND_TO_SUBMIT_JOB "mpiexec -n NUM_PROCS")
+else()
+  message("WARNING!! Neither slurm nor mpiexec was detected, so I am not sure how to launch MPI jobs.")
 endif()
 
 #set(CMAKE_MODULE_PATH cmake)

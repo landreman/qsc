@@ -15,6 +15,6 @@ elseif(DEFINED ENV{NERSC_HOST})
   message("Detected host is NERSC Cori")
 
 else()
-  message("This host is not one already known to qsc.")
+  message("This host is not one with specific rules for qsc.")
 
 endif()
