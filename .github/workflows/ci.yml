@@ -1,0 +1,91 @@
+# This file is based on examples in
+# https://docs.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions
+
+# Note that all the "sudo" commands here appear to cause a warning message
+# "sudo: setrlimit(RLIMIT_CORE): operation not permitted"
+# This appears to be a known harmless annoyance:
+# https://gitlab.alpinelinux.org/alpine/aports/-/issues/11122
+
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+
+    env:
+      OMPI_ALLOW_RUN_AS_ROOT: 1
+      OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
+
+    steps:
+    # First print out lots of information. We do this in separate 
+    # "name" blocks because otherwise the output gets mixed together
+    # in the github actions log.
+    
+    - name: Print user and group id
+      run: |
+        set -ex
+        id
+
+    - name: PWD
+      run: |
+        set -ex
+        pwd
+
+    - name: ls -l
+      run: |
+        set -ex
+        ls -l
+
+    - name: apt-get any needed packages
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential openmpi-bin libopenmpi-dev liblapack-dev git cmake
+
+    - name: Print versions
+      run: |
+        which mpicc
+        which mpiexec
+        cmake --version
+
+    - uses: actions/checkout@v2
+      # If we want submodules downloaded, uncomment the next 2 lines:
+      #with:
+      #  submodules: true
+
+    - name: which python3 after python setup
+      run: which python3
+
+    - name: which pip after python setup
+      run: pip --version
+
+    - name: which pip using sudo
+      run: sudo pip --version
+
+    - name: which pip using sudo -E
+      run: sudo -E pip --version
+
+    - name: which python using sudo
+      run: sudo which python3
+
+    - name: which python using sudo -E
+      run: sudo -E which python3
+
+    - name: env after adding python
+      run: env
+
+    - name: CMake configure
+      run: cmake .
+
+    - name: Compile
+      run: make
+
+    - name: Run driver
+      run: bin/qsc_driver
+
+    - name: Run driver with MPI
+      run: mpiexec -n 2 bin/qsc_driver
+
+    - name: Run tests
+      run: make test

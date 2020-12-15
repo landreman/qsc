@@ -3,11 +3,11 @@
 # This script runs the executable "unitTests" repeatedly, for various numbers of MPI processes.
 # The executable "unitTests" is created by running "make unitTests" from the main qsc directory.
 
-max_N_procs = 5
-
 import subprocess
 import sys
 import os
+
+max_N_procs = 5
 
 #####################################################################
 # Make sure unitTests exists
