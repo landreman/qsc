@@ -13,7 +13,10 @@ include_directories(include)
 include_directories(src)
 include_directories(externalPackages/doctest)
 
-# file(GLOB SOURCES "src/*.cpp")
+# Get a list of all source files except for the driver:
+file(GLOB SOURCES "src/*.cpp")
+list(REMOVE_ITEM SOURCES src/qsc.cpp)
+message("Sources: ${SOURCES}")
 
 # Set where the compiled library will go.
 # CMAKE_ARCHIVE_OUTPUT_DIRECTORY applies to static libraries.
@@ -25,11 +28,10 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY lib)
 # Set where the executable will go:
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
 
-add_library(qsc src/hw.cpp src/differentiation_matrix.cpp)
+add_library(qsc ${SOURCES})
 # Below, PUBLIC means that anything that links to qsc must also link to MPI.
 target_link_libraries(qsc PUBLIC MPI::MPI_CXX)
 
-#add_executable(qsc_driver ${SOURCES})
 add_executable(qsc_driver src/qsc.cpp)
 
 # qsc driver depends on the qsc library:
