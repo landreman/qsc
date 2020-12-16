@@ -1,5 +1,6 @@
 #include <iostream>
 #include <valarray>
+#include <cassert>
 #include "vector_matrix.hpp"
 
 using namespace qsc;
