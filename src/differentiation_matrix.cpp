@@ -7,7 +7,6 @@ Matrix qsc::differentiation_matrix(const int N, const QSC_REAL xmin, const QSC_R
     
   double h = 2 * pi / N;
 
-  // Do floor and ceil need a "std::" in front?
   int n1 = floor((N - 1.0) / 2);
   int n2 = ceil((N - 1.0) / 2);
   Vector topc(n2);
@@ -20,7 +19,6 @@ Matrix qsc::differentiation_matrix(const int N, const QSC_REAL xmin, const QSC_R
     // Even size:
     
     for (j = 0; j < n2; j++) {
-      // Coefficient in the next line is 1.0 in DMSuite:fourdif but 0.5 in sfincs/quasisymmetry.
       topc[j] = 0.5 / tan((j + 1) * h / 2);
     }
     for (j = 1; j < n2 + 1; j++) {
