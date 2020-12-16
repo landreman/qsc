@@ -11,7 +11,7 @@ set(CMAKE_VERBOSE_MAKEFILE on)
 
 include_directories(include)
 include_directories(src)
-include_directories(externalPackages/catch2)
+include_directories(externalPackages/doctest)
 
 # file(GLOB SOURCES "src/*.cpp")
 
@@ -41,7 +41,7 @@ add_executable(unitTests ${UNIT_TEST_SOURCES})
 target_link_libraries(unitTests PUBLIC qsc)
 # Put the unitTests executable in the "tests" directory:
 set_property(TARGET unitTests PROPERTY RUNTIME_OUTPUT_DIRECTORY tests)
-# Catch2 requires c++11
+# Doctest requires c++11
 set_property(TARGET unitTests PROPERTY CXX_STANDARD 11)
 # Do not build the unit tests by default, since they take some time to build:
 set_property(TARGET unitTests PROPERTY EXCLUDE_FROM_ALL 1)
