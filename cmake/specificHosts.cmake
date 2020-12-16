@@ -16,6 +16,12 @@ if(DEFINED ENV{TRAVIS_ARCH})
 elseif(DEFINED ENV{NERSC_HOST})
   message("Detected host is NERSC Cori")
 
+elseif($ENV{CLUSTER} STREQUAL "DRACO")
+  message("Detected host is IPP Draco")
+  # CMake detects gnu compiler unless you specify Intel:
+  set(CMAKE_CXX_COMPILER "mpiicpc")
+  #set(BLA_VENDOR Intel10_64ilp_seq)
+
 else()
   message("This host is not one with specific rules for qsc.")
 

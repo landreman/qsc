@@ -5,10 +5,36 @@ cmake_minimum_required (VERSION 3.9)
 # Comment out the next line when speed is needed
 set(CMAKE_BUILD_TYPE Debug)
 
+# Figure out the command to submit mpi jobs. It should be either srun or mpiexec. Other batch systems besides Slurm are not supported.
+# First, see if the system uses slurm by checking for the "sinfo" command.
+execute_process(COMMAND "sinfo" RESULT_VARIABLE SINFO_RESULT OUTPUT_QUIET ERROR_QUIET)
+message("Result of 'sinfo': ${SINFO_RESULT}")
+# If sinfo ran successfully, the "result_variable" SINFO_RESULT will be 0.
+# Next, see if mpiexec exists:
+execute_process(COMMAND mpiexec --version RESULT_VARIABLE MPIEXEC_RESULT OUTPUT_QUIET ERROR_QUIET)
+message("Result of 'mpiexec --version': ${MPIEXEC_RESULT}")
+# If mpiexec ran successfully, the "result_variable" MPIEXEC_RESULT will be 0.
+if (SINFO_RESULT EQUAL 0)
+  message("srun detected")
+  set(QSC_COMMAND_TO_SUBMIT_JOB "srun -n NUM_PROCS")
+elseif (MPIEXEC_RESULT EQUAL 0)
+  message("srun not detected. mpiexec detected")
+  set(QSC_COMMAND_TO_SUBMIT_JOB "mpiexec -n NUM_PROCS")
+else()
+  message("WARNING!! Neither slurm nor mpiexec was detected, so I am not sure how to launch MPI jobs.")
+endif()
+
+#set(CMAKE_MODULE_PATH cmake)
+include(cmake/specificHosts.cmake)
+
+message("QSC_COMMAND_TO_SUBMIT_JOB is ${QSC_COMMAND_TO_SUBMIT_JOB}")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/tests/commandToSubmitJob ${QSC_COMMAND_TO_SUBMIT_JOB})
+
 project(qsc LANGUAGES CXX)
 
-find_package(BLAS REQUIRED)
+message("BLA_VENDOR: ${BLA_VENDOR}")
 find_package(MPI REQUIRED)
+find_package(BLAS REQUIRED)
 
 # Tell "make" to print out the commands used for compiling and linking:
 set(CMAKE_VERBOSE_MAKEFILE on)
@@ -86,31 +112,6 @@ else()
   endif()
 endif()
 
-
-# Figure out the command to submit mpi jobs. It should be either srun or mpiexec. Other batch systems besides Slurm are not supported.
-# First, see if the system uses slurm by checking for the "sinfo" command.
-execute_process(COMMAND "sinfo" RESULT_VARIABLE SINFO_RESULT OUTPUT_QUIET ERROR_QUIET)
-message("Result of 'sinfo': ${SINFO_RESULT}")
-# If sinfo ran successfully, the "result_variable" SINFO_RESULT will be 0.
-# Next, see if mpiexec exists:
-execute_process(COMMAND mpiexec --version RESULT_VARIABLE MPIEXEC_RESULT OUTPUT_QUIET ERROR_QUIET)
-message("Result of 'mpiexec --version': ${MPIEXEC_RESULT}")
-# If mpiexec ran successfully, the "result_variable" MPIEXEC_RESULT will be 0.
-if (SINFO_RESULT EQUAL 0)
-  message("srun detected")
-  set(QSC_COMMAND_TO_SUBMIT_JOB "srun -n NUM_PROCS")
-elseif (MPIEXEC_RESULT EQUAL 0)
-  message("srun not detected. mpiexec detected")
-  set(QSC_COMMAND_TO_SUBMIT_JOB "mpiexec -n NUM_PROCS")
-else()
-  message("WARNING!! Neither slurm nor mpiexec was detected, so I am not sure how to launch MPI jobs.")
-endif()
-
-#set(CMAKE_MODULE_PATH cmake)
-include(cmake/specificHosts.cmake)
-
-message("QSC_COMMAND_TO_SUBMIT_JOB is ${QSC_COMMAND_TO_SUBMIT_JOB}")
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/tests/commandToSubmitJob ${QSC_COMMAND_TO_SUBMIT_JOB})
 
 find_package(GSL)
 message("GSL_FOUND = ${GSL_FOUND}")
