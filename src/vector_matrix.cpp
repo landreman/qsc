@@ -31,3 +31,14 @@ std::ostream& qsc::operator<< (std::ostream& os, Matrix& m) {
   return os;
 }
 
+Vector qsc::operator*(Matrix& m, Vector& v) {
+  assert(m.ncols() == v.size());
+  Vector result(m.nrows());
+  double sum = 0;
+  for (int j = 0; j < m.nrows(); j++) {
+    sum = 0;
+    for (int k = 0; k < v.size(); k++) sum += m(j, k) * v[k];
+    result[j] = sum;
+  }
+  return result;
+}

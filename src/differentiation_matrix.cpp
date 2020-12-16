@@ -2,7 +2,16 @@
 #include "qsc.hpp"
 
 using namespace qsc;
-  
+
+/**
+ * Return the spectral differentiation matrix for n grid points on the
+ * periodic domain [xmax, xmax). This routine is based on the matlab
+ * code in the DMSuite package by S.C. Reddy and J.A.C. Weideman,
+ * available at
+ * http://www.mathworks.com/matlabcentral/fileexchange/29
+ * or here:
+ * http://dip.sun.ac.za/~weideman/research/differ.html  
+ */
 Matrix qsc::differentiation_matrix(const int N, const QSC_REAL xmin, const QSC_REAL xmax) {
     
   double h = 2 * pi / N;

@@ -3,6 +3,7 @@
 #include "vector_matrix.hpp"
 
 using namespace qsc;
+using doctest::Approx;
 
 TEST_CASE("Create a matrix") {  
   Matrix m1(3, 4), m2(1, 3), m3(2, 2);
@@ -14,10 +15,9 @@ TEST_CASE("Set matrix to a constant") {
   m1 = 42.0;
   for (int j = 0; j < m1.ncols(); j++) {
     for (int k = 0; k < m1.nrows(); k++) {
-      CHECK(m1(k, j) == 42.0);
+      CHECK(m1(k, j) == Approx(42.0));
     }
   }
-  //CHECK(1 == 1);
 }
 /*
 TEST_CASE("Set matrix to a constant") {
@@ -43,3 +43,34 @@ TEST_CASE("Set matrix to a constant") {
   std::cout << "Here is v3: " << v3 << std::endl;
 }
 */
+
+TEST_CASE("matrix-vector multiply 1") {
+  Vector v1{0.6, 0.9, -1.2};
+  Matrix m(2, 3);
+  m(0, 0) = 1.1;
+  m(1, 0) = -0.3;
+  m(0, 1) = -0.1;
+  m(1, 1) = 0.7;
+  m(0, 2) = -1.3;
+  m(1, 2) = 0.5;
+
+  Vector v2 = m * v1;
+  CHECK(v2[0] == Approx(2.13));
+  CHECK(v2[1] == Approx(-0.15));
+}
+
+TEST_CASE("matrix-vector multiply 2") {
+  Vector v1{0.6, 0.9};
+  Matrix m(3, 2);
+  m(0, 0) = 1.1;
+  m(1, 0) = -0.3;
+  m(2, 0) = -0.1;
+  m(0, 1) = 0.7;
+  m(1, 1) = -1.3;
+  m(2, 1) = 0.5;
+
+  Vector v2 = m * v1;
+  CHECK(v2[0] == Approx(1.29));
+  CHECK(v2[1] == Approx(-1.35));
+  CHECK(v2[2] == Approx(0.39));
+}

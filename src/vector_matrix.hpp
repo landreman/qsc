@@ -32,6 +32,7 @@ namespace qsc {
   // https://stackoverflow.com/questions/3623631/where-should-non-member-operator-overloads-be-placed
   std::ostream& operator<<(std::ostream&, Vector&);
   std::ostream& operator<<(std::ostream&, Matrix&);
+  Vector operator*(Matrix&, Vector&);
 
   // inline functions must be included in every file that uses them,
   // so these functions should go in the header file.
