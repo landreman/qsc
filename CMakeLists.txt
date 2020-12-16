@@ -7,6 +7,7 @@ set(CMAKE_BUILD_TYPE Debug)
 
 project(qsc LANGUAGES CXX)
 
+find_package(BLAS REQUIRED)
 find_package(MPI REQUIRED)
 
 # Tell "make" to print out the commands used for compiling and linking:
@@ -33,7 +34,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
 
 add_library(qsc ${SOURCES})
 # Below, PUBLIC means that anything that links to qsc must also link to MPI.
-target_link_libraries(qsc PUBLIC MPI::MPI_CXX)
+target_link_libraries(qsc PUBLIC MPI::MPI_CXX ${BLAS_LIBRARIES})
 
 add_executable(qsc_driver src/qsc.cpp)
 
