@@ -10,6 +10,7 @@ find_package(MPI REQUIRED)
 set(CMAKE_VERBOSE_MAKEFILE on)
 
 include_directories(include)
+include_directories(src)
 include_directories(externalPackages/catch2)
 
 # file(GLOB SOURCES "src/*.cpp")
@@ -24,7 +25,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY lib)
 # Set where the executable will go:
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
 
-add_library(qsc src/hw.cpp)
+add_library(qsc src/hw.cpp src/differentiation_matrix.cpp)
 # Below, PUBLIC means that anything that links to qsc must also link to MPI.
 target_link_libraries(qsc PUBLIC MPI::MPI_CXX)
 
