@@ -2,6 +2,9 @@
 # Versions >= 3.9 have improved support for MPI: https://cliutils.gitlab.io/modern-cmake/chapters/packages/MPI.html
 cmake_minimum_required (VERSION 3.9)
 
+# Comment out the next line when speed is needed
+set(CMAKE_BUILD_TYPE Debug)
+
 project(qsc LANGUAGES CXX)
 
 find_package(MPI REQUIRED)
@@ -39,6 +42,7 @@ target_link_libraries(qsc_driver PUBLIC qsc)
 
 # Set up unitTests executable
 file(GLOB UNIT_TEST_SOURCES "src/tests/*.cpp")
+message("Tests: ${UNIT_TEST_SOURCES}")
 add_executable(unitTests ${UNIT_TEST_SOURCES})
 target_link_libraries(unitTests PUBLIC qsc)
 # Put the unitTests executable in the "tests" directory:
