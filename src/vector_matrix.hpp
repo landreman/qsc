@@ -2,6 +2,7 @@
 #define QSC_VECTOR_MATRIX_H
 
 #include <valarray>
+#include <iostream>
 
 namespace qsc {
   
