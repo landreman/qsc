@@ -13,7 +13,7 @@ int main(int argc, char* argv[]) {
 
   qsc::Qsc q;
   q.nfp = 3;
-  q.nphi = 31;
+  q.nphi = 63;
   
   q.R0c.resize(2, 0.0);
   q.R0s.resize(2, 0.0);

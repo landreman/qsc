@@ -19,6 +19,7 @@ namespace qsc {
     Matrix(index_type, index_type);
     index_type nrows();
     index_type ncols();
+    void resize(index_type, index_type, double);
     // For info about matrix indexing:
     // https://isocpp.org/wiki/faq/operator-overloading#matrix-subscript-op
     double& operator()(index_type, index_type);

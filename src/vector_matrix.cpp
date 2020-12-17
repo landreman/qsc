@@ -27,6 +27,13 @@ Matrix::Matrix(index_type nrows_in, index_type ncols_in)
   len_ = nrows_ * ncols_;
 }
 
+void Matrix::resize(index_type nrows_in, index_type ncols_in, double v) {
+  nrows_ = nrows_in;
+  ncols_ = ncols_in;
+  len_ = nrows_ * ncols_;
+  std::valarray<double>::resize(nrows_ * ncols_, v);
+}
+	       
 std::ostream& qsc::operator<< (std::ostream& os, Vector& v) {
   for (index_type j = 0; j < v.size(); j++) {
     if (j > 0) os << " ";
