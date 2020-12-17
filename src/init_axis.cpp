@@ -54,11 +54,11 @@ void Qsc::init_axis() {
 #define d_r_d_phi_cylindrical3 Z0p
 
 #define d2_r_d_phi2_cylindrical1 (R0pp - R0)
-#define d2_r_d_phi2_cylindrical2 (2 * R0p)
+#define d2_r_d_phi2_cylindrical2 (2.0 * R0p)
 #define d2_r_d_phi2_cylindrical3 Z0pp
 
-#define d3_r_d_phi3_cylindrical1 (R0ppp - 3*R0p)
-#define d3_r_d_phi3_cylindrical2 (3 * R0pp - R0)
+#define d3_r_d_phi3_cylindrical1 (R0ppp - 3.0 * R0p)
+#define d3_r_d_phi3_cylindrical2 (3.0 * R0pp - R0)
 #define d3_r_d_phi3_cylindrical3 Z0ppp
 
   tangent_cylindrical1 = d_r_d_phi_cylindrical1 / d_l_d_phi;
