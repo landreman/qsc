@@ -12,16 +12,7 @@ Qsc::Qsc(std::string config_name) :
   d_d_phi(1, 1),
   d_d_varphi(1, 1)
 {
-  // Defaults common to most or all of these configurations:
-  verbose = 1;
-  nphi = 31;
-  sG = 1;
-  spsi = 1;
-  B0 = 1.0;
-  I2 = 0.0;
-  sigma0 = 0.0;
-  B2s = 0.0;
-  B2c = 0.0;
+  defaults();
   
   if (config_name.compare("r1 section 5.1") == 0) {
     nfp = 3;
@@ -64,7 +55,7 @@ Qsc::Qsc(std::string config_name) :
   } else if (config_name.compare("r2 section 5.1") == 0 ||
 	     config_name.compare("1") == 0) {
     nfp = 2;
-    eta_bar = -0.64;
+    eta_bar = 0.64;
     B2c = -0.00322;
 
     R0c.resize(3, 0.0);
@@ -76,6 +67,80 @@ Qsc::Qsc(std::string config_name) :
     R0c[2] = 0.0102;
     Z0s[1] = 0.154;
     Z0s[2] = 0.0111;
+
+  } else if (config_name.compare("r2 section 5.2") == 0 ||
+	     config_name.compare("2") == 0) {
+    nfp = 2;
+    eta_bar = 0.632;
+    B2c = -0.158;
+
+    R0c.resize(4, 0.0);
+    R0s.resize(4, 0.0);
+    Z0c.resize(4, 0.0);
+    Z0s.resize(4, 0.0);
+    R0c[0] = 1.0;
+    R0c[1] = 0.173;
+    R0c[2] = 0.0168;
+    R0c[3] = 0.00101;
+    
+    Z0s[1] = 0.159;
+    Z0s[2] = 0.0165;
+    Z0s[3] = 0.000985;
+
+  } else if (config_name.compare("r2 section 5.3") == 0 ||
+	     config_name.compare("3") == 0) {
+    nfp = 2;
+    eta_bar = 0.95;
+    B2c = -0.7;
+    I2 = 0.9;
+    p2 = -600000.0;
+    
+    R0c.resize(2, 0.0);
+    R0s.resize(2, 0.0);
+    Z0c.resize(2, 0.0);
+    Z0s.resize(2, 0.0);
+    R0c[0] = 1.0;
+    R0c[1] = 0.09;
+    Z0s[1] = -0.09;
+
+  } else if (config_name.compare("r2 section 5.4") == 0 ||
+	     config_name.compare("4") == 0) {
+    nfp = 4;
+    eta_bar = 1.569;
+    B2c = 0.1348;
+
+    R0c.resize(5, 0.0);
+    R0s.resize(5, 0.0);
+    Z0c.resize(5, 0.0);
+    Z0s.resize(5, 0.0);
+    R0c[0] = 1.0;
+    R0c[1] = 0.17;
+    R0c[2] = 0.01804;
+    R0c[3] = 0.001409;
+    R0c[4] = 5.877e-05;
+    
+    Z0s[1] = 0.1581;
+    Z0s[2] = 0.01820;
+    Z0s[3] = 0.001548;
+    Z0s[4] = 7.772e-05;
+
+  } else if (config_name.compare("r2 section 5.5") == 0 ||
+	     config_name.compare("5") == 0) {
+    nfp = 5;
+    eta_bar = 2.5;
+    sigma0 = 0.3;
+    B2c = 1.0;
+    B2s = 3.0;
+    I2 = 1.6;
+    p2 = -0.5e7;
+
+    R0c.resize(2, 0.0);
+    R0s.resize(2, 0.0);
+    Z0c.resize(2, 0.0);
+    Z0s.resize(2, 0.0);
+    R0c[0] = 1.0;
+    R0c[1] = 0.3;
+    Z0s[1] = 0.3;
 
   } else {
     throw std::runtime_error("Configuration name not recognized");

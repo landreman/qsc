@@ -30,7 +30,7 @@ namespace qsc {
     int verbose;
     Vector R0c, R0s, Z0c, Z0s;
     int nphi, nfp;
-    double eta_bar, sigma0, B2c, B2s, I2;
+    double eta_bar, sigma0, B2c, B2s, I2, p2;
     Vector phi, R0, Z0, R0p, Z0p, R0pp, Z0pp, R0ppp, Z0ppp;
     Vector d_l_d_phi, d2_l_d_phi2;
     Vector curvature, torsion;
@@ -44,6 +44,7 @@ namespace qsc {
     
     Qsc();
     Qsc(std::string);
+    void defaults();
     void allocate();
     void init_axis();
     void calculate();
