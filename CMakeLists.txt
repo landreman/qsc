@@ -1,6 +1,7 @@
 # I don't really know what minimum version is required, but if you don't specify one, cmake gives a warning.
 # Versions >= 3.9 have improved support for MPI: https://cliutils.gitlab.io/modern-cmake/chapters/packages/MPI.html
-cmake_minimum_required (VERSION 3.9)
+# The command add_compile_definitions, used in this file, was new in CMake version 3.12.
+cmake_minimum_required (VERSION 3.12)
 
 # Comment out the next line when speed is needed
 set(CMAKE_BUILD_TYPE Debug)
@@ -59,26 +60,42 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY lib)
 # Set where the executable will go:
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
 
-add_library(qsc ${SOURCES})
-# Below, PUBLIC means that anything that links to qsc must also link to MPI.
-target_link_libraries(qsc PUBLIC MPI::MPI_CXX ${BLAS_LIBRARIES})
+# single precision is off by default
+option(SINGLE "Compile in single precision" OFF)
+if (SINGLE)
+  message("Compiling in SINGLE precision")
+  # Add -DFOO to the compile statements
+  add_compile_definitions(SINGLE)
+  set(QSC_LIB qsc_single)
+  set(QSC_DRIVER qsc_driver_single)
+  set(QSC_TESTS unitTests_single)
+else()
+  message("Compiling in DOUBLE precision")
+  set(QSC_LIB qsc)
+  set(QSC_DRIVER qsc_driver)
+  set(QSC_TESTS unitTests)
+endif()
 
-add_executable(qsc_driver src/qsc_driver.cpp)
+add_library(${QSC_LIB} ${SOURCES})
+# Below, PUBLIC means that anything that links to qsc must also link to MPI.
+target_link_libraries(${QSC_LIB} PUBLIC MPI::MPI_CXX ${BLAS_LIBRARIES})
+
+add_executable(${QSC_DRIVER} src/qsc_driver.cpp)
 
 # qsc driver depends on the qsc library:
-target_link_libraries(qsc_driver PUBLIC qsc)
+target_link_libraries(${QSC_DRIVER} PUBLIC ${QSC_LIB})
 
 # Set up unitTests executable
 file(GLOB UNIT_TEST_SOURCES "src/tests/*.cpp")
 message("Tests: ${UNIT_TEST_SOURCES}")
-add_executable(unitTests ${UNIT_TEST_SOURCES})
-target_link_libraries(unitTests PUBLIC qsc)
+add_executable(${QSC_TESTS} ${UNIT_TEST_SOURCES})
+target_link_libraries(${QSC_TESTS} PUBLIC ${QSC_LIB})
 # Put the unitTests executable in the "tests" directory:
-set_property(TARGET unitTests PROPERTY RUNTIME_OUTPUT_DIRECTORY tests)
+set_property(TARGET ${QSC_TESTS} PROPERTY RUNTIME_OUTPUT_DIRECTORY tests)
 # Doctest requires c++11
-set_property(TARGET unitTests PROPERTY CXX_STANDARD 11)
+set_property(TARGET ${QSC_TESTS} PROPERTY CXX_STANDARD 11)
 # Do not build the unit tests by default, since they take some time to build:
-set_property(TARGET unitTests PROPERTY EXCLUDE_FROM_ALL 1)
+set_property(TARGET ${QSC_TESTS} PROPERTY EXCLUDE_FROM_ALL 1)
 
 
 
@@ -91,7 +108,7 @@ set_property(TARGET unitTests PROPERTY EXCLUDE_FROM_ALL 1)
 
 # Set up "make test" so it runs the scripts I want it to run.
 # See https://cmake.org/cmake/help/latest/command/add_custom_target.html
-add_custom_target(test COMMAND ./runTests WORKING_DIRECTORY tests DEPENDS unitTests)
+add_custom_target(test COMMAND ./runTests WORKING_DIRECTORY tests DEPENDS ${QSC_TESTS})
 
 # Copy some files from the source to the build locations
 message("CMAKE_CURRENT_SOURCE_DIR is ${CMAKE_CURRENT_SOURCE_DIR}")
@@ -121,4 +138,3 @@ if(GSL_FOUND)
 else()
   message("Could not find GSL")
 endif()
-

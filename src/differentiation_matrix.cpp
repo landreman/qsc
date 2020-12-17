@@ -12,9 +12,9 @@ using namespace qsc;
  * or here:
  * http://dip.sun.ac.za/~weideman/research/differ.html  
  */
-Matrix qsc::differentiation_matrix(const int N, const QSC_REAL xmin, const QSC_REAL xmax) {
+Matrix qsc::differentiation_matrix(const int N, const qscfloat xmin, const qscfloat xmax) {
     
-  double h = 2 * pi / N;
+  qscfloat h = 2 * pi / N;
 
   int n1 = floor((N - 1.0) / 2);
   int n2 = ceil((N - 1.0) / 2);

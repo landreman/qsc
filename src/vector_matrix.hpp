@@ -5,12 +5,20 @@
 #include <iostream>
 
 namespace qsc {
+
+#ifdef SINGLE
+  typedef float qscfloat;
+  const int single = 1;
+#else
+  typedef double qscfloat;
+  const int single = 0;
+#endif
   
-  typedef std::valarray<double> Vector;
+  typedef std::valarray<qscfloat> Vector;
   // typedef unsigned index_type;
   typedef int index_type;
 
-  class Matrix : public std::valarray<double> {
+  class Matrix : public std::valarray<qscfloat> {
 
   private:
     index_type nrows_, ncols_, len_;
@@ -19,12 +27,12 @@ namespace qsc {
     Matrix(index_type, index_type);
     index_type nrows();
     index_type ncols();
-    void resize(index_type, index_type, double);
+    void resize(index_type, index_type, qscfloat);
     // For info about matrix indexing:
     // https://isocpp.org/wiki/faq/operator-overloading#matrix-subscript-op
-    double& operator()(index_type, index_type);
-    double  operator()(index_type, index_type) const;
-    Matrix& operator=(const double);
+    qscfloat& operator()(index_type, index_type);
+    qscfloat  operator()(index_type, index_type) const;
+    Matrix& operator=(const qscfloat);
     Matrix& operator=(const Matrix&);
   };
 
@@ -36,9 +44,9 @@ namespace qsc {
   Vector operator*(Matrix&, Vector&);
 
   /*
-  // Multiplication of an int with std::valarray<double> is not included in some compilers:
+  // Multiplication of an int with std::valarray<qscfloat> is not included in some compilers:
   inline Vector operator*(int j, Vector& v) {
-    return std::operator*(double(j), v);
+    return std::operator*(qscfloat(j), v);
   }
   */
 
@@ -52,23 +60,23 @@ namespace qsc {
     return ncols_;
   }
 
-  inline double& Matrix::operator()(index_type m, index_type n) {
+  inline qscfloat& Matrix::operator()(index_type m, index_type n) {
     return (*this)[m + nrows_ * n];
   }
 
-  inline double Matrix::operator()(index_type m, index_type n) const {
+  inline qscfloat Matrix::operator()(index_type m, index_type n) const {
     return (*this)[m + nrows_ * n];
   }
 
-  inline Matrix& Matrix::operator=(const double v) {
+  inline Matrix& Matrix::operator=(const qscfloat v) {
     // Delegate to parent class:
-    std::valarray<double>::operator=(v);
+    std::valarray<qscfloat>::operator=(v);
     return *this;
   }
 
   inline Matrix& Matrix::operator=(const Matrix &v) {
     // Delegate to parent class:
-    std::valarray<double>::operator=(v);
+    std::valarray<qscfloat>::operator=(v);
     return *this;
   }
 

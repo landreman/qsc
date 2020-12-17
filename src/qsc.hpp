@@ -1,18 +1,14 @@
 #ifndef QSC_H
 #define QSC_H
 
-#ifndef QSC_REAL
-#define QSC_REAL double
-#endif
-
 #include <string>
 #include "vector_matrix.hpp"
 
 namespace qsc {  
 
-  const double pi = 3.141592653589793;
+  const qscfloat pi = 3.141592653589793;
   
-  Matrix differentiation_matrix(const int N, const QSC_REAL xmin, const QSC_REAL xmax);
+  Matrix differentiation_matrix(const int N, const qscfloat xmin, const qscfloat xmax);
 
   class Qsc {
   private:
@@ -30,14 +26,14 @@ namespace qsc {
     int verbose;
     Vector R0c, R0s, Z0c, Z0s;
     int nphi, nfp;
-    double eta_bar, sigma0, B2c, B2s, I2, p2;
+    qscfloat eta_bar, sigma0, B2c, B2s, I2, p2;
     Vector phi, R0, Z0, R0p, Z0p, R0pp, Z0pp, R0ppp, Z0ppp;
     Vector d_l_d_phi, d2_l_d_phi2;
     Vector curvature, torsion;
-    double d_phi, B0, G0, B0_over_abs_G0, abs_G0_over_B0, d_l_d_varphi;
+    qscfloat d_phi, B0, G0, B0_over_abs_G0, abs_G0_over_B0, d_l_d_varphi;
     int sG, spsi, helicity;
-    double axis_length, rms_curvature;
-    double mean_R, mean_Z, standard_deviation_of_R, standard_deviation_of_Z;
+    qscfloat axis_length, rms_curvature;
+    qscfloat mean_R, mean_Z, standard_deviation_of_R, standard_deviation_of_Z;
     Matrix d_d_phi, d_d_varphi;
     Vector X1s, X1c;
     Vector Boozer_toroidal_angle;
