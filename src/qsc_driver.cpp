@@ -9,6 +9,7 @@ int main(int argc, char* argv[]) {
   std::cout << m(1, 1) << std::endl;
   std::cout << m << std::endl;
 
+  /*
   qsc::Qsc q;
   q.nfp = 3;
   q.nphi = 63;
@@ -23,7 +24,9 @@ int main(int argc, char* argv[]) {
   
   q.allocate();
   q.init_axis();
-
+  */
+  qsc::Qsc q("r1 section 5.1");
+  qsc::Qsc q2("1");
   /*
   qsc::Vector foo;
   foo.resize(3, 42.0);

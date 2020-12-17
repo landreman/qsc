@@ -23,22 +23,22 @@ void Qsc::init_axis() {
   Z0pp = 0.0;
   R0ppp = 0.0;
   Z0ppp = 0.0;
-  for (n = 1; n <= R0c.size(); n++) {
+  for (n = 1; n < R0c.size(); n++) {
     sinangle = sin(double(n * nfp) * phi);
     cosangle = cos(double(n * nfp) * phi);
-    R0 = R0 + R0c[n] * cosangle + R0s[n] * sinangle;
-    Z0 = Z0 + Z0c[n] * cosangle + Z0s[n] * sinangle;
+    R0 += R0c[n] * cosangle + R0s[n] * sinangle;
+    Z0 += Z0c[n] * cosangle + Z0s[n] * sinangle;
     //R0_extended = R0_extended + R0c[n] * cosangle + R0s[n] * sinangle;
     //Z0_extended = Z0_extended + R0c[n] * cosangle + R0s[n] * sinangle;
-    R0p = R0p + R0c[n] * (-n*nfp)*sinangle + R0s[n] * (n*nfp)*cosangle;
-    Z0p = Z0p + Z0c[n] * (-n*nfp)*sinangle + Z0s[n] * (n*nfp)*cosangle;
-    R0pp = R0pp + R0c[n] * (-n*nfp*n*nfp)*cosangle
+    R0p += R0c[n] * (-n*nfp)*sinangle + R0s[n] * (n*nfp)*cosangle;
+    Z0p += Z0c[n] * (-n*nfp)*sinangle + Z0s[n] * (n*nfp)*cosangle;
+    R0pp += R0c[n] * (-n*nfp*n*nfp)*cosangle
       + R0s[n] * (-n*nfp*n*nfp)*sinangle;
-    Z0pp = Z0pp + Z0c[n] * (-n*nfp*n*nfp)*cosangle
+    Z0pp += Z0c[n] * (-n*nfp*n*nfp)*cosangle
       + Z0s[n] * (-n*nfp*n*nfp)*sinangle;
-    R0ppp = R0ppp + R0c[n] * (n*nfp*n*nfp*n*nfp)*sinangle
+    R0ppp += R0c[n] * (n*nfp*n*nfp*n*nfp)*sinangle
       + R0s[n] * (-n*nfp*n*nfp*n*nfp)*cosangle;
-    Z0ppp = Z0ppp + Z0c[n] * (n*nfp*n*nfp*n*nfp)*sinangle
+    Z0ppp += Z0c[n] * (n*nfp*n*nfp*n*nfp)*sinangle
       + Z0s[n] * (-n*nfp*n*nfp*n*nfp)*cosangle;
   }
   d_l_d_phi = sqrt(R0 * R0 + R0p * R0p + Z0p * Z0p);
@@ -73,7 +73,22 @@ void Qsc::init_axis() {
   
   d_tangent_d_l_cylindrical3 = (-d_r_d_phi_cylindrical3 * d2_l_d_phi2 / d_l_d_phi 
 				+ d2_r_d_phi2_cylindrical3) / (d_l_d_phi * d_l_d_phi);
-
+  /*
+  std::cout << "R0: " << R0 << std::endl;
+  std::cout << "Z0: " << Z0 << std::endl;
+  std::cout << "R0p: " << R0p << std::endl;
+  std::cout << "Z0p: " << Z0p << std::endl;
+  std::cout << "R0pp: " << R0pp << std::endl;
+  std::cout << "Z0pp: " << Z0pp << std::endl;
+  std::cout << "R0ppp: " << R0ppp << std::endl;
+  std::cout << "Z0ppp: " << Z0ppp << std::endl;
+  std::cout << "d_r_d_phi_cylindrical1: " << d_r_d_phi_cylindrical1 << std::endl;
+  std::cout << "d_r_d_phi_cylindrical2: " << d_r_d_phi_cylindrical2 << std::endl;
+  std::cout << "d_r_d_phi_cylindrical3: " << d_r_d_phi_cylindrical3 << std::endl;
+  std::cout << "d_tangent_d_l_cylindrical1: " << d_tangent_d_l_cylindrical1 << std::endl;
+  std::cout << "d_tangent_d_l_cylindrical2: " << d_tangent_d_l_cylindrical2 << std::endl;
+  std::cout << "d_tangent_d_l_cylindrical3: " << d_tangent_d_l_cylindrical3 << std::endl;
+  */
   curvature = sqrt(d_tangent_d_l_cylindrical1 * d_tangent_d_l_cylindrical1 +
 		   d_tangent_d_l_cylindrical2 * d_tangent_d_l_cylindrical2 +
 		   d_tangent_d_l_cylindrical3 * d_tangent_d_l_cylindrical3);

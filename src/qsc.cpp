@@ -14,6 +14,8 @@ Qsc::Qsc() :
   spsi = 1;
   B0 = 1.0;
   eta_bar = -1.0;
+  I2 = 0.0;
+  sigma0 = 0.0;
 
   nfp = 3;
   nphi = 15;
@@ -23,4 +25,11 @@ Qsc::Qsc() :
   Z0c.resize(1, 0.0);
   Z0s.resize(1, 0.0);
 
+}
+
+/** High-level routine to call the low-level routines.
+ */
+void Qsc::calculate() {
+  allocate();
+  init_axis();
 }

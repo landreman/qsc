@@ -5,6 +5,7 @@
 #define QSC_REAL double
 #endif
 
+#include <string>
 #include "vector_matrix.hpp"
 
 namespace qsc {  
@@ -29,7 +30,7 @@ namespace qsc {
     int verbose;
     Vector R0c, R0s, Z0c, Z0s;
     int nphi, nfp;
-    double eta_bar;
+    double eta_bar, sigma0, B2c, B2s, I2;
     Vector phi, R0, Z0, R0p, Z0p, R0pp, Z0pp, R0ppp, Z0ppp;
     Vector d_l_d_phi, d2_l_d_phi2;
     Vector curvature, torsion;
@@ -42,8 +43,10 @@ namespace qsc {
     Vector Boozer_toroidal_angle;
     
     Qsc();
+    Qsc(std::string);
     void allocate();
     void init_axis();
+    void calculate();
   };
 }
 
