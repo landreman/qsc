@@ -8,6 +8,8 @@ Qsc::Qsc() :
   d_d_varphi(1, 1)
 {
   // Set defaults.
+  verbose = 1;
+  
   sG = 1;
   spsi = 1;
   B0 = 1.0;

@@ -135,6 +135,8 @@ void Qsc::init_axis() {
       + (d_l_d_phi[j - 1] + d_l_d_phi[j]);
   }
   Boozer_toroidal_angle *= (0.5 * d_phi * 2 * pi / axis_length);
+
+  calculate_helicity();
   
   std::cout << "R0c:" << R0c << std::endl;
   std::cout << "R0s:" << R0s << std::endl;

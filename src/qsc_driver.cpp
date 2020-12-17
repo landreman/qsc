@@ -2,8 +2,6 @@
 #include "qsc.hpp"
 
 int main(int argc, char* argv[]) {
-  qsc::hw();
-
   qsc::Matrix m = qsc::differentiation_matrix(4, 0, 2 * qsc::pi);
   std::cout << m << std::endl;
 

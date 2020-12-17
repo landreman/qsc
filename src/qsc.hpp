@@ -13,9 +13,6 @@ namespace qsc {
   
   Matrix differentiation_matrix(const int N, const QSC_REAL xmin, const QSC_REAL xmax);
 
-  void hw();
-  int return5();
-
   class Qsc {
   private:
     Vector sinangle, cosangle, tempvec, tempvec1, tempvec2, tempvec3;
@@ -24,8 +21,12 @@ namespace qsc {
     Vector binormal_cylindrical1, binormal_cylindrical2, binormal_cylindrical3;
     Vector d_tangent_d_l_cylindrical1, d_tangent_d_l_cylindrical2, d_tangent_d_l_cylindrical3;
     Vector torsion_numerator, torsion_denominator, B1Squared_over_curvatureSquared;
+    std::valarray<int> quadrant;
+    
+    void calculate_helicity();
     
   public:
+    int verbose;
     Vector R0c, R0s, Z0c, Z0s;
     int nphi, nfp;
     double eta_bar;
@@ -33,7 +34,7 @@ namespace qsc {
     Vector d_l_d_phi, d2_l_d_phi2;
     Vector curvature, torsion;
     double d_phi, B0, G0, B0_over_abs_G0, abs_G0_over_B0, d_l_d_varphi;
-    int sG, spsi;
+    int sG, spsi, helicity;
     double axis_length, rms_curvature;
     double mean_R, mean_Z, standard_deviation_of_R, standard_deviation_of_Z;
     Matrix d_d_phi, d_d_varphi;

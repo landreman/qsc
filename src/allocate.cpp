@@ -55,4 +55,5 @@ void Qsc::allocate() {
   
   X1s.resize(nphi, 0.0);
   X1c.resize(nphi, 0.0);
+  quadrant.resize(nphi + 1, 0);
 }
