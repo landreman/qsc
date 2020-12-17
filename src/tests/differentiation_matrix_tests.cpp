@@ -203,3 +203,30 @@ TEST_CASE("5x5 differentiation matrix, shifted") {
     }
   }
 }
+
+TEST_CASE("differentiation matrix: Check derivatives of sine(n*x) are exact") {
+  double xmin = -3.4, xmax = -0.7, L;
+  L = xmax - xmin;
+  Vector phi, x, dx;
+  for (int nphi = 11; nphi < 21; nphi += 2) {
+    Matrix ddx = differentiation_matrix(nphi, xmin, xmax);
+    phi.resize(nphi, 0.0);
+    x.resize(nphi, 0.0);
+    dx.resize(nphi, 0.0);
+    for (int n = 0; n < int(floor(nphi / 2)); n++) {
+      for (double phase = 0; phase < 0.5; phase += 0.3) {
+	//std::cout << "nphi=" << nphi << " n=" << n << " phase=" << phase << std::endl;
+	for (int k = 0; k < nphi; k++) {
+	  phi[k] = xmin + k * L / nphi;
+	  x[k] = sin(n * phi[k] * 2 * pi / L + phase);
+	  dx[k] = (n * 2 * pi / L) * cos(n * phi[k] * 2 * pi / L + phase);
+	}
+	Vector dx_matmul = ddx * x;
+	for (int k = 0; k < nphi; k++) {
+	  CHECK(dx[k] == Approx(dx_matmul[k]));
+	}
+      }
+    }
+  }
+}
+
