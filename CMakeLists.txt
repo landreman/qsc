@@ -25,7 +25,7 @@ else()
 endif()
 
 #set(CMAKE_MODULE_PATH cmake)
-include(cmake/specificHosts.cmake)
+include(cmake/knownHosts.cmake)
 
 message("QSC_COMMAND_TO_SUBMIT_JOB is ${QSC_COMMAND_TO_SUBMIT_JOB}")
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/tests/commandToSubmitJob ${QSC_COMMAND_TO_SUBMIT_JOB})
@@ -45,7 +45,9 @@ include_directories(externalPackages/doctest)
 
 # Get a list of all source files except for the driver:
 file(GLOB SOURCES "src/*.cpp")
-list(REMOVE_ITEM SOURCES src/qsc.cpp)
+#list(REMOVE_ITEM SOURCES src/qsc.cpp)
+message("Sources before filter: ${SOURCES}")
+list(FILTER SOURCES EXCLUDE REGEX ".*qsc.cpp$")
 message("Sources: ${SOURCES}")
 
 # Set where the compiled library will go.

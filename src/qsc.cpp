@@ -10,6 +10,26 @@ int main(int argc, char* argv[]) {
   m = 4.3;
   std::cout << m(1, 1) << std::endl;
   std::cout << m << std::endl;
+
+  qsc::Qsc q;
+  q.nfp = 3;
+  q.nphi = 31;
+  
+  q.R0c.resize(2, 0.0);
+  q.R0s.resize(2, 0.0);
+  q.Z0c.resize(2, 0.0);
+  q.Z0s.resize(2, 0.0);
+  q.R0c[0] = 1.0;
+  q.R0c[1] = 0.045;
+  q.Z0s[1] = -0.045;
+  
+  q.allocate();
+  q.init_axis();
+  /*
+  std::cout << "R0:" << q.R0 << std::endl;
+  std::cout << "Z0:" << q.Z0 << std::endl;
+  */
+  std::cout << "Good bye." << std::endl;
   
   return 0;
 }

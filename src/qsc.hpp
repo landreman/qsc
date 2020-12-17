@@ -15,6 +15,20 @@ namespace qsc {
 
   void hw();
   int return5();
+
+  class Qsc {
+  private:
+    Vector sinangle, cosangle;
+  public:
+    Vector R0c, R0s, Z0c, Z0s;
+    int nphi, nfp;
+    Vector phi, R0, Z0, R0p, Z0p, R0pp, Z0pp, R0ppp, Z0ppp;
+    Vector curvature, torsion;
+    double d_phi;
+
+    void allocate();
+    void init_axis();
+  };
 }
 
 #endif
