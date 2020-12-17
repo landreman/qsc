@@ -1,35 +1,15 @@
-#include <iostream>
 #include "qsc.hpp"
 
-int main(int argc, char* argv[]) {
-  qsc::hw();
+using namespace qsc;
 
-  qsc::Matrix m = qsc::differentiation_matrix(4, 0, 2 * qsc::pi);
-  std::cout << m << std::endl;
+Qsc::Qsc() {
+  // Set defaults.
+  sG = 1;
+  spsi = 1;
+  B0 = 1.0;
 
-  m = 4.3;
-  std::cout << m(1, 1) << std::endl;
-  std::cout << m << std::endl;
-
-  qsc::Qsc q;
-  q.nfp = 3;
-  q.nphi = 31;
-  
-  q.R0c.resize(2, 0.0);
-  q.R0s.resize(2, 0.0);
-  q.Z0c.resize(2, 0.0);
-  q.Z0s.resize(2, 0.0);
-  q.R0c[0] = 1.0;
-  q.R0c[1] = 0.045;
-  q.Z0s[1] = -0.045;
-  
-  q.allocate();
-  q.init_axis();
-  /*
-  std::cout << "R0:" << q.R0 << std::endl;
-  std::cout << "Z0:" << q.Z0 << std::endl;
-  */
-  std::cout << "Good bye." << std::endl;
-  
-  return 0;
+  R0c.resize(1, 1.0);
+  R0s.resize(1, 0.0);
+  Z0c.resize(1, 0.0);
+  Z0s.resize(1, 0.0);
 }

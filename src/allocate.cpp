@@ -21,4 +21,6 @@ void Qsc::allocate() {
   torsion.resize(nphi, 0.0);
   sinangle.resize(nphi, 0.0);
   cosangle.resize(nphi, 0.0);
+  d_l_d_phi.resize(nphi, 0.0);
+  d2_l_d_phi2.resize(nphi, 0.0);
 }

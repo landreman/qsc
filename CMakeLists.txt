@@ -45,9 +45,8 @@ include_directories(externalPackages/doctest)
 
 # Get a list of all source files except for the driver:
 file(GLOB SOURCES "src/*.cpp")
-#list(REMOVE_ITEM SOURCES src/qsc.cpp)
 message("Sources before filter: ${SOURCES}")
-list(FILTER SOURCES EXCLUDE REGEX ".*qsc.cpp$")
+list(FILTER SOURCES EXCLUDE REGEX ".*qsc_driver.cpp$")
 message("Sources: ${SOURCES}")
 
 # Set where the compiled library will go.
@@ -64,7 +63,7 @@ add_library(qsc ${SOURCES})
 # Below, PUBLIC means that anything that links to qsc must also link to MPI.
 target_link_libraries(qsc PUBLIC MPI::MPI_CXX ${BLAS_LIBRARIES})
 
-add_executable(qsc_driver src/qsc.cpp)
+add_executable(qsc_driver src/qsc_driver.cpp)
 
 # qsc driver depends on the qsc library:
 target_link_libraries(qsc_driver PUBLIC qsc)

@@ -23,9 +23,12 @@ namespace qsc {
     Vector R0c, R0s, Z0c, Z0s;
     int nphi, nfp;
     Vector phi, R0, Z0, R0p, Z0p, R0pp, Z0pp, R0ppp, Z0ppp;
+    Vector d_l_d_phi, d2_l_d_phi2;
     Vector curvature, torsion;
-    double d_phi;
+    double d_phi, B0, G0, B0_over_abs_G0, abs_G0_over_B0, d_l_d_varphi;
+    int sG, spsi;
 
+    Qsc();
     void allocate();
     void init_axis();
   };
