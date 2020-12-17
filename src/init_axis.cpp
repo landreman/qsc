@@ -23,8 +23,8 @@ void Qsc::init_axis() {
   R0ppp = 0.0;
   Z0ppp = 0.0;
   for (n = 1; n <= R0c.size(); n++) {
-    sinangle = sin(n * nfp * phi);
-    cosangle = cos(n * nfp * phi);
+    sinangle = sin(double(n * nfp) * phi);
+    cosangle = cos(double(n * nfp) * phi);
     R0 = R0 + R0c[n] * cosangle + R0s[n] * sinangle;
     Z0 = Z0 + Z0c[n] * cosangle + Z0s[n] * sinangle;
     //R0_extended = R0_extended + R0c[n] * cosangle + R0s[n] * sinangle;

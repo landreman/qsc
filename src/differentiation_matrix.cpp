@@ -54,7 +54,7 @@ Matrix qsc::differentiation_matrix(const int N, const QSC_REAL xmin, const QSC_R
   for (j = 1; j < N; j += 2) {
     col1[j] = -col1[j];
   }
-  col1 = 2 * pi / (xmax - xmin) * col1;
+  col1 = (2 * pi / (xmax - xmin)) * col1;
 
   // Create a Toeplitz matrix:
   for (j = 0; j < N; j++) {

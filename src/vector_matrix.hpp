@@ -34,6 +34,13 @@ namespace qsc {
   std::ostream& operator<<(std::ostream&, Matrix&);
   Vector operator*(Matrix&, Vector&);
 
+  /*
+  // Multiplication of an int with std::valarray<double> is not included in some compilers:
+  inline Vector operator*(int j, Vector& v) {
+    return std::operator*(double(j), v);
+  }
+  */
+
   // inline functions must be included in every file that uses them,
   // so these functions should go in the header file.
   inline index_type Matrix::nrows() {
