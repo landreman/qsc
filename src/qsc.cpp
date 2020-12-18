@@ -19,9 +19,13 @@ void Qsc::defaults() {
   nfp = 3;
   nphi = 15;
 
-  max_newton_iterations = 20;
-  max_linesearch_iterations = 8;
-  newton_tolerance = 1.0e-12;
+  max_newton_iterations = 12;
+  max_linesearch_iterations = 4;
+  if (single) {
+    newton_tolerance = 1.0e-12;
+  } else {
+    newton_tolerance = 1.0e-6;
+  }
 }
 
 Qsc::Qsc() :
