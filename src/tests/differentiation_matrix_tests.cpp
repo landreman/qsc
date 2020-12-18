@@ -208,6 +208,12 @@ TEST_CASE("differentiation matrix: Check derivatives of sine(n*x) are exact") {
   double xmin = -3.4, xmax = -0.7, L;
   L = xmax - xmin;
   Vector phi, x, dx;
+  double tol;
+  if (single) {
+    tol = 1e-4;
+  } else {
+    tol = 1e-13;
+  }
   for (int nphi = 11; nphi < 21; nphi += 2) {
     Matrix ddx = differentiation_matrix(nphi, xmin, xmax);
     phi.resize(nphi, 0.0);
@@ -223,7 +229,7 @@ TEST_CASE("differentiation matrix: Check derivatives of sine(n*x) are exact") {
 	}
 	Vector dx_matmul = ddx * x;
 	for (int k = 0; k < nphi; k++) {
-	  CHECK(dx[k] == Approx(dx_matmul[k]));
+	  CHECK(dx[k] == Approx(dx_matmul[k]).epsilon(tol));
 	}
       }
     }

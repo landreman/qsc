@@ -42,9 +42,9 @@ By default the code uses double precision for all calculations, but it
 is also possible to build the code using single precision. To do this,
 run
 ~~~~
-cmake -DSINGLE=1 .
+cmake -DSINGLE=ON .
 ~~~~
-(Alternative flags like `-DSINGLE=ON` also work.) Then run `make` as before.
+(Alternative flags like `-DSINGLE=1` also work.) Then run `make` as before.
 The library and driver that are then compiled will be named `libqsc_single.a` and `qsc_driver_single`.
 
 
