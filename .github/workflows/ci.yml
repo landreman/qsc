@@ -18,6 +18,11 @@ jobs:
       OMPI_ALLOW_RUN_AS_ROOT: 1
       OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
 
+    strategy:
+      fail-fast: false
+      matrix:
+        single-precision: [0, 1]
+
     steps:
     # First print out lots of information. We do this in separate 
     # "name" blocks because otherwise the output gets mixed together
@@ -76,7 +81,7 @@ jobs:
       run: env
 
     - name: CMake configure
-      run: cmake .
+      run: cmake -DSINGLE={{ matrix.single-precision }} .
 
     - name: Compile
       run: make

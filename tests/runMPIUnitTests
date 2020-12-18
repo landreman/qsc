@@ -13,7 +13,11 @@ max_N_procs = 3
 # Make sure unitTests exists
 #####################################################################
 
-if not os.path.isfile("unitTests"):
+if os.path.isfile("unitTests"):
+    testfile = "unitTests"
+elif os.path.isfile("unitTests_single"):
+    testfile = "unitTests_single"
+else:
     print("The executable `unitTests' does not appear to be present in the qsc/tests/ directory")
     print("You need to run `make unitTests' from the QSC build directory to build the unitTests executable.")
     exit(1)
@@ -39,7 +43,7 @@ print("QSC_COMMAND_TO_SUBMIT_JOB=",submitCommand)
 
 all_succeeded = True
 for N_procs in range(1, max_N_procs+1):
-    command = submitCommand + " ./unitTests"
+    command = submitCommand + " ./" + testfile
     command = command.replace('NUM_PROCS',str(N_procs))
     print("Submitting command "+command)
     sys.stdout.flush()
