@@ -36,6 +36,7 @@ project(qsc LANGUAGES CXX)
 message("BLA_VENDOR: ${BLA_VENDOR}")
 find_package(MPI REQUIRED)
 find_package(BLAS REQUIRED)
+find_package(LAPACK REQUIRED)
 
 # Tell "make" to print out the commands used for compiling and linking:
 set(CMAKE_VERBOSE_MAKEFILE on)
@@ -77,8 +78,8 @@ else()
 endif()
 
 add_library(${QSC_LIB} ${SOURCES})
-# Below, PUBLIC means that anything that links to qsc must also link to MPI.
-target_link_libraries(${QSC_LIB} PUBLIC MPI::MPI_CXX ${BLAS_LIBRARIES})
+# Below, PUBLIC means that anything that links to qsc must also link to MPI, BLAS, & LAPACK.
+target_link_libraries(${QSC_LIB} PUBLIC MPI::MPI_CXX ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 
 add_executable(${QSC_DRIVER} src/qsc_driver.cpp)
 

@@ -18,7 +18,7 @@ namespace qsc {
     Vector binormal_cylindrical1, binormal_cylindrical2, binormal_cylindrical3;
     Vector d_tangent_d_l_cylindrical1, d_tangent_d_l_cylindrical2, d_tangent_d_l_cylindrical3;
     Vector torsion_numerator, torsion_denominator, B1Squared_over_curvatureSquared;
-    std::valarray<int> quadrant;
+    std::valarray<int> quadrant, ipiv;
     
     void calculate_helicity();
     

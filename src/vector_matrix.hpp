@@ -36,6 +36,8 @@ namespace qsc {
     Matrix& operator=(const Matrix&);
   };
 
+  void linear_solve(Matrix&, Vector&, std::valarray<int>&);
+  
   // These operators should be in the qsc namespace:
   // https://stackoverflow.com/questions/3891402/operator-overloading-and-namespaces
   // https://stackoverflow.com/questions/3623631/where-should-non-member-operator-overloads-be-placed

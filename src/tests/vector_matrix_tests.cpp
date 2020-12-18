@@ -74,3 +74,39 @@ TEST_CASE("matrix-vector multiply 2") {
   CHECK(v2[1] == Approx(-1.35));
   CHECK(v2[2] == Approx(0.39));
 }
+
+TEST_CASE("linear solve 1") {
+  Vector v {0.6, -0.9};
+  Matrix m(2, 2);
+  m(0, 0) = 1.1;
+  m(1, 0) = 0.7;
+  m(0, 1) = -0.3;
+  m(1, 1) = -1.3;
+
+  std::valarray<int> IPIV(2);
+  linear_solve(m, v, IPIV);
+  
+  CHECK(Approx(v[0]) == 0.860655737704918);
+  CHECK(Approx(v[1]) == 1.15573770491803);
+}
+
+TEST_CASE("linear solve 3") {
+  Vector v {0.6, -0.9, 0.4};
+  Matrix m(3, 3);
+  m(0, 0) = 1.1;
+  m(1, 0) = 0.7;
+  m(2, 0) = -0.2;
+  m(0, 1) = -0.3;
+  m(1, 1) = -1.3;
+  m(2, 1) = 0.1;
+  m(0, 2) = 0.6;
+  m(1, 2) = -1.2;
+  m(2, 2) = 2.1;
+
+  std::valarray<int> IPIV(3);
+  linear_solve(m, v, IPIV);
+  
+  CHECK(Approx(v[0]) == 0.661697247706422);
+  CHECK(Approx(v[1]) == 0.852064220183486);
+  CHECK(Approx(v[2]) == 0.212920489296636);
+}
