@@ -25,6 +25,8 @@ using namespace qsc;
  *        values on exit are irrelevant.
  * @param m Merely a work array. Values on entry are ignored, and
  *        values on exit are irrelevant.
+ * @param user_data This pointer allows you to pass any data you like to the
+ *        residual and jacobian functions.
  */
 void qsc::newton_solve(residual_function_type residual_function,
 		       jacobian_function_type jacobian_function,
@@ -37,12 +39,13 @@ void qsc::newton_solve(residual_function_type residual_function,
 		       int max_newton_iterations,
 		       int max_linesearch_iterations,
 		       qscfloat tolerance,
-		       int verbose) {
+		       int verbose,
+		       void* user_data) {
   
   qscfloat tolerance_sq = tolerance * tolerance;
 
   // Find the initial residual:
-  residual_function(state, residual);
+  residual_function(state, residual, user_data);
   qscfloat initial_residual_norm_sq = dot_product(residual, residual);
   qscfloat residual_norm_sq = initial_residual_norm_sq;
   qscfloat last_residual_norm_sq, step_scale;
@@ -55,7 +58,7 @@ void qsc::newton_solve(residual_function_type residual_function,
     last_residual_norm_sq = residual_norm_sq;
     if (residual_norm_sq < tolerance_sq) break;
 
-    jacobian_function(state, m);
+    jacobian_function(state, m, user_data);
 
     state0 = state;
     if (verbose > 0) std::cout << "  Newton iteration " << j_newton << std::endl;
@@ -68,7 +71,7 @@ void qsc::newton_solve(residual_function_type residual_function,
     step_scale = 1.0;
     for (j_linesearch = 0; j_linesearch < max_linesearch_iterations; j_linesearch++) {
       state = state0 + step_scale * step_direction;
-      residual_function(state, residual);
+      residual_function(state, residual, user_data);
       residual_norm_sq = dot_product(residual, residual);
       if (verbose > 0) {
 	std::cout << "    Line search step " << j_linesearch

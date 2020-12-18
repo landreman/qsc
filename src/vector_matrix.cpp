@@ -110,6 +110,33 @@ Vector qsc::operator*(Matrix& m, Vector& v) {
   return result;
 }
 
+/** This subroutine is almost the same as the overloaded operator *,
+ * but in this version there is no new vector created, so it may be
+ * slightly faster.
+ */
+void qsc::matrix_vector_product(Matrix& m, Vector& v, Vector& result) {
+  assert(m.ncols() == v.size());
+  assert(m.nrows() == result.size());
+  /*
+  // Non-BLAS simple-minded method:
+  qscfloat sum = 0;
+  for (int j = 0; j < m.nrows(); j++) {
+    sum = 0;
+    for (int k = 0; k < v.size(); k++) sum += m(j, k) * v[k];
+    result[j] = sum;
+  }
+  */
+
+  char TRANS = 'N';
+  int INC = 1;
+  int nrows = m.nrows();
+  int ncols = m.ncols();
+  qscfloat ALPHA = 1.0;
+  qscfloat BETA = 0.0;
+  gemv_(&TRANS, &nrows, &ncols, &ALPHA, &m(0, 0), &nrows,
+	      &v[0], &INC, &BETA, &result[0], &INC);
+}
+
 /** Solve a linear system A x = b for x.
  *
  *  Like LAPACK's *gesv, this subroutine over-writes the matrix with

@@ -49,13 +49,22 @@ void Qsc::allocate() {
   torsion_denominator.resize(nphi, 0.0);
 
   Boozer_toroidal_angle.resize(nphi, 0.0);
-  B1Squared_over_curvatureSquared.resize(nphi, 0.0);
+  etabar_squared_over_curvature_squared.resize(nphi, 0.0);
 
+  d_d_phi.resize(nphi, nphi, 0.0);
   d_d_varphi.resize(nphi, nphi, 0.0);
+  work_matrix.resize(nphi, nphi, 0.0);
   
   X1s.resize(nphi, 0.0);
   X1c.resize(nphi, 0.0);
+  Y1s.resize(nphi, 0.0);
+  Y1c.resize(nphi, 0.0);
+  sigma.resize(nphi, 0.0);
   
   quadrant.resize(nphi + 1, 0);
+  state.resize(nphi, 0);
+  residual.resize(nphi, 0);
+  work1.resize(nphi, 0.0);
+  work2.resize(nphi, 0.0);
   ipiv.resize(nphi, 0);
 }

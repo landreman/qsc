@@ -18,12 +18,17 @@ void Qsc::defaults() {
 
   nfp = 3;
   nphi = 15;
+
+  max_newton_iterations = 20;
+  max_linesearch_iterations = 8;
+  newton_tolerance = 1.0e-12;
 }
 
 Qsc::Qsc() :
   // Call constructor of member objects:
   d_d_phi(1, 1),
-  d_d_varphi(1, 1)
+  d_d_varphi(1, 1),
+  work_matrix(1, 1)
 {
   defaults();
   
@@ -39,4 +44,5 @@ Qsc::Qsc() :
 void Qsc::calculate() {
   allocate();
   init_axis();
+  solve_sigma_equation();
 }

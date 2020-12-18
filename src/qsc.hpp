@@ -10,11 +10,11 @@ namespace qsc {
   
   Matrix differentiation_matrix(const int N, const qscfloat xmin, const qscfloat xmax);
 
-  typedef void (*residual_function_type)(Vector&, Vector&);
-  typedef void (*jacobian_function_type)(Vector&, Matrix&);
+  typedef void (*residual_function_type)(Vector&, Vector&, void*);
+  typedef void (*jacobian_function_type)(Vector&, Matrix&, void*);
   void newton_solve(residual_function_type, jacobian_function_type,
 		    Vector&, Vector&, Vector&, Vector&, std::valarray<int>&,
-		    Matrix&, int, int, qscfloat, int);
+		    Matrix&, int, int, qscfloat, int, void*);
   
   class Qsc {
   private:
@@ -23,10 +23,14 @@ namespace qsc {
     Vector normal_cylindrical1, normal_cylindrical2, normal_cylindrical3;
     Vector binormal_cylindrical1, binormal_cylindrical2, binormal_cylindrical3;
     Vector d_tangent_d_l_cylindrical1, d_tangent_d_l_cylindrical2, d_tangent_d_l_cylindrical3;
-    Vector torsion_numerator, torsion_denominator, B1Squared_over_curvatureSquared;
+    Vector torsion_numerator, torsion_denominator, etabar_squared_over_curvature_squared;
     std::valarray<int> quadrant, ipiv;
+    Vector state, residual, work1, work2;
+    Matrix work_matrix;
     
     void calculate_helicity();
+    static void sigma_eq_residual(Vector&, Vector&, void*);
+    static void sigma_eq_jacobian(Vector&, Matrix&, void*);
     
   public:
     int verbose;
@@ -41,14 +45,18 @@ namespace qsc {
     qscfloat axis_length, rms_curvature;
     qscfloat mean_R, mean_Z, standard_deviation_of_R, standard_deviation_of_Z;
     Matrix d_d_phi, d_d_varphi;
-    Vector X1s, X1c;
+    Vector X1s, X1c, sigma, Y1s, Y1c;
     Vector Boozer_toroidal_angle;
+    int max_newton_iterations, max_linesearch_iterations;
+    qscfloat newton_tolerance;
+    qscfloat iota, iota_N;
     
     Qsc();
     Qsc(std::string);
     void defaults();
     void allocate();
     void init_axis();
+    void solve_sigma_equation();
     void calculate();
   };
 }

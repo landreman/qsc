@@ -49,6 +49,7 @@ void Qsc::init_axis() {
   abs_G0_over_B0 = 1 / B0_over_abs_G0;
   d_l_d_varphi = abs_G0_over_B0;
   G0 = sG * abs_G0_over_B0 * B0;
+  if (verbose > 0) std::cout << "G0: " << G0 << std::endl;
 
   // Define some aliases:
 #define d_r_d_phi_cylindrical1 R0p
@@ -132,7 +133,7 @@ void Qsc::init_axis() {
   
   torsion = torsion_numerator / torsion_denominator;
 
-  B1Squared_over_curvatureSquared = eta_bar * eta_bar / (curvature * curvature);
+  etabar_squared_over_curvature_squared = (eta_bar * eta_bar) / (curvature * curvature);
   for (k = 0; k < nphi; k++) {
     for (j = 0; j < nphi; j++) {
       d_d_varphi(j, k) = d_d_phi(j, k) / (B0_over_abs_G0 * d_l_d_phi[j]);

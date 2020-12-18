@@ -26,7 +26,12 @@ int main(int argc, char* argv[]) {
   q.init_axis();
   */
   qsc::Qsc q("r1 section 5.1");
+  //std::cout << "d_d_phi:" << std::endl << q.d_d_phi;
+  //std::cout << "d_d_varphi:" << std::endl << q.d_d_varphi;
+  std::cout << "***********************************************************" << std::endl;
   qsc::Qsc q2("1");
+  //std::cout << "d_d_phi:" << std::endl << q2.d_d_phi;
+  //std::cout << "d_d_varphi:" << std::endl << q2.d_d_varphi;
   /*
   qsc::Vector foo;
   foo.resize(3, 42.0);
