@@ -10,6 +10,12 @@ namespace qsc {
   
   Matrix differentiation_matrix(const int N, const qscfloat xmin, const qscfloat xmax);
 
+  typedef void (*residual_function_type)(Vector&, Vector&);
+  typedef void (*jacobian_function_type)(Vector&, Matrix&);
+  void newton_solve(residual_function_type, jacobian_function_type,
+		    Vector&, Vector&, Vector&, Vector&, std::valarray<int>&,
+		    Matrix&, int, int, qscfloat, int);
+  
   class Qsc {
   private:
     Vector sinangle, cosangle, tempvec, tempvec1, tempvec2, tempvec3;

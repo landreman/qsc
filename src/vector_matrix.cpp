@@ -71,6 +71,15 @@ std::ostream& qsc::operator<< (std::ostream& os, Matrix& m) {
   return os;
 }
 
+qscfloat qsc::dot_product(Vector& u, Vector& v) {
+  assert(u.size() == v.size());
+  qscfloat sum = 0;
+  for (int j = 0; j < u.size(); j++) {
+    sum += u[j] * v[j];
+  }
+  return sum;
+}
+
 Vector qsc::operator*(Matrix& m, Vector& v) {
   assert(m.ncols() == v.size());
   Vector result(m.nrows());

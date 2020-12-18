@@ -36,6 +36,7 @@ namespace qsc {
     Matrix& operator=(const Matrix&);
   };
 
+  qscfloat dot_product(Vector&, Vector&);
   void linear_solve(Matrix&, Vector&, std::valarray<int>&);
   
   // These operators should be in the qsc namespace:
