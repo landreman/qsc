@@ -81,7 +81,7 @@ jobs:
       run: env
 
     - name: CMake configure
-      run: cmake -DSINGLE={{ matrix.single-precision }} .
+      run: cmake -DSINGLE=${{ matrix.single-precision }} .
 
     - name: Compile
       run: make
