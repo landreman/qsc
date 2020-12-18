@@ -86,11 +86,21 @@ jobs:
     - name: Compile
       run: make
 
-    - name: Run driver
+    - name: Run driver, double precision
       run: bin/qsc_driver
+      if: matrix.single-precision == 0
 
-    - name: Run driver with MPI
+    - name: Run driver, single precision
+      run: bin/qsc_driver_single
+      if: matrix.single-precision == 1
+
+    - name: Run driver with MPI, double precision
       run: mpiexec -n 2 bin/qsc_driver
+      if: matrix.single-precision == 0
+
+    - name: Run driver with MPI, single precision
+      run: mpiexec -n 2 bin/qsc_driver_single
+      if: matrix.single-precision == 1
 
     - name: Run tests
       run: make test
