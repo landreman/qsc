@@ -24,8 +24,10 @@ void Qsc::init_axis() {
   R0ppp = 0.0;
   Z0ppp = 0.0;
   for (n = 1; n < R0c.size(); n++) {
-    sinangle = sin(qscfloat(n * nfp) * phi);
-    cosangle = cos(qscfloat(n * nfp) * phi);
+    //sinangle = sin(qscfloat(n * nfp) * phi);
+    //cosangle = cos(qscfloat(n * nfp) * phi);
+    sinangle = sin((n * nfp) * phi);
+    cosangle = cos((n * nfp) * phi);
     R0 += R0c[n] * cosangle + R0s[n] * sinangle;
     Z0 += Z0c[n] * cosangle + Z0s[n] * sinangle;
     //R0_extended = R0_extended + R0c[n] * cosangle + R0s[n] * sinangle;
@@ -54,11 +56,11 @@ void Qsc::init_axis() {
 #define d_r_d_phi_cylindrical3 Z0p
 
 #define d2_r_d_phi2_cylindrical1 (R0pp - R0)
-#define d2_r_d_phi2_cylindrical2 (2.0 * R0p)
+#define d2_r_d_phi2_cylindrical2 (2 * R0p)
 #define d2_r_d_phi2_cylindrical3 Z0pp
 
-#define d3_r_d_phi3_cylindrical1 (R0ppp - 3.0 * R0p)
-#define d3_r_d_phi3_cylindrical2 (3.0 * R0pp - R0)
+#define d3_r_d_phi3_cylindrical1 (R0ppp - 3 * R0p)
+#define d3_r_d_phi3_cylindrical2 (3 * R0pp - R0)
 #define d3_r_d_phi3_cylindrical3 Z0ppp
 
   tangent_cylindrical1 = d_r_d_phi_cylindrical1 / d_l_d_phi;

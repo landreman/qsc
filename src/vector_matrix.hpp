@@ -45,12 +45,18 @@ namespace qsc {
   std::ostream& operator<<(std::ostream&, Matrix&);
   Vector operator*(Matrix&, Vector&);
 
-  /*
+  
   // Multiplication of an int with std::valarray<qscfloat> is not included in some compilers:
   inline Vector operator*(int j, Vector& v) {
+    //return qscfloat(j) * v;
     return std::operator*(qscfloat(j), v);
   }
-  */
+
+  // gcc complains about ambiguity if we do not have this next little function:
+  inline Vector operator*(qscfloat j, Vector& v) {
+    return std::operator*(j, v);
+  }
+  
 
   // inline functions must be included in every file that uses them,
   // so these functions should go in the header file.
