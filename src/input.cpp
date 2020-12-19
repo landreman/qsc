@@ -61,7 +61,7 @@ void toml_read(std::vector<std::string>& varlist, toml::value indata, std::strin
   varlist.push_back(varname);
 }
 
-/* Expand a Vector to a longer size, padding with zeros.
+/** Expand a Vector to a longer size, padding with zeros.
  */
 void pad_vector(Vector& v, std::size_t newsize) {
   assert(v.size() <= newsize);
@@ -126,8 +126,6 @@ void Qsc::input(std::string filename) {
   }
 
   // Now, make {R0c, R0s, Z0c, Z0s} have the same size.
-  //auto sizes = std::valarray<int>({R0c.size(), R0s.size(), Z0c.size(), Z0s.size()});
-  //int newsize = sizes.max();
   std::size_t newsize = 0;
   newsize = std::max(newsize, R0c.size());
   newsize = std::max(newsize, R0s.size());

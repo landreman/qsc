@@ -97,6 +97,7 @@ void Qsc::init_axis() {
 		   d_tangent_d_l_cylindrical3 * d_tangent_d_l_cylindrical3);
 
   axis_length = d_l_d_phi.sum() * d_phi * nfp;
+  grid_max_curvature = curvature.max();
   tempvec = curvature * curvature * d_l_d_phi;
   rms_curvature = sqrt((tempvec.sum() * d_phi * nfp) / axis_length);
   // At this point in the fortran code, we find the exact max curvature.

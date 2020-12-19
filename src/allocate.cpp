@@ -60,6 +60,7 @@ void Qsc::allocate() {
   Y1s.resize(nphi, 0.0);
   Y1c.resize(nphi, 0.0);
   sigma.resize(nphi, 0.0);
+  elongation.resize(nphi, 0.0);
   
   quadrant.resize(nphi + 1, 0);
   state.resize(nphi, 0);
@@ -67,4 +68,8 @@ void Qsc::allocate() {
   work1.resize(nphi, 0.0);
   work2.resize(nphi, 0.0);
   ipiv.resize(nphi, 0);
+
+  d_X1c_d_varphi.resize(nphi, 0.0);
+  d_Y1s_d_varphi.resize(nphi, 0.0);
+  d_Y1c_d_varphi.resize(nphi, 0.0);
 }

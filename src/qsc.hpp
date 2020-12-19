@@ -45,12 +45,13 @@ namespace qsc {
     qscfloat axis_length, rms_curvature;
     qscfloat mean_R, mean_Z, standard_deviation_of_R, standard_deviation_of_Z;
     Matrix d_d_phi, d_d_varphi;
-    Vector X1s, X1c, sigma, Y1s, Y1c;
+    Vector X1s, X1c, sigma, Y1s, Y1c, elongation;
     Vector Boozer_toroidal_angle;
     int max_newton_iterations, max_linesearch_iterations;
     qscfloat newton_tolerance;
-    qscfloat iota, iota_N;
+    qscfloat iota, iota_N, grid_max_curvature, grid_max_elongation, mean_elongation;
     std::string order_r_option;
+    Vector d_X1c_d_varphi, d_Y1s_d_varphi, d_Y1c_d_varphi;
     
     Qsc();
     Qsc(std::string);
@@ -59,6 +60,7 @@ namespace qsc {
     void allocate();
     void init_axis();
     void solve_sigma_equation();
+    void r1_diagnostics();
     void calculate();
   };
 }

@@ -49,7 +49,7 @@ void Qsc::sigma_eq_jacobian(Vector& state, Matrix& jac, void* user_data) {
   }
 }
 
-void qsc::Qsc::solve_sigma_equation() {
+void Qsc::solve_sigma_equation() {
   state = sigma0; // Initial guess for sigma
   state[0] = 0.0; // Initial guess for iota
     
@@ -59,4 +59,30 @@ void qsc::Qsc::solve_sigma_equation() {
 	       newton_tolerance, verbose, this);
 
   if (verbose > 0) std::cout << "iota: " << iota << "  state[0]: " << state[0] << std::endl;
+}
+
+void Qsc::r1_diagnostics() {
+  Y1s = (sG * spsi / eta_bar) * curvature;
+  Y1c = Y1s * sigma;
+
+  // Use (R,Z) for elongation in the (R,Z) plane
+  // or use (X,Y) for elongation in the plane perpendicular to the magnetic axis.
+  // tempvec1 = p, tempvec2 = q
+  tempvec1 = X1s * X1s + X1c * X1c + Y1s * Y1s + Y1c * Y1c;
+  tempvec2 = X1s * Y1c - X1c * Y1s;
+  elongation = (tempvec1 + sqrt(tempvec1 * tempvec1 - 4 * tempvec2 * tempvec2))
+    / (2 * abs(tempvec2));
+
+  grid_max_elongation = elongation.max();
+  tempvec = elongation * d_l_d_phi;
+  mean_elongation = tempvec.sum() / d_l_d_phi.sum();
+  //index = np.argmax(elongation);
+  //max_elongation = -fourier_minimum(-elongation);
+
+  matrix_vector_product(d_d_varphi, X1c, d_X1c_d_varphi);
+  matrix_vector_product(d_d_varphi, Y1s, d_Y1s_d_varphi);
+  matrix_vector_product(d_d_varphi, Y1c, d_Y1c_d_varphi);
+
+  //    calculate_grad_B_tensor()
+
 }

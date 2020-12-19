@@ -51,4 +51,5 @@ void Qsc::calculate() {
   allocate();
   init_axis();
   solve_sigma_equation();
+  r1_diagnostics();
 }
