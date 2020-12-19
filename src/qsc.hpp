@@ -50,6 +50,7 @@ namespace qsc {
     int max_newton_iterations, max_linesearch_iterations;
     qscfloat newton_tolerance;
     qscfloat iota, iota_N;
+    std::string order_r_option;
     
     Qsc();
     Qsc(std::string);

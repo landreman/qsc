@@ -26,6 +26,8 @@ void Qsc::defaults() {
   } else {
     newton_tolerance = 1.0e-12;
   }
+
+  order_r_option = "r1";
 }
 
 Qsc::Qsc() :
