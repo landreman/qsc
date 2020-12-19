@@ -166,3 +166,36 @@ void qsc::linear_solve(Matrix& m, Vector& v, std::valarray<int>& IPIV) {
     throw std::runtime_error("LAPACK error in *gesv");
   }
 }
+
+Rank3Tensor::Rank3Tensor(index_type d1_in, index_type d2_in, index_type d3_in)
+  : std::valarray<qscfloat>(d1_in * d2_in) // Call constructor of base class.
+{
+  d1_ = d1_in;
+  d2_ = d2_in;
+  d3_ = d3_in;
+  len_ = d1_ * d2_ * d3_;
+}
+
+void Rank3Tensor::resize(index_type d1_in, index_type d2_in, index_type d3_in, qscfloat v) {
+  d1_ = d1_in;
+  d2_ = d2_in;
+  d3_ = d3_in;
+  len_ = d1_ * d2_ * d3_;
+  std::valarray<qscfloat>::resize(len_, v);
+}
+
+void Rank3Tensor::set_row(Vector& v, index_type j2, index_type j3) {
+  assert(v.size() == d1_);
+  for (int j = 0; j < d1_; j++) {
+    (*this)[j] = v[j];
+  }
+}
+
+qscfloat Rank3Tensor::frobenius_norm_squared() {
+  qscfloat sum = 0;
+  for (int j = 0; j < len_; j++) {
+    sum += (*this)[j] * (*this)[j];
+  }
+  return sum;
+}
+

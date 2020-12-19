@@ -72,4 +72,6 @@ void Qsc::allocate() {
   d_X1c_d_varphi.resize(nphi, 0.0);
   d_Y1s_d_varphi.resize(nphi, 0.0);
   d_Y1c_d_varphi.resize(nphi, 0.0);
+
+  grad_B_tensor.resize(nphi, 3, 3, 0.0);
 }

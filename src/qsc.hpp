@@ -52,6 +52,7 @@ namespace qsc {
     qscfloat iota, iota_N, grid_max_curvature, grid_max_elongation, mean_elongation;
     std::string order_r_option;
     Vector d_X1c_d_varphi, d_Y1s_d_varphi, d_Y1c_d_varphi;
+    Rank3Tensor grad_B_tensor;
     
     Qsc();
     Qsc(std::string);

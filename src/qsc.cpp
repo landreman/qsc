@@ -34,7 +34,8 @@ Qsc::Qsc() :
   // Call constructor of member objects:
   d_d_phi(1, 1),
   d_d_varphi(1, 1),
-  work_matrix(1, 1)
+  work_matrix(1, 1),
+  grad_B_tensor(1, 3, 3)
 {
   defaults();
   

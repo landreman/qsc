@@ -90,6 +90,32 @@ namespace qsc {
     return *this;
   }
 
+  //////////////////////////////////////////////////////////
+  
+  class Rank3Tensor : public std::valarray<qscfloat> {
+
+  private:
+    index_type d1_, d2_, d3_, len_;
+
+  public:
+    Rank3Tensor(index_type, index_type, index_type);
+    void resize(index_type, index_type, index_type, qscfloat);
+    // For info about matrix indexing:
+    // https://isocpp.org/wiki/faq/operator-overloading#matrix-subscript-op
+    qscfloat& operator()(index_type, index_type, index_type);
+    qscfloat  operator()(index_type, index_type, index_type) const;
+    void set_row(Vector&, index_type, index_type);
+    qscfloat frobenius_norm_squared();
+  };
+
+  inline qscfloat& Rank3Tensor::operator()(index_type j1, index_type j2, index_type j3) {
+    return (*this)[j1 + d1_ * (j2 + d2_ * j3)];
+  }
+
+  inline qscfloat Rank3Tensor::operator()(index_type j1, index_type j2, index_type j3) const {
+    return (*this)[j1 + d1_ * (j2 + d2_ * j3)];
+  }
+
 
 } // namespace qsc
 
