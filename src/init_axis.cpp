@@ -155,15 +155,17 @@ void Qsc::init_axis() {
   Boozer_toroidal_angle *= (0.5 * d_phi * 2 * pi / axis_length);
 
   calculate_helicity();
-  
-  std::cout << "R0c:" << R0c << std::endl;
-  std::cout << "R0s:" << R0s << std::endl;
-  std::cout << "Z0c:" << Z0c << std::endl;
-  std::cout << "Z0s:" << Z0s << std::endl;
-  std::cout << "phi:" << phi << std::endl << std::endl;
-  std::cout << "R0:" << R0 << std::endl << std::endl;
-  std::cout << "curvature:" << curvature << std::endl << std::endl;
-  std::cout << "torsion:" << torsion << std::endl << std::endl;
-  std::cout << "stddevR: " << standard_deviation_of_R
-	    << "  stddevZ: " << standard_deviation_of_Z << std::endl;
+
+  if (verbose > 0) {
+    std::cout << "R0c:" << R0c << std::endl;
+    std::cout << "R0s:" << R0s << std::endl;
+    std::cout << "Z0c:" << Z0c << std::endl;
+    std::cout << "Z0s:" << Z0s << std::endl;
+    std::cout << "phi:" << phi << std::endl << std::endl;
+    std::cout << "R0:" << R0 << std::endl << std::endl;
+    std::cout << "curvature:" << curvature << std::endl << std::endl;
+    std::cout << "torsion:" << torsion << std::endl << std::endl;
+    std::cout << "stddevR: " << standard_deviation_of_R
+	      << "  stddevZ: " << standard_deviation_of_Z << std::endl;
+  }
 }

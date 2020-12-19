@@ -22,9 +22,9 @@ void Qsc::defaults() {
   max_newton_iterations = 12;
   max_linesearch_iterations = 4;
   if (single) {
-    newton_tolerance = 1.0e-12;
+    newton_tolerance = 1.0e-5;
   } else {
-    newton_tolerance = 1.0e-6;
+    newton_tolerance = 1.0e-12;
   }
 }
 
