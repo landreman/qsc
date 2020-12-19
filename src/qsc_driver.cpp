@@ -1,4 +1,6 @@
 #include <iostream>
+#include <ctime>
+#include <chrono>
 #include "qsc.hpp"
 
 int main(int argc, char* argv[]) {
@@ -30,6 +32,22 @@ int main(int argc, char* argv[]) {
   //std::cout << "d_d_varphi:" << std::endl << q.d_d_varphi;
   std::cout << "***********************************************************" << std::endl;
   qsc::Qsc q2("1");
+  q2.nphi = 31;
+  q2.verbose = 0;
+  std::time_t start_time, end_time;
+  start_time = std::clock();
+  auto start = std::chrono::steady_clock::now();
+  for (int j = 1; j < 1000; j++) {
+    q2.calculate();
+  }
+  end_time = std::clock();
+  auto end = std::chrono::steady_clock::now();
+
+  std::chrono::duration<double> elapsed = end - start;
+  std::cout << "Time for 1000 solves from chrono:           "
+            << elapsed.count() << std::endl;
+  std::cout << "Time for 1000 solves from ctime (CPU time): "
+            << double(end_time - start_time) / CLOCKS_PER_SEC << std::endl;
   //std::cout << "d_d_phi:" << std::endl << q2.d_d_phi;
   //std::cout << "d_d_varphi:" << std::endl << q2.d_d_varphi;
   /*
@@ -45,6 +63,12 @@ int main(int argc, char* argv[]) {
   std::cout << "R0:" << q.R0 << std::endl;
   std::cout << "Z0:" << q.Z0 << std::endl;
   */
+  std::cout << "***********************************************************" << std::endl;
+  qsc::Qsc q3;
+  q3.input("qsc_in.foo");
+  std::cout << "nfp: " << q3.nfp << std::endl;
+  std::cout << "eta_bar: " << q3.eta_bar << std::endl;
+  q3.calculate();
   std::cout << "Good bye." << std::endl;
   
   return 0;

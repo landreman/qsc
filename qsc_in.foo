@@ -1,0 +1,9 @@
+# This is a sample input file
+nfp = 7
+# I can put comments here
+nphi = 31
+order_r_option="r2"
+#eta_bar = 1.1
+R0c = [1.0, 0.3, 0.09]
+
+verbose = 0

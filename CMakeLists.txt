@@ -44,6 +44,7 @@ set(CMAKE_VERBOSE_MAKEFILE on)
 include_directories(include)
 include_directories(src)
 include_directories(externalPackages/doctest)
+include_directories(externalPackages/toml11)
 
 # Get a list of all source files except for the driver:
 file(GLOB SOURCES "src/*.cpp")
@@ -81,7 +82,11 @@ add_library(${QSC_LIB} ${SOURCES})
 # Below, PUBLIC means that anything that links to qsc must also link to MPI, BLAS, & LAPACK.
 target_link_libraries(${QSC_LIB} PUBLIC MPI::MPI_CXX ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 
+# toml11 requires c++11
+set_property(TARGET ${QSC_LIB} PROPERTY CXX_STANDARD 11)
+
 add_executable(${QSC_DRIVER} src/qsc_driver.cpp)
+set_property(TARGET ${QSC_DRIVER} PROPERTY CXX_STANDARD 11)
 
 # qsc driver depends on the qsc library:
 target_link_libraries(${QSC_DRIVER} PUBLIC ${QSC_LIB})

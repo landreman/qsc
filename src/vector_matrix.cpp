@@ -154,11 +154,13 @@ void qsc::linear_solve(Matrix& m, Vector& v, std::valarray<int>& IPIV) {
   int n = m.nrows();
   int INFO = 0;
   int one = 1;
-  if (single) {
-    std::cout << "calling SINGLE precision LAPACK" << std::endl;
-  } else {
-    std::cout << "calling DOUBLE precision LAPACK" << std::endl;
-  }
+  /*
+    if (single) {
+      std::cout << "calling SINGLE precision LAPACK" << std::endl;
+    } else {
+      std::cout << "calling DOUBLE precision LAPACK" << std::endl;
+    }
+  */
   gesv_(&n, &one, &m(0, 0), &n, &IPIV[0], &v[0], &n, &INFO);
   if (INFO != 0) {
     throw std::runtime_error("LAPACK error in *gesv");

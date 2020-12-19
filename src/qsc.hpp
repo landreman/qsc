@@ -53,6 +53,7 @@ namespace qsc {
     
     Qsc();
     Qsc(std::string);
+    void input(std::string);
     void defaults();
     void allocate();
     void init_axis();
