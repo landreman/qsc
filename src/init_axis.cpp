@@ -1,3 +1,5 @@
+#include <ctime>
+#include <chrono>
 #include <iostream>
 #include "qsc.hpp"
 
@@ -6,6 +8,13 @@ using namespace qsc;
 /** Initialize the axis shape, curvature, and torsion.
  */
 void Qsc::init_axis() {
+  std::time_t start_time, end_time;
+  std::chrono::time_point<std::chrono::steady_clock> start;
+  if (verbose > 0) {
+    start_time = std::clock();
+    start = std::chrono::steady_clock::now();
+  }
+
   int j, k, n;
 
   // Initialize the phi grid.
@@ -169,4 +178,17 @@ void Qsc::init_axis() {
     std::cout << "stddevR: " << standard_deviation_of_R
 	      << "  stddevZ: " << standard_deviation_of_Z << std::endl;
   }
+
+  if (verbose > 0) {
+    end_time = std::clock();
+    auto end = std::chrono::steady_clock::now();
+
+    std::chrono::duration<double> elapsed = end - start;
+    std::cout << "Time for init_axis from chrono:           "
+              << elapsed.count() << " seconds" << std::endl;
+    std::cout << "Time for init_axis from ctime (CPU time): "
+              << double(end_time - start_time) / CLOCKS_PER_SEC
+              << " seconds" << std::endl;
+  }
+
 }

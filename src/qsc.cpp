@@ -1,3 +1,5 @@
+#include <ctime>
+#include <chrono>
 #include "qsc.hpp"
 
 using namespace qsc;
@@ -49,8 +51,28 @@ Qsc::Qsc() :
 /** High-level routine to call the low-level routines.
  */
 void Qsc::calculate() {
+  std::time_t start_time, end_time;
+  std::chrono::time_point<std::chrono::steady_clock> start;
+  if (verbose > 0) {
+    start_time = std::clock();
+    start = std::chrono::steady_clock::now();
+  }
+
   allocate();
   init_axis();
   solve_sigma_equation();
   r1_diagnostics();
+
+  if (verbose > 0) {
+    end_time = std::clock();
+    auto end = std::chrono::steady_clock::now();
+
+    std::chrono::duration<double> elapsed = end - start;
+    std::cout << "Time for calculate() from chrono:           "
+              << elapsed.count() << " seconds" << std::endl;
+    std::cout << "Time for calculate() from ctime (CPU time): "
+              << double(end_time - start_time) / CLOCKS_PER_SEC
+              << " seconds" << std::endl;
+  }
+
 }

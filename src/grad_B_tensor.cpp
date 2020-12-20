@@ -14,7 +14,6 @@ void Qsc::calculate_grad_B_tensor() {
   
   // tn
   tempvec = (sG * B0) * curvature;
-  if (verbose > 0) std::cout << "in grad B tensor: tn=" << tempvec << std::endl;
   grad_B_tensor.set_row(tempvec, 2, 0);
 
   // nt - same as tn
