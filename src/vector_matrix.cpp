@@ -191,11 +191,3 @@ void Rank3Tensor::set_row(Vector& v, index_type j2, index_type j3) {
   }
 }
 
-qscfloat Rank3Tensor::frobenius_norm_squared() {
-  qscfloat sum = 0;
-  for (int j = 0; j < len_; j++) {
-    sum += (*this)[j] * (*this)[j];
-  }
-  return sum;
-}
-

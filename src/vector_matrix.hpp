@@ -105,7 +105,6 @@ namespace qsc {
     qscfloat& operator()(index_type, index_type, index_type);
     qscfloat  operator()(index_type, index_type, index_type) const;
     void set_row(Vector&, index_type, index_type);
-    qscfloat frobenius_norm_squared();
   };
 
   inline qscfloat& Rank3Tensor::operator()(index_type j1, index_type j2, index_type j3) {
