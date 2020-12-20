@@ -1,5 +1,7 @@
 #include <iostream>
 #include <valarray>
+#include <ctime>
+#include <chrono>
 #include "qsc.hpp"
 
 using namespace qsc;
@@ -50,6 +52,13 @@ void Qsc::sigma_eq_jacobian(Vector& state, Matrix& jac, void* user_data) {
 }
 
 void Qsc::solve_sigma_equation() {
+  std::time_t start_time, end_time;
+  std::chrono::time_point<std::chrono::steady_clock> start;
+  if (verbose > 0) {
+    start_time = std::clock();
+    start = std::chrono::steady_clock::now();
+  }
+  
   state = sigma0; // Initial guess for sigma
   state[0] = 0.0; // Initial guess for iota
     
@@ -58,10 +67,28 @@ void Qsc::solve_sigma_equation() {
 	       max_newton_iterations, max_linesearch_iterations,
 	       newton_tolerance, verbose, this);
 
-  if (verbose > 0) std::cout << "iota: " << iota << "  state[0]: " << state[0] << std::endl;
+  if (verbose > 0) {
+    end_time = std::clock();
+    auto end = std::chrono::steady_clock::now();
+    
+    std::chrono::duration<double> elapsed = end - start;
+    std::cout << "Time for sigma equation from chrono:           "
+              << elapsed.count() << " seconds" << std::endl;
+    std::cout << "Time for sigma equation from ctime (CPU time): "
+              << double(end_time - start_time) / CLOCKS_PER_SEC
+              << " seconds" << std::endl;
+  }
+
 }
 
 void Qsc::r1_diagnostics() {
+  std::time_t start_time, end_time;
+  std::chrono::time_point<std::chrono::steady_clock> start;
+  if (verbose > 0) {
+    start_time = std::clock();
+    start = std::chrono::steady_clock::now();
+  }
+
   iota_N = iota + helicity * nfp;
   
   Y1s = (sG * spsi / eta_bar) * curvature;
@@ -87,4 +114,15 @@ void Qsc::r1_diagnostics() {
 
   calculate_grad_B_tensor();
 
+  if (verbose > 0) {
+    end_time = std::clock();
+    auto end = std::chrono::steady_clock::now();
+    
+    std::chrono::duration<double> elapsed = end - start;
+    std::cout << "Time for r1_diagnostics from chrono:           "
+              << elapsed.count() << " seconds" << std::endl;
+    std::cout << "Time for r1_diagnostics from ctime (CPU time): "
+              << double(end_time - start_time) / CLOCKS_PER_SEC
+              << " seconds" << std::endl;
+  }
 }

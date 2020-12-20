@@ -31,7 +31,7 @@ Once CMake has completed successfully, then run
 make
 ~~~~
 If the build is successful, the `qsc` library will be built in the project's `lib/` directory,
-and `qsc_driver` will be present in the `bin/` directory.
+and the driver program `xqsc` will be present in the `bin/` directory.
 
 If you want to clear all CMake files to do a clean configure and build, you
 can run the `./clean_cmake` script.
@@ -45,7 +45,7 @@ run
 cmake -DSINGLE=ON .
 ~~~~
 (Alternative flags like `-DSINGLE=1` also work.) Then run `make` as before.
-The library and driver that are then compiled will be named `libqsc_single.a` and `qsc_driver_single`.
+The library and driver that are then compiled will be named `libqsc_single.a` and `xqsc_single`.
 
 
 ## Testing
@@ -57,3 +57,11 @@ make test
 It is also possible to type `make unitTests` to build the tests without running them.
 The unit test executable is named `unitTests` and is placed in the project's `tests/` directory.
 
+
+## Running the code
+
+To run the code, type
+~~~~
+<path-to-executable>/xqsc qsc_in.<extension>
+~~~~
+The input files use TOML format.

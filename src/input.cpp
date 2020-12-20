@@ -1,6 +1,8 @@
 #include <exception>
 #include <stdexcept>
 #include <algorithm>
+#include <ctime>
+#include <chrono>
 #include "qsc.hpp"
 #include "toml.hpp"
 
@@ -74,7 +76,14 @@ void pad_vector(Vector& v, std::size_t newsize) {
 /** Read in a configuration input file
  */
 void Qsc::input(std::string filename) {
-  if (verbose > 0) std::cout << "About to try loading input file " << filename << std::endl;
+  std::time_t start_time, end_time;
+  std::chrono::time_point<std::chrono::steady_clock> start;
+  if (verbose > 0) {
+    start_time = std::clock();
+    start = std::chrono::steady_clock::now();
+
+    std::cout << "About to try loading input file " << filename << std::endl;
+  }
   
   auto indata = toml::parse(filename);
 
@@ -141,4 +150,17 @@ void Qsc::input(std::string filename) {
   std::cout << "R0s: " << R0s << std::endl;
   std::cout << "Z0c: " << Z0c << std::endl;
   std::cout << "Z0s: " << Z0s << std::endl;
+
+  if (verbose > 0) {
+    end_time = std::clock();
+    auto end = std::chrono::steady_clock::now();
+
+    std::chrono::duration<double> elapsed = end - start;
+    std::cout << "Time for reading input from chrono:           "
+	      << elapsed.count() << " seconds" << std::endl;
+    std::cout << "Time for reading input from ctime (CPU time): "
+	      << double(end_time - start_time) / CLOCKS_PER_SEC
+	      << " seconds" << std::endl;
+  }
+  
 }
