@@ -65,7 +65,7 @@ namespace qsc {
     void solve_sigma_equation();
     void r1_diagnostics();
     void calculate();
-    void write_output();
+    void write_netcdf();
   };
 }
 

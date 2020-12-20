@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
 
   q.calculate();
 
-  q.write_output();
+  q.write_netcdf();
   
   end_time = std::clock();
   auto end = std::chrono::steady_clock::now();

@@ -31,6 +31,7 @@ include(cmake/knownHosts.cmake)
 project(qsc LANGUAGES CXX)
 
 set(CMAKE_MODULE_PATH cmake)
+#set (NETCDF_CXX "YES")
 find_package (NetCDF REQUIRED)
 message("NETCDF_INCLUDES=${NETCDF_INCLUDES}")
 message("NETCDF_LIBRARIES=${NETCDF_LIBRARIES}")
