@@ -25,6 +25,8 @@ else()
   message("WARNING!! Neither slurm nor mpiexec was detected, so I am not sure how to launch MPI jobs.")
 endif()
 
+project(qsc LANGUAGES CXX)
+
 #set(CMAKE_MODULE_PATH cmake)
 include(cmake/knownHosts.cmake)
 include(cmake/FindNetCDF.cmake)
@@ -35,8 +37,6 @@ message("NetCDF::NetCDF")
 
 message("QSC_COMMAND_TO_SUBMIT_JOB is ${QSC_COMMAND_TO_SUBMIT_JOB}")
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/tests/commandToSubmitJob ${QSC_COMMAND_TO_SUBMIT_JOB})
-
-project(qsc LANGUAGES CXX)
 
 message("BLA_VENDOR: ${BLA_VENDOR}")
 find_package(MPI REQUIRED)
