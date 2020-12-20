@@ -6,8 +6,8 @@
 #include "qsc.hpp"
 
 using namespace qsc;
-//using namespace netCDF;
-//using namespace netCDF::exceptions;
+using namespace netCDF;
+using namespace netCDF::exceptions;
 
 void Qsc::write_output() {
   std::time_t start_time, end_time;

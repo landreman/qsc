@@ -2,11 +2,13 @@
 Quasisymmetric Stellarator Construction
 
 ## Requirements
-* A C++ compiler
+* A C++ compiler (C++11 standard)
 * CMake
 * BLAS
 * LAPACK
 * MPI
+* NetCDF, including the C++ interface
+
 
 ## Building the code
 
