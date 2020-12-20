@@ -31,9 +31,12 @@ if (NETCDF_INCLUDES AND NETCDF_LIBRARIES)
 endif (NETCDF_INCLUDES AND NETCDF_LIBRARIES)
 
 find_path (NETCDF_INCLUDES netcdf.h
-  HINTS NETCDF_DIR ENV NETCDF_DIR)
+           HINTS NETCDF_DIR ENV NETCDF_DIR ENV NETCDF_HOME PATH_SUFFIXES include)
+#  HINTS NETCDF_DIR ENV NETCDF_DIR)
 
-find_library (NETCDF_LIBRARIES_C       NAMES netcdf)
+#find_library (NETCDF_LIBRARIES_C       NAMES netcdf)
+find_library (NETCDF_LIBRARIES_C       NAMES netcdf
+              HINTS NETCDF_DIR ENV NETCDF_DIR ENV NETCDF_HOME PATH_SUFFIXES lib)
 mark_as_advanced(NETCDF_LIBRARIES_C)
 
 set (NetCDF_has_interfaces "YES") # will be set to NO if we're missing any interfaces
