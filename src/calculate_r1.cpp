@@ -62,6 +62,8 @@ void Qsc::solve_sigma_equation() {
 }
 
 void Qsc::r1_diagnostics() {
+  iota_N = iota + helicity * nfp;
+  
   Y1s = (sG * spsi / eta_bar) * curvature;
   Y1c = Y1s * sigma;
 
@@ -83,6 +85,6 @@ void Qsc::r1_diagnostics() {
   matrix_vector_product(d_d_varphi, Y1s, d_Y1s_d_varphi);
   matrix_vector_product(d_d_varphi, Y1c, d_Y1c_d_varphi);
 
-  //    calculate_grad_B_tensor()
+  calculate_grad_B_tensor();
 
 }

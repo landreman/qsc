@@ -31,6 +31,7 @@ namespace qsc {
     void calculate_helicity();
     static void sigma_eq_residual(Vector&, Vector&, void*);
     static void sigma_eq_jacobian(Vector&, Matrix&, void*);
+    void calculate_grad_B_tensor();
     
   public:
     int verbose;

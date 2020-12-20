@@ -187,7 +187,7 @@ void Rank3Tensor::resize(index_type d1_in, index_type d2_in, index_type d3_in, q
 void Rank3Tensor::set_row(Vector& v, index_type j2, index_type j3) {
   assert(v.size() == d1_);
   for (int j = 0; j < d1_; j++) {
-    (*this)[j] = v[j];
+    (*this)[j + d1_ * (j2 + d2_ * j3)] = v[j];
   }
 }
 
