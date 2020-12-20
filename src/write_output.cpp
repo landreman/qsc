@@ -1,13 +1,13 @@
 #include <ctime>
 #include <chrono>
 //#include <netcdfcpp.h>
-//#include <netcdf.h>
-#include <netcdf>
+#include <netcdf.h>
+//#include <netcdf>
 #include "qsc.hpp"
 
 using namespace qsc;
-using namespace netCDF;
-using namespace netCDF::exceptions;
+//using namespace netCDF;
+//using namespace netCDF::exceptions;
 
 void Qsc::write_output() {
   std::time_t start_time, end_time;
@@ -18,12 +18,11 @@ void Qsc::write_output() {
   }
   
   //NcFile dataFile("sfc_pres_temp.nc", NcFile::Replace);
-  NcFile dataFile("simple_xy.nc", NcFile::replace);
-  /*
+  //NcFile dataFile("simple_xy.nc", NcFile::replace);
+  
   int ncid, retval;
   retval = nc_create("qsc_out.foo.nc", NC_CLOBBER, &ncid);
   retval = nc_close(ncid);
-  */
   
   if (verbose > 0) {
     end_time = std::clock();

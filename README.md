@@ -7,7 +7,7 @@ Quasisymmetric Stellarator Construction
 * BLAS
 * LAPACK
 * MPI
-* NetCDF, including the C++ interface
+* NetCDF (The C++ interface to NetCDF is not required, just the standard C interface.)
 
 
 ## Building the code
