@@ -33,6 +33,8 @@ int main(int argc, char* argv[]) {
 
   q.calculate();
 
+  q.write_output();
+  
   end_time = std::clock();
   auto end = std::chrono::steady_clock::now();
 

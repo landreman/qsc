@@ -27,6 +27,10 @@ endif()
 
 #set(CMAKE_MODULE_PATH cmake)
 include(cmake/knownHosts.cmake)
+include(cmake/FindNetCDF.cmake)
+message("NetCDF_INCLUDE_DIRS=${NetCDF_INCLUDE_DIRS}")
+message("NetCDF::NetCDF")
+#message("NetCDF::NetCDF=${NetCDF::NetCDF}")
 
 message("QSC_COMMAND_TO_SUBMIT_JOB is ${QSC_COMMAND_TO_SUBMIT_JOB}")
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/tests/commandToSubmitJob ${QSC_COMMAND_TO_SUBMIT_JOB})
@@ -45,6 +49,7 @@ include_directories(include)
 include_directories(src)
 include_directories(externalPackages/doctest)
 include_directories(externalPackages/toml11)
+include_directories("${NetCDF_INCLUDE_DIRS}")
 
 # Get a list of all source files except for the driver:
 file(GLOB SOURCES "src/*.cpp")
@@ -80,7 +85,7 @@ endif()
 
 add_library(${QSC_LIB} ${SOURCES})
 # Below, PUBLIC means that anything that links to qsc must also link to MPI, BLAS, & LAPACK.
-target_link_libraries(${QSC_LIB} PUBLIC MPI::MPI_CXX ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
+target_link_libraries(${QSC_LIB} PUBLIC MPI::MPI_CXX ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} NetCDF::NetCDF)
 
 # toml11 requires c++11
 set_property(TARGET ${QSC_LIB} PROPERTY CXX_STANDARD 11)
