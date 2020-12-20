@@ -87,19 +87,19 @@ jobs:
       run: make
 
     - name: Run driver, double precision
-      run: bin/qsc_driver
+      run: bin/xqsc qsc_in.foo
       if: matrix.single-precision == 0
 
     - name: Run driver, single precision
-      run: bin/qsc_driver_single
+      run: bin/xqsc_single qsc_in.foo
       if: matrix.single-precision == 1
 
     - name: Run driver with MPI, double precision
-      run: mpiexec -n 2 bin/qsc_driver
+      run: mpiexec -n 2 bin/xqsc qsc_in.foo
       if: matrix.single-precision == 0
 
     - name: Run driver with MPI, single precision
-      run: mpiexec -n 2 bin/qsc_driver_single
+      run: mpiexec -n 2 bin/xqsc_single qsc_in.foo
       if: matrix.single-precision == 1
 
     - name: Run tests

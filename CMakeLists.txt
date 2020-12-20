@@ -49,7 +49,7 @@ include_directories(externalPackages/toml11)
 # Get a list of all source files except for the driver:
 file(GLOB SOURCES "src/*.cpp")
 message("Sources before filter: ${SOURCES}")
-list(FILTER SOURCES EXCLUDE REGEX ".*qsc_driver.cpp$")
+list(FILTER SOURCES EXCLUDE REGEX ".*xqsc.cpp$")
 message("Sources: ${SOURCES}")
 
 # Set where the compiled library will go.
@@ -69,12 +69,12 @@ if (SINGLE)
   # Add -DFOO to the compile statements
   add_compile_definitions(SINGLE)
   set(QSC_LIB qsc_single)
-  set(QSC_DRIVER qsc_driver_single)
+  set(QSC_DRIVER xqsc_single)
   set(QSC_TESTS unitTests_single)
 else()
   message("Compiling in DOUBLE precision")
   set(QSC_LIB qsc)
-  set(QSC_DRIVER qsc_driver)
+  set(QSC_DRIVER xqsc)
   set(QSC_TESTS unitTests)
 endif()
 
@@ -85,7 +85,7 @@ target_link_libraries(${QSC_LIB} PUBLIC MPI::MPI_CXX ${BLAS_LIBRARIES} ${LAPACK_
 # toml11 requires c++11
 set_property(TARGET ${QSC_LIB} PROPERTY CXX_STANDARD 11)
 
-add_executable(${QSC_DRIVER} src/qsc_driver.cpp)
+add_executable(${QSC_DRIVER} src/xqsc.cpp)
 set_property(TARGET ${QSC_DRIVER} PROPERTY CXX_STANDARD 11)
 
 # qsc driver depends on the qsc library:
