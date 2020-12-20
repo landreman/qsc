@@ -47,13 +47,14 @@ namespace qsc {
     qscfloat mean_R, mean_Z, standard_deviation_of_R, standard_deviation_of_Z;
     Matrix d_d_phi, d_d_varphi;
     Vector X1s, X1c, sigma, Y1s, Y1c, elongation;
-    Vector Boozer_toroidal_angle;
+    Vector Boozer_toroidal_angle, L_grad_B;
     int max_newton_iterations, max_linesearch_iterations;
     qscfloat newton_tolerance;
     qscfloat iota, iota_N, grid_max_curvature, grid_max_elongation, mean_elongation;
     std::string order_r_option;
     Vector d_X1c_d_varphi, d_Y1s_d_varphi, d_Y1c_d_varphi;
     Rank3Tensor grad_B_tensor;
+    qscfloat grid_min_L_grad_B;
     
     Qsc();
     Qsc(std::string);

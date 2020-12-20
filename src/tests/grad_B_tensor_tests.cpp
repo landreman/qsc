@@ -69,6 +69,8 @@ TEST_CASE("grad B tensor for an axisymmetric vacuum field") {
 		  CHECK(Approx(q.grad_B_tensor(j, 2, 1)) == 0.0);
 		  // bt
 		  CHECK(Approx(q.grad_B_tensor(j, 1, 2)) == 0.0);
+
+		  CHECK(Approx(q.L_grad_B[j]) == R0);
 		}
 	      }
 	    }
