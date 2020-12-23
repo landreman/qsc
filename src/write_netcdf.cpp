@@ -200,7 +200,8 @@ void Qsc::write_netcdf(std::string filename) {
   
   // Scalars
   nc.put("nfp", nfp, "Number of field periods", "dimensionless");
-  nc.put("nphi", nfp, "Number of grid points in the toroidal angle phi", "dimensionless");
+  nc.put("nphi", nphi, "Number of grid points in the toroidal angle phi", "dimensionless");
+  //nc.put("axis_nmax_plus_1", R0c.size(), "Length of the arrays R0c, Z0s, etc", "dimensionless");
   nc.put("eta_bar", eta_bar, "Constant equal to B1c / B0", "1/meter");
   nc.put("sigma0", sigma0, "Value of sigma at phi=0", "dimensionless");
   nc.put("B2c", B2c, "r^2 * cos(2*theta) term in |B|", "Tesla/(meter^2)");
@@ -259,6 +260,7 @@ void Qsc::write_netcdf(std::string filename) {
   nc.put(nphi_dim, "elongation", elongation, "Ratio of major to minor axes of the O(r^1) elliptical surfaces in the plane perpendicular to the magnetic axis", "dimensionless");
   nc.put(nphi_dim, "Boozer_toroidal_angle", Boozer_toroidal_angle, "Boozer toroidal angle varphi", "dimensionless");
   nc.put(nphi_dim, "L_grad_B", L_grad_B, "Scale length associated with first derivatives of the magnetic field, eq (3.1) in Landreman J Plasma Physics (2021)", "meter");
+  nc.put(nphi_dim, "L_grad_B_inverse", L_grad_B_inverse, "1 / L_grad_B", "1/meter");
   nc.put(nphi_dim, "d_X1c_d_varphi", d_X1c_d_varphi, "Derivative of X1c with respect to the Boozer toroidal angle varphi", "dimensionless");
   nc.put(nphi_dim, "d_Y1c_d_varphi", d_Y1c_d_varphi, "Derivative of Y1c with respect to the Boozer toroidal angle varphi", "dimensionless");
   nc.put(nphi_dim, "d_Y1s_d_varphi", d_Y1s_d_varphi, "Derivative of Y1s with respect to the Boozer toroidal angle varphi", "dimensionless");

@@ -47,7 +47,7 @@ namespace qsc {
     qscfloat mean_R, mean_Z, standard_deviation_of_R, standard_deviation_of_Z;
     Matrix d_d_phi, d_d_varphi;
     Vector X1s, X1c, sigma, Y1s, Y1c, elongation;
-    Vector Boozer_toroidal_angle, L_grad_B;
+    Vector Boozer_toroidal_angle, L_grad_B, L_grad_B_inverse;
     int max_newton_iterations, max_linesearch_iterations;
     qscfloat newton_tolerance;
     qscfloat iota, iota_N, grid_max_curvature, grid_max_elongation, mean_elongation;
@@ -66,6 +66,7 @@ namespace qsc {
     void r1_diagnostics();
     void calculate();
     void write_netcdf(std::string);
+    void read_netcdf(std::string, char);
   };
   
   std::string outfile(std::string);
