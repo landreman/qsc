@@ -1,7 +1,7 @@
 # This is a sample input file
-nfp = 7
+nfp = 1
 # I can put comments here
-nphi = 31
+nphi = 5
 #order_r_option="r2"
 eta_bar = -1.1
 #R0c = [1.0, 0.3, 0.09]
@@ -11,5 +11,7 @@ sG=-1
 
 order_r_option = "r2"
 
-R0c = [1.0, 0.04, 0.002]
-Z0s = [0.0, 0.03]
+R0c = [1.0]
+Z0s = [0.0]
+# R0c = [1.0, 0.04, 0.002]
+# Z0s = [0.0, 0.03]

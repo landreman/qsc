@@ -16,6 +16,8 @@ int main(int argc, char* argv[]) {
     std::cout << "Usage: " << exe << " qsc_in.<extension>" << std::endl;
     return 1;
   }
+  std::string directory_and_infile(argv[1]);
+  std::string directory_and_outfile = qsc::outfile(directory_and_infile);
 
   if (qsc::single) {
     std::cout << "Using SINGLE precision." << std::endl;
@@ -29,11 +31,11 @@ int main(int argc, char* argv[]) {
   
   qsc::Qsc q;
     
-  q.input(argv[1]);
+  q.input(directory_and_infile);
 
   q.calculate();
 
-  q.write_netcdf();
+  q.write_netcdf(directory_and_outfile);
   
   end_time = std::clock();
   auto end = std::chrono::steady_clock::now();

@@ -176,15 +176,16 @@ void qsc::NetCDFWriter::write_and_close() {
 // End of definition of the qsc::NetCDFWriter class.
 //////////////////////////////////////////////////////////////////////
 
-void Qsc::write_netcdf() {
+void Qsc::write_netcdf(std::string filename) {
   std::time_t start_time, end_time;
   std::chrono::time_point<std::chrono::steady_clock> start;
   if (verbose > 0) {
     start_time = std::clock();
     start = std::chrono::steady_clock::now();
   }
-  
-  qsc::NetCDFWriter nc("qsc_out.foo.nc");
+
+  if (verbose > 0) std::cout << "Writing output to " << filename << std::endl;
+  qsc::NetCDFWriter nc(filename);
 
   // Define dimensions
   dim_id_type nphi_dim, axis_nmax_plus_1_dim, nbt_dim;
