@@ -48,5 +48,6 @@ void Qsc::calculate_grad_B_tensor() {
 				 grad_B_tensor(j, 1, 0) * grad_B_tensor(j, 1, 0) +
 				 grad_B_tensor(j, 0, 1) * grad_B_tensor(j, 0, 1)));
   }
+  L_grad_B_inverse = ((qscfloat)1.0) / L_grad_B;
   grid_min_L_grad_B = L_grad_B.min();
 }

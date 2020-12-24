@@ -221,6 +221,7 @@ void Qsc::write_netcdf(std::string filename) {
   nc.put("rms_curvature", rms_curvature, "Root-mean-squared curvature of the magnetic axis, where the average is taken with respect to arclength", "1/meter");
   nc.put("grid_max_curvature", grid_max_curvature, "Maximum curvature of the magnetic axis, maximizing only over the phi grid points and not interpolating in between", "1/meter");
   nc.put("grid_max_elongation", grid_max_elongation, "Maximum elongation (ratio of major to minor axes of the O(r^1) elliptical surfaces in the plane perpendicular to the magnetic axis), maximizing only over the phi grid points and not interpolating in between", "dimensionless");
+  nc.put("grid_min_R0", grid_min_R0, "Minimum major radius of the magnetic axis, minimizing only over the phi grid points and not interpolating in between", "meter");
   nc.put("mean_elongation", mean_elongation, "Average elongation (ratio of major to minor axes of the O(r^1) elliptical surfaces in the plane perpendicular to the magnetic axis), where the average is taken with respect to arclength", "dimensionless");
   nc.put("mean_R", mean_R, "Average major radius of the magnetic axis, where the average is taken with respect to arclength", "meter");
   nc.put("mean_Z", mean_Z, "Average Z coordinate of the magnetic axis, where the average is taken with respect to arclength", "meter");

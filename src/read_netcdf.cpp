@@ -100,14 +100,43 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
 
   // Scalars
   nc.get("nfp", nfp);
-  nc.get("iota", iota);
-  nc.get("mean_elongation", mean_elongation);
+  nc.get("eta_bar", eta_bar);
+  nc.get("B2c", B2c);
+  nc.get("B2s", B2s);
+  nc.get("p2", p2);
+  nc.get("d_phi", d_phi);
+  nc.get("B0", B0);
+  nc.get("G0", G0);
+  nc.get("sG", sG);
+  nc.get("spsi", spsi);
+  nc.get("axis_length", axis_length);
+  nc.get("d_l_d_varphi", d_l_d_varphi);
+  nc.get("B0_over_abs_G0", B0_over_abs_G0);
+  nc.get("abs_G0_over_B0", abs_G0_over_B0);
   nc.get("rms_curvature", rms_curvature);
+  nc.get("mean_elongation", mean_elongation);
+  nc.get("mean_R", mean_R);
+  nc.get("mean_Z", mean_Z);
+  nc.get("standard_deviation_of_R", standard_deviation_of_R);
+  nc.get("standard_deviation_of_Z", standard_deviation_of_Z);
+  nc.get("iota", iota);
   if (fortran) {
     nc.get("axis_helicity", helicity);
+    nc.get("sigma_initial", sigma0);
   } else {
+    // Quantities that are not in the fortran code
     nc.get("helicity", helicity);
+    nc.get("I2", I2);
+    nc.get("sigma0", sigma0);
+    nc.get("grid_max_curvature", grid_max_curvature);
+    nc.get("grid_max_elongation", grid_max_elongation);
+    nc.get("grid_min_R0", grid_min_R0);
+    nc.get("max_newton_iterations", max_newton_iterations);
+    nc.get("max_linesearch_iterations", max_linesearch_iterations);
+    nc.get("newton_tolerance", newton_tolerance);
+    nc.get("iota_N", iota_N);
   }
+  // nc.get("", );
 
   // Vectors
   nc.get("phi", phi);
@@ -120,18 +149,18 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
   nc.get("R0", R0);
   nc.get("Z0", Z0);
   nc.get("d_l_d_phi", d_l_d_phi);
-  nc.get("d2_l_d_phi2", d2_l_d_phi2);
   nc.get("elongation", elongation);
   nc.get("Boozer_toroidal_angle", Boozer_toroidal_angle);
-  nc.get("d_X1c_d_varphi", d_X1c_d_varphi);
-  nc.get("d_Y1c_d_varphi", d_Y1c_d_varphi);
-  nc.get("d_Y1s_d_varphi", d_Y1s_d_varphi);
   if (fortran) {
     nc.get("modBinv_sqrt_half_grad_B_colon_grad_B", L_grad_B_inverse);
-    L_grad_B = 1.0 / L_grad_B_inverse;
+    L_grad_B = ((qscfloat)1.0) / L_grad_B_inverse;
   } else {
+    nc.get("d2_l_d_phi2", d2_l_d_phi2);
     nc.get("L_grad_B", L_grad_B);
     nc.get("L_grad_B_inverse", L_grad_B_inverse);
+    nc.get("d_X1c_d_varphi", d_X1c_d_varphi);
+    nc.get("d_Y1c_d_varphi", d_Y1c_d_varphi);
+    nc.get("d_Y1s_d_varphi", d_Y1s_d_varphi);
   }
 
   nc.close();

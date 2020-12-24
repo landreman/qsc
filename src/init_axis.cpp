@@ -59,6 +59,7 @@ void Qsc::init_axis() {
   d_l_d_varphi = abs_G0_over_B0;
   G0 = sG * abs_G0_over_B0 * B0;
   if (verbose > 0) std::cout << "G0: " << G0 << std::endl;
+  grid_min_R0 = R0.min();
 
   // Define some aliases:
 #define d_r_d_phi_cylindrical1 R0p

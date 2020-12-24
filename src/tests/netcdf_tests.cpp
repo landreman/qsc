@@ -18,10 +18,37 @@ TEST_CASE("netcdf") {
   // Scalars
   CHECK(qfile.nphi == q11.nphi);
   CHECK(qfile.nfp == q11.nfp);
-  CHECK(qfile.helicity == q11.helicity);
-  CHECK(Approx(qfile.iota) == q11.iota);
-  CHECK(Approx(qfile.mean_elongation) == q11.mean_elongation);
+  CHECK(Approx(qfile.eta_bar) == q11.eta_bar);
+  CHECK(Approx(qfile.B2c) == q11.B2c);
+  CHECK(Approx(qfile.B2s) == q11.B2s);
+  CHECK(Approx(qfile.p2) == q11.p2);
+  CHECK(Approx(qfile.d_phi) == q11.d_phi);
+  CHECK(Approx(qfile.B0) == q11.B0);
+  CHECK(Approx(qfile.G0) == q11.G0);
+  CHECK(qfile.sG == q11.sG);
+  CHECK(qfile.spsi == q11.spsi);
+  CHECK(Approx(qfile.axis_length) == q11.axis_length);
+  CHECK(Approx(qfile.d_l_d_varphi) == q11.d_l_d_varphi);
+  CHECK(Approx(qfile.B0_over_abs_G0) == q11.B0_over_abs_G0);
+  CHECK(Approx(qfile.abs_G0_over_B0) == q11.abs_G0_over_B0);
   CHECK(Approx(qfile.rms_curvature) == q11.rms_curvature);
+  CHECK(Approx(qfile.mean_elongation) == q11.mean_elongation);
+  CHECK(Approx(qfile.mean_R) == q11.mean_R);
+  CHECK(Approx(qfile.mean_Z) == q11.mean_Z);
+  CHECK(Approx(qfile.standard_deviation_of_R) == q11.standard_deviation_of_R);
+  CHECK(Approx(qfile.standard_deviation_of_Z) == q11.standard_deviation_of_Z);
+  CHECK(Approx(qfile.iota) == q11.iota);
+  CHECK(Approx(qfile.iota_N) == q11.iota_N);
+  CHECK(Approx(qfile.I2) == q11.I2);
+  CHECK(Approx(qfile.sigma0) == q11.sigma0);
+  CHECK(Approx(qfile.grid_max_curvature) == q11.grid_max_curvature);
+  CHECK(Approx(qfile.grid_max_elongation) == q11.grid_max_elongation);
+  CHECK(Approx(qfile.grid_min_R0) == q11.grid_min_R0);
+  CHECK(Approx(qfile.newton_tolerance) == q11.newton_tolerance);
+  CHECK(qfile.max_newton_iterations == q11.max_newton_iterations);
+  CHECK(qfile.max_linesearch_iterations == q11.max_linesearch_iterations);
+  CHECK(qfile.helicity == q11.helicity);
+  // CHECK(Approx(qfile.) == q11.);
 
   // Vectors
   for (int j = 0; j < q11.nphi; j++) {
