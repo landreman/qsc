@@ -1,3 +1,6 @@
+#include <iostream>
+#include <vector>
+#include <string>
 #include "doctest.h"
 #include "qsc.hpp"
 
@@ -79,3 +82,71 @@ TEST_CASE("Check iota for published configurations") {
   }
 }
 
+TEST_CASE("Compare published configurations to fortran version of QSC") {
+  std::vector<std::string> cconfigs = {
+    "r1 section 5.1",
+    "r1 section 5.2",
+    "r1 section 5.3",
+    "r2 section 5.1",
+    "r2 section 5.2",
+    "r2 section 5.3",
+    "r2 section 5.4",
+    "r2 section 5.5"};
+  
+  std::vector<std::string> fconfigs = {
+    "quasisymmetry_out.LandremanSenguptaPlunk_section5.1_order_r1_finite_r_linear.nc",
+    "quasisymmetry_out.LandremanSenguptaPlunk_section5.2_order_r1_finite_r_nonlinear.nc",
+    "quasisymmetry_out.LandremanSenguptaPlunk_section5.3_order_r1_finite_r_linear.nc",
+    "quasisymmetry_out.LandremanSengupta2019_section5.1.nc",
+    "quasisymmetry_out.LandremanSengupta2019_section5.2.nc",
+    "quasisymmetry_out.LandremanSengupta2019_section5.3.nc",
+    "quasisymmetry_out.LandremanSengupta2019_section5.4.nc",
+    "quasisymmetry_out.LandremanSengupta2019_section5.5.nc"};
+
+    Qsc f;
+    std::cout << "Hello world" << std::endl;
+    for (int jconfig = 0; jconfig < fconfigs.size(); jconfig++) {
+      std::cout << "jconfig=" << jconfig << std::endl;
+      CAPTURE(jconfig);
+      f.read_netcdf(fconfigs[jconfig], 'F');
+      std::cout << "Read NetCDF fortran file" << std::endl;
+      Qsc c(cconfigs[jconfig]);
+      c.nphi = f.nphi;
+      c.calculate();
+      
+      // Scalars
+      CHECK(c.nphi == f.nphi);
+      CHECK(c.nfp == f.nfp);
+      CHECK(Approx(c.eta_bar) == f.eta_bar);
+      CHECK(Approx(c.B0) == f.B0);
+      CHECK(c.sG == f.sG);
+      CHECK(c.spsi == f.spsi);
+      CHECK(Approx(c.axis_length) == f.axis_length);
+      CHECK(Approx(c.abs_G0_over_B0) == f.abs_G0_over_B0);
+      CHECK(Approx(c.rms_curvature) == f.rms_curvature);
+      CHECK(Approx(c.mean_elongation) == f.mean_elongation);
+      CHECK(Approx(c.standard_deviation_of_R) == f.standard_deviation_of_R);
+      CHECK(Approx(c.standard_deviation_of_Z) == f.standard_deviation_of_Z);
+      CHECK(Approx(c.iota) == f.iota);
+      CHECK(Approx(c.sigma0) == f.sigma0);
+      CHECK(c.helicity == f.helicity);
+      // CHECK(Approx(c.) == f.);
+
+      // Vectors
+      for (int j = 0; j < f.nphi; j++) {
+	CHECK(Approx(c.phi[j]) == f.phi[j]);
+	CHECK(Approx(c.curvature[j]) == f.curvature[j]);
+	CHECK(Approx(c.torsion[j]) == f.torsion[j]);
+	CHECK(Approx(c.sigma[j]) == f.sigma[j]);
+	CHECK(Approx(c.X1c[j]) == f.X1c[j]);
+	CHECK(Approx(c.Y1c[j]) == f.Y1c[j]);
+	CHECK(Approx(c.Y1s[j]) == f.Y1s[j]);
+	CHECK(Approx(c.R0[j]) == f.R0[j]);
+	CHECK(Approx(c.Z0[j]) == f.Z0[j]);
+	CHECK(Approx(c.d_l_d_phi[j]) == f.d_l_d_phi[j]);
+	CHECK(Approx(c.elongation[j]) == f.elongation[j]);
+	CHECK(Approx(c.Boozer_toroidal_angle[j]) == f.Boozer_toroidal_angle[j]);
+	CHECK(Approx(c.L_grad_B_inverse[j]) == f.L_grad_B_inverse[j]);
+      }
+    }
+}
