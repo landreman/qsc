@@ -167,8 +167,18 @@ void Qsc::calculate_r2() {
     r2_rhs[j + nphi] = work2[j];
   }
 
+  std::time_t solve_start_time, solve_end_time;
+  std::chrono::time_point<std::chrono::steady_clock> solve_start, solve_end;
+  if (verbose > 0) {
+    solve_start_time = std::clock();
+    solve_start = std::chrono::steady_clock::now();
+  }
   // Here is the main solve:
   linear_solve(r2_matrix, r2_rhs, r2_ipiv);
+  if (verbose > 0) {
+    solve_end_time = std::clock();
+    solve_end = std::chrono::steady_clock::now();
+  }
 
   // Extract X20 and Y20 from the solution:
   for (j = 0; j < nphi; j++) {
@@ -180,6 +190,11 @@ void Qsc::calculate_r2() {
   Y2s = Y2s_inhomogeneous + Y2s_from_X20 * X20;
   Y2c = Y2c_inhomogeneous + Y2c_from_X20 * X20 + Y20;
 
+  matrix_vector_product(d_d_varphi, X20, d_X20_d_varphi);
+  matrix_vector_product(d_d_varphi, Y20, d_Y20_d_varphi);
+  matrix_vector_product(d_d_varphi, Y2s, d_Y2s_d_varphi);
+  matrix_vector_product(d_d_varphi, Y2c, d_Y2c_d_varphi);
+
   B20 = B0 * (curvature * X20 - B0_over_abs_G0 * d_Z20_d_varphi + half * eta_bar * eta_bar - mu0 * p2 / (B0 * B0)
 	      - quarter * B0_over_abs_G0 * B0_over_abs_G0 * (qc * qc + qs * qs + rc * rc + rs * rs));
   
@@ -190,10 +205,13 @@ void Qsc::calculate_r2() {
     auto end = std::chrono::steady_clock::now();
     
     std::chrono::duration<double> elapsed = end - start;
+    std::chrono::duration<double> solve_elapsed = solve_end - solve_start;
     std::cout << "Time for calculate_r2 from chrono:           "
-              << elapsed.count() << " seconds" << std::endl;
+              << elapsed.count() << " seconds, " << solve_elapsed.count()
+	      << " for solve" << std::endl;
     std::cout << "Time for calculate_r2 from ctime (CPU time): "
               << double(end_time - start_time) / CLOCKS_PER_SEC
-              << " seconds" << std::endl;
+              << " seconds, " << double(solve_end_time - solve_start_time) / CLOCKS_PER_SEC
+	      << " for solve" << std::endl;
   }
 }

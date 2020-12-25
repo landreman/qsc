@@ -7,6 +7,7 @@ using namespace qsc;
 void Qsc::defaults() {
   // Set defaults.
   verbose = 1;
+  order_r_option = ORDER_R_OPTION_R1;
   
   sG = 1;
   spsi = 1;
