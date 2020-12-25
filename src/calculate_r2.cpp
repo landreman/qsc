@@ -21,7 +21,8 @@ void Qsc::calculate_r2() {
 
   if (verbose > 0) std::cout << "Beginning O(r^2) calculation" << std::endl;
 
-  qscfloat half = 0.5;
+  qscfloat half = 0.5, quarter = 0.25;
+  int j, k;
   
   V1 = X1c * X1c + Y1c * Y1c + Y1s * Y1s;
   V2 = 2 * Y1s * Y1c;
@@ -112,6 +113,75 @@ void Qsc::calculate_r2() {
   fYc_inhomogeneous = work1 + 2 * iota_N * Y2s_inhomogeneous + torsion * abs_G0_over_B0 * X2c
     - 4 * spsi * sG * abs_G0_over_B0 * (X2s * Z20)
     - spsi * I2_over_B0 * (-half * curvature * X1c * X1c + 2 * X2c) * abs_G0_over_B0 + half * abs_G0_over_B0 * beta_1s * X1c;
+
+  for (j = 0; j < nphi; j++) {
+    for (k = 0; k < nphi; k++) {
+      // Handle the terms involving d X_0 / d zeta and d Y_0 / d zeta:
+      // ----------------------------------------------------------------
+
+      // Equation 1, terms involving X0:
+      // Contributions arise from Y1c * fYs - Y1s * fYc.
+      r2_matrix(j, k) = Y1c[j] * d_d_varphi(j, k) * Y2s_from_X20[k]
+	- Y1s[j] * d_d_varphi(j, k) * Y2c_from_X20[k];
+
+      // Equation 1, terms involving Y0:
+      // Contributions arise from -Y1s * fY0 - Y1s * fYc, and they happen to be equal.
+      r2_matrix(j, k + nphi) = -2 * Y1s[j] * d_d_varphi(j, k);
+
+      // Equation 2, terms involving X0:
+      // Contributions arise from -X1c * fX0 + Y1s * fYs + Y1c * fYc
+      r2_matrix(j + nphi, k) = -X1c[j] * d_d_varphi(j, k)
+	+ Y1s[j] * d_d_varphi(j, k) * Y2s_from_X20[k]
+	+ Y1c[j] * d_d_varphi(j, k) * Y2c_from_X20[k];
+
+      // Equation 2, terms involving Y0:
+      // Contributions arise from -Y1c * fY0 + Y1c * fYc, but they happen to cancel.
+      r2_matrix(j + nphi, k + nphi) = 0.0;
+    }
+
+    // Now handle the terms involving X_0 and Y_0 without d / d varphi derivatives:
+    // ----------------------------------------------------------------
+
+    r2_matrix(j, j       ) = r2_matrix(j, j       )
+      + X1c[j] * fXs_from_X20[j] - Y1s[j] * fY0_from_X20[j]
+      + Y1c[j] * fYs_from_X20[j] - Y1s[j] * fYc_from_X20[j];
+    
+    r2_matrix(j, j + nphi) = r2_matrix(j, j + nphi)
+      + X1c[j] * fXs_from_Y20[j] - Y1s[j] * fY0_from_Y20[j]
+      + Y1c[j] * fYs_from_Y20[j] - Y1s[j] * fYc_from_Y20[j];
+
+    r2_matrix(j + nphi, j       ) = r2_matrix(j + nphi, j      )
+      - X1c[j] * fX0_from_X20[j] + X1c[j] * fXc_from_X20[j] - Y1c[j] * fY0_from_X20[j]
+      + Y1s[j] * fYs_from_X20[j] + Y1c[j] * fYc_from_X20[j];
+    
+    r2_matrix(j + nphi, j + nphi) = r2_matrix(j + nphi, j + nphi)
+      - X1c[j] * fX0_from_Y20[j] + X1c[j] * fXc_from_Y20[j] - Y1c[j] * fY0_from_Y20[j]
+      + Y1s[j] * fYs_from_Y20[j] + Y1c[j] * fYc_from_Y20[j];
+  }
+
+  // Assemble the right-hand side
+  work1 = -(X1c * fXs_inhomogeneous - Y1s * fY0_inhomogeneous + Y1c * fYs_inhomogeneous - Y1s * fYc_inhomogeneous);
+  work2 = -(- X1c * fX0_inhomogeneous + X1c * fXc_inhomogeneous - Y1c * fY0_inhomogeneous + Y1s * fYs_inhomogeneous + Y1c * fYc_inhomogeneous);
+  for (j = 0; j < nphi; j++) {
+    r2_rhs[j] = work1[j];
+    r2_rhs[j + nphi] = work2[j];
+  }
+
+  // Here is the main solve:
+  linear_solve(r2_matrix, r2_rhs, r2_ipiv);
+
+  // Extract X20 and Y20 from the solution:
+  for (j = 0; j < nphi; j++) {
+    X20[j] = r2_rhs[j];
+    Y20[j] = r2_rhs[j + nphi];
+  }
+
+  // Now that we have X20 and Y20 explicitly, we can reconstruct Y2s, Y2c, and B20:
+  Y2s = Y2s_inhomogeneous + Y2s_from_X20 * X20;
+  Y2c = Y2c_inhomogeneous + Y2c_from_X20 * X20 + Y20;
+
+  B20 = B0 * (curvature * X20 - B0_over_abs_G0 * d_Z20_d_varphi + half * eta_bar * eta_bar - mu0 * p2 / (B0 * B0)
+	      - quarter * B0_over_abs_G0 * B0_over_abs_G0 * (qc * qc + qs * qs + rc * rc + rs * rs));
   
   ////////////////////////////////////////////////////////////
   

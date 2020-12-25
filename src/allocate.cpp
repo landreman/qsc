@@ -110,6 +110,7 @@ void Qsc::allocate() {
 
     r2_matrix.resize(2 * nphi, 2 * nphi, 0.0);
     r2_rhs.resize(2 * nphi, 0.0);
+    r2_ipiv.resize(2 * nphi, 0);
 
     Y2s_from_X20.resize(nphi, 0.0);
     Y2s_inhomogeneous.resize(nphi, 0.0);

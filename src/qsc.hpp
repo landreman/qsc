@@ -28,7 +28,7 @@ namespace qsc {
     Vector binormal_cylindrical1, binormal_cylindrical2, binormal_cylindrical3;
     Vector d_tangent_d_l_cylindrical1, d_tangent_d_l_cylindrical2, d_tangent_d_l_cylindrical3;
     Vector torsion_numerator, torsion_denominator, etabar_squared_over_curvature_squared;
-    std::valarray<int> quadrant, ipiv;
+    std::valarray<int> quadrant, ipiv, r2_ipiv;
     Vector state, residual, work1, work2;
     Matrix work_matrix;
     Vector V1, V2, V3, rc, rs, qc, qs, r2_rhs;

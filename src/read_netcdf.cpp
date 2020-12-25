@@ -139,13 +139,13 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
     // Data saved by the C++ version
     
     // Scalars
+    int tempint;
+    nc.get("at_least_order_r2", tempint);
+    at_least_order_r2 = (bool) tempint;
     nc.get("nfp", nfp);
     nc.get("eta_bar", eta_bar);
     nc.get("sigma0", sigma0);
-    nc.get("B2c", B2c);
-    nc.get("B2s", B2s);
     nc.get("I2", I2);
-    nc.get("p2", p2);
     nc.get("d_phi", d_phi);
     nc.get("B0", B0);
     nc.get("G0", G0);
@@ -170,6 +170,13 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
     nc.get("newton_tolerance", newton_tolerance);
     nc.get("iota", iota);
     nc.get("iota_N", iota_N);
+    if (at_least_order_r2) {
+      nc.get("B2c", B2c);
+      nc.get("B2s", B2s);
+      nc.get("p2", p2);
+      nc.get("G2", G2);
+      nc.get("beta_1s", beta_1s);
+    }
 
     // Vectors
     nc.get("phi", phi);
@@ -190,6 +197,27 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
     nc.get("d_X1c_d_varphi", d_X1c_d_varphi);
     nc.get("d_Y1c_d_varphi", d_Y1c_d_varphi);
     nc.get("d_Y1s_d_varphi", d_Y1s_d_varphi);
+    if (at_least_order_r2) {
+      nc.get("X20", X20);
+      nc.get("X2s", X2s);
+      nc.get("X2c", X2c);
+      nc.get("Y20", Y20);
+      nc.get("Y2s", Y2s);
+      nc.get("Y2c", Y2c);
+      nc.get("Z20", Z20);
+      nc.get("Z2s", Z2s);
+      nc.get("Z2c", Z2c);
+      nc.get("B20", B20);
+      nc.get("d_X20_d_varphi", d_X20_d_varphi);
+      nc.get("d_X2s_d_varphi", d_X2s_d_varphi);
+      nc.get("d_X2c_d_varphi", d_X2c_d_varphi);
+      nc.get("d_Y20_d_varphi", d_Y20_d_varphi);
+      nc.get("d_Y2s_d_varphi", d_Y2s_d_varphi);
+      nc.get("d_Y2c_d_varphi", d_Y2c_d_varphi);
+      nc.get("d_Z20_d_varphi", d_Z20_d_varphi);
+      nc.get("d_Z2s_d_varphi", d_Z2s_d_varphi);
+      nc.get("d_Z2c_d_varphi", d_Z2c_d_varphi);
+    }
   }
   // nc.get("", );
 

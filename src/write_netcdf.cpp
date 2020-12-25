@@ -199,15 +199,14 @@ void Qsc::write_netcdf(std::string filename) {
   nbt_dim = nc.dim("normal_binormal_tangent", 3);
   
   // Scalars
+  int at_least_order_r2_int = (int) at_least_order_r2;
+  nc.put("at_least_order_r2", at_least_order_r2_int, "1 if the O(r^2) equations were solved, 0 if not", "dimensionless");
   nc.put("nfp", nfp, "Number of field periods", "dimensionless");
   nc.put("nphi", nphi, "Number of grid points in the toroidal angle phi", "dimensionless");
   //nc.put("axis_nmax_plus_1", R0c.size(), "Length of the arrays R0c, Z0s, etc", "dimensionless");
   nc.put("eta_bar", eta_bar, "Constant equal to B1c / B0", "1/meter");
   nc.put("sigma0", sigma0, "Value of sigma at phi=0", "dimensionless");
-  nc.put("B2c", B2c, "r^2 * cos(2*theta) term in |B|", "Tesla/(meter^2)");
-  nc.put("B2s", B2s, "r^2 * sin(2*theta) term in |B|", "Tesla/(meter^2)");
   nc.put("I2", I2, "r^2 term in I(r), which is the toroidal current inside the flux surface times mu0/(2pi)", "Tesla/meter");
-  nc.put("p2", p2, "r^2 term in p(r), the pressure profile", "Pascal/(meter^2)");
   nc.put("d_phi", d_phi, "Grid spacing in phi", "dimensionless");
   nc.put("B0", B0, "Magnetic field magnitude on the magnetic axis", "Telsa");
   nc.put("G0", G0, "Value on the magnetic axis of G(r), which is the poloidal current outside the flux surface times mu0/(2pi)", "Tesla*meter");
@@ -233,6 +232,10 @@ void Qsc::write_netcdf(std::string filename) {
   nc.put("iota", iota, "Rotational transform", "dimensionless");
   nc.put("iota_N", iota_N, "Rotational transform minus N", "dimensionless");
   if (at_least_order_r2) {
+    nc.put("B2c", B2c, "r^2 * cos(2*theta) term in |B|", "Tesla/(meter^2)");
+    nc.put("B2s", B2s, "r^2 * sin(2*theta) term in |B|", "Tesla/(meter^2)");
+    nc.put("p2", p2, "r^2 term in p(r), the pressure profile", "Pascal/(meter^2)");
+    nc.put("G2", G2, "r^2 term in G(r), which is the poloidal current outside the flux surface times mu0/(2pi)", "Tesla/meter");
     nc.put("beta_1s", beta_1s, "r * sin(theta) component of beta, the coefficient of grad psi in the Boozer covariant representation of B", "meter^{-2}");
   }
   /*
@@ -268,6 +271,29 @@ void Qsc::write_netcdf(std::string filename) {
   nc.put(nphi_dim, "d_X1c_d_varphi", d_X1c_d_varphi, "Derivative of X1c with respect to the Boozer toroidal angle varphi", "dimensionless");
   nc.put(nphi_dim, "d_Y1c_d_varphi", d_Y1c_d_varphi, "Derivative of Y1c with respect to the Boozer toroidal angle varphi", "dimensionless");
   nc.put(nphi_dim, "d_Y1s_d_varphi", d_Y1s_d_varphi, "Derivative of Y1s with respect to the Boozer toroidal angle varphi", "dimensionless");
+  if (at_least_order_r2) {
+    nc.put(nphi_dim, "X20", X20, "r^2*cos(0*theta) term in X, the component of the position vector in the direction of the normal vector", "1/meter");
+    nc.put(nphi_dim, "X2s", X2s, "r^2*sin(2*theta) term in X, the component of the position vector in the direction of the normal vector", "1/meter");
+    nc.put(nphi_dim, "X2c", X2c, "r^2*cos(2*theta) term in X, the component of the position vector in the direction of the normal vector", "1/meter");
+    nc.put(nphi_dim, "Y20", Y20, "r^2*cos(0*theta) term in Y, the component of the position vector in the direction of the binormal vector", "1/meter");
+    nc.put(nphi_dim, "Y2s", Y2s, "r^2*sin(2*theta) term in Y, the component of the position vector in the direction of the binormal vector", "1/meter");
+    nc.put(nphi_dim, "Y2c", Y2c, "r^2*cos(2*theta) term in Y, the component of the position vector in the direction of the binormal vector", "1/meter");
+    nc.put(nphi_dim, "Z20", Z20, "r^2*cos(0*theta) term in Z, the component of the position vector in the direction of the tangent vector", "1/meter");
+    nc.put(nphi_dim, "Z2s", Z2s, "r^2*sin(2*theta) term in Z, the component of the position vector in the direction of the tangent vector", "1/meter");
+    nc.put(nphi_dim, "Z2c", Z2c, "r^2*cos(2*theta) term in Z, the component of the position vector in the direction of the tangent vector", "1/meter");
+
+    nc.put(nphi_dim, "B20", B20, "r^2*cos(0*theta) term in the magnetic field magnitude B", "Telsa/(meter^2)");
+	   
+    nc.put(nphi_dim, "d_X20_d_varphi", d_X20_d_varphi, "Derivative of X20 with respect to the Boozer toroidal angle varphi", "1/meter");
+    nc.put(nphi_dim, "d_X2s_d_varphi", d_X2s_d_varphi, "Derivative of X2s with respect to the Boozer toroidal angle varphi", "1/meter");
+    nc.put(nphi_dim, "d_X2c_d_varphi", d_X2c_d_varphi, "Derivative of X2c with respect to the Boozer toroidal angle varphi", "1/meter");
+    nc.put(nphi_dim, "d_Y20_d_varphi", d_Y20_d_varphi, "Derivative of Y20 with respect to the Boozer toroidal angle varphi", "1/meter");
+    nc.put(nphi_dim, "d_Y2s_d_varphi", d_Y2s_d_varphi, "Derivative of Y2s with respect to the Boozer toroidal angle varphi", "1/meter");
+    nc.put(nphi_dim, "d_Y2c_d_varphi", d_Y2c_d_varphi, "Derivative of Y2c with respect to the Boozer toroidal angle varphi", "1/meter");
+    nc.put(nphi_dim, "d_Z20_d_varphi", d_Z20_d_varphi, "Derivative of Z20 with respect to the Boozer toroidal angle varphi", "1/meter");
+    nc.put(nphi_dim, "d_Z2s_d_varphi", d_Z2s_d_varphi, "Derivative of Z2s with respect to the Boozer toroidal angle varphi", "1/meter");
+    nc.put(nphi_dim, "d_Z2c_d_varphi", d_Z2c_d_varphi, "Derivative of Z2c with respect to the Boozer toroidal angle varphi", "1/meter");
+  }
   /*
   nc.put(nphi_dim, "", , "", "");
   */
