@@ -232,6 +232,9 @@ void Qsc::write_netcdf(std::string filename) {
   nc.put("newton_tolerance", newton_tolerance, "L2 norm of the residual used as a stopping criterion for Newton's method when solving the sigma equation", "dimensionless");
   nc.put("iota", iota, "Rotational transform", "dimensionless");
   nc.put("iota_N", iota_N, "Rotational transform minus N", "dimensionless");
+  if (at_least_order_r2) {
+    nc.put("beta_1s", beta_1s, "r * sin(theta) component of beta, the coefficient of grad psi in the Boozer covariant representation of B", "meter^{-2}");
+  }
   /*
   nc.put("", , "", "");
   */

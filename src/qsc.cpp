@@ -37,7 +37,8 @@ Qsc::Qsc() :
   d_d_phi(1, 1),
   d_d_varphi(1, 1),
   work_matrix(1, 1),
-  grad_B_tensor(1, 3, 3)
+  grad_B_tensor(1, 3, 3),
+  r2_matrix(1, 1)
 {
   defaults();
   
@@ -58,10 +59,14 @@ void Qsc::calculate() {
     start = std::chrono::steady_clock::now();
   }
 
+  validate();
   allocate();
   init_axis();
   solve_sigma_equation();
   r1_diagnostics();
+  if (at_least_order_r2) {
+    calculate_r2();
+  }
 
   if (verbose > 0) {
     end_time = std::clock();

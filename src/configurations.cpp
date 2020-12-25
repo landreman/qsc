@@ -12,13 +12,15 @@ Qsc::Qsc(std::string config_name) :
   d_d_phi(1, 1),
   d_d_varphi(1, 1),
   work_matrix(1, 1),
-  grad_B_tensor(1, 3, 3)
+  grad_B_tensor(1, 3, 3),
+  r2_matrix(1, 1)
 {
   defaults();
   
   if (config_name.compare("r1 section 5.1") == 0) {
     nfp = 3;
     eta_bar = -0.9;
+    order_r_option = ORDER_R_OPTION_R1;
 
     R0c.resize(2, 0.0);
     R0s.resize(2, 0.0);
@@ -31,6 +33,7 @@ Qsc::Qsc(std::string config_name) :
   } else if (config_name.compare("r1 section 5.2") == 0) {
     nfp = 4;
     eta_bar = -2.25;
+    order_r_option = ORDER_R_OPTION_R1;
 
     R0c.resize(2, 0.0);
     R0s.resize(2, 0.0);
@@ -44,6 +47,7 @@ Qsc::Qsc(std::string config_name) :
     nfp = 3;
     eta_bar = -1.1;
     sigma0 = -0.6;
+    order_r_option = ORDER_R_OPTION_R1;
 
     R0c.resize(2, 0.0);
     R0s.resize(2, 0.0);
@@ -59,6 +63,7 @@ Qsc::Qsc(std::string config_name) :
     nfp = 2;
     eta_bar = 0.64;
     B2c = -0.00322;
+    order_r_option = ORDER_R_OPTION_R2;
 
     R0c.resize(3, 0.0);
     R0s.resize(3, 0.0);
@@ -75,6 +80,7 @@ Qsc::Qsc(std::string config_name) :
     nfp = 2;
     eta_bar = 0.632;
     B2c = -0.158;
+    order_r_option = ORDER_R_OPTION_R2;
 
     R0c.resize(4, 0.0);
     R0s.resize(4, 0.0);
@@ -96,6 +102,7 @@ Qsc::Qsc(std::string config_name) :
     B2c = -0.7;
     I2 = 0.9;
     p2 = -600000.0;
+    order_r_option = ORDER_R_OPTION_R2;
     
     R0c.resize(2, 0.0);
     R0s.resize(2, 0.0);
@@ -110,6 +117,7 @@ Qsc::Qsc(std::string config_name) :
     nfp = 4;
     eta_bar = 1.569;
     B2c = 0.1348;
+    order_r_option = ORDER_R_OPTION_R2;
 
     R0c.resize(5, 0.0);
     R0s.resize(5, 0.0);
@@ -135,6 +143,7 @@ Qsc::Qsc(std::string config_name) :
     B2s = 3.0;
     I2 = 1.6;
     p2 = -0.5e7;
+    order_r_option = ORDER_R_OPTION_R2;
 
     R0c.resize(2, 0.0);
     R0s.resize(2, 0.0);

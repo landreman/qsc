@@ -4,7 +4,7 @@
 
 using namespace qsc;
 
-/** Allocate all of the arrays (Vectors) that will be used.
+/** Allocate all of the arrays (Vectors), matrices, and higher-rank tensors that will be used.
  */
 void Qsc::allocate() {
   std::time_t start_time, end_time;
@@ -86,6 +86,80 @@ void Qsc::allocate() {
   L_grad_B.resize(nphi, 0.0);
   L_grad_B_inverse.resize(nphi, 0.0);
 
+  if (at_least_order_r2) {
+    X20.resize(nphi, 0.0);
+    X2s.resize(nphi, 0.0);
+    X2c.resize(nphi, 0.0);
+
+    Y20.resize(nphi, 0.0);
+    Y2s.resize(nphi, 0.0);
+    Y2c.resize(nphi, 0.0);
+
+    Z20.resize(nphi, 0.0);
+    Z2s.resize(nphi, 0.0);
+    Z2c.resize(nphi, 0.0);
+
+    V1.resize(nphi, 0.0);
+    V2.resize(nphi, 0.0);
+    V3.resize(nphi, 0.0);
+    
+    rs.resize(nphi, 0.0);
+    rc.resize(nphi, 0.0);
+    qs.resize(nphi, 0.0);
+    qc.resize(nphi, 0.0);
+
+    r2_matrix.resize(2 * nphi, 2 * nphi, 0.0);
+    r2_rhs.resize(2 * nphi, 0.0);
+
+    Y2s_from_X20.resize(nphi, 0.0);
+    Y2s_inhomogeneous.resize(nphi, 0.0);
+    Y2c_from_X20.resize(nphi, 0.0);
+    Y2c_inhomogeneous.resize(nphi, 0.0);
+
+    fX0_from_X20.resize(nphi, 0.0);
+    fX0_from_Y20.resize(nphi, 0.0);
+    fX0_inhomogeneous.resize(nphi, 0.0);
+
+    fXs_from_X20.resize(nphi, 0.0);
+    fXs_from_Y20.resize(nphi, 0.0);
+    fXs_inhomogeneous.resize(nphi, 0.0);
+
+    fXc_from_X20.resize(nphi, 0.0);
+    fXc_from_Y20.resize(nphi, 0.0);
+    fXc_inhomogeneous.resize(nphi, 0.0);
+
+    fY0_from_X20.resize(nphi, 0.0);
+    fY0_from_Y20.resize(nphi, 0.0);
+    fY0_inhomogeneous.resize(nphi, 0.0);
+
+    fYs_from_X20.resize(nphi, 0.0);
+    fYs_from_Y20.resize(nphi, 0.0);
+    fYs_inhomogeneous.resize(nphi, 0.0);
+
+    fYc_from_X20.resize(nphi, 0.0);
+    fYc_from_Y20.resize(nphi, 0.0);
+    fYc_inhomogeneous.resize(nphi, 0.0);
+
+    d_curvature_d_varphi.resize(nphi, 0.0);
+    d_torsion_d_varphi.resize(nphi, 0.0);
+    
+    d_X20_d_varphi.resize(nphi, 0.0);
+    d_X2s_d_varphi.resize(nphi, 0.0);
+    d_X2c_d_varphi.resize(nphi, 0.0);
+    
+    d_Y20_d_varphi.resize(nphi, 0.0);
+    d_Y2s_d_varphi.resize(nphi, 0.0);
+    d_Y2c_d_varphi.resize(nphi, 0.0);
+    
+    d_Z20_d_varphi.resize(nphi, 0.0);
+    d_Z2s_d_varphi.resize(nphi, 0.0);
+    d_Z2c_d_varphi.resize(nphi, 0.0);
+    
+    d2_X1c_d_varphi2.resize(nphi, 0.0);
+    d2_Y1c_d_varphi2.resize(nphi, 0.0);
+    d2_Y1s_d_varphi2.resize(nphi, 0.0);
+  }
+  
   if (verbose > 0) {
     end_time = std::clock();
     auto end = std::chrono::steady_clock::now();

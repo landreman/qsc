@@ -59,6 +59,15 @@ namespace qsc {
     return std::operator*(j, v);
   }
   
+  /*
+  inline Vector operator*(float j, Vector& v) {
+    return std::operator*(qscfloat(j), v);
+  }
+  
+  inline Vector operator*(double j, Vector& v) {
+    return std::operator*(qscfloat(j), v);
+  }
+  */
 
   // inline functions must be included in every file that uses them,
   // so these functions should go in the header file.

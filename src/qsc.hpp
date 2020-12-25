@@ -7,6 +7,7 @@
 namespace qsc {  
 
   const qscfloat pi = 3.141592653589793;
+  const qscfloat mu0 = (4.0e-7) * pi;
   
   Matrix differentiation_matrix(const int N, const qscfloat xmin, const qscfloat xmax);
 
@@ -15,6 +16,9 @@ namespace qsc {
   void newton_solve(residual_function_type, jacobian_function_type,
 		    Vector&, Vector&, Vector&, Vector&, std::valarray<int>&,
 		    Matrix&, int, int, qscfloat, int, void*);
+
+  const std::string ORDER_R_OPTION_R1 = "r1";
+  const std::string ORDER_R_OPTION_R2 = "r2";
   
   class Qsc {
   private:
@@ -27,6 +31,15 @@ namespace qsc {
     std::valarray<int> quadrant, ipiv;
     Vector state, residual, work1, work2;
     Matrix work_matrix;
+    Vector V1, V2, V3, rc, rs, qc, qs, r2_rhs;
+    Matrix r2_matrix;
+    Vector Y2s_from_X20, Y2s_inhomogeneous, Y2c_from_X20, Y2c_inhomogeneous;
+    Vector fX0_from_X20, fX0_from_Y20, fX0_inhomogeneous;
+    Vector fXs_from_X20, fXs_from_Y20, fXs_inhomogeneous;
+    Vector fXc_from_X20, fXc_from_Y20, fXc_inhomogeneous;
+    Vector fY0_from_X20, fY0_from_Y20, fY0_inhomogeneous;
+    Vector fYs_from_X20, fYs_from_Y20, fYs_inhomogeneous;
+    Vector fYc_from_X20, fYc_from_Y20, fYc_inhomogeneous;
     
     void calculate_helicity();
     static void sigma_eq_residual(Vector&, Vector&, void*);
@@ -49,21 +62,30 @@ namespace qsc {
     Vector X1s, X1c, sigma, Y1s, Y1c, elongation;
     Vector Boozer_toroidal_angle, L_grad_B, L_grad_B_inverse;
     int max_newton_iterations, max_linesearch_iterations;
-    qscfloat newton_tolerance, grid_min_R0;
+    qscfloat newton_tolerance, grid_min_R0, G2, I2_over_B0;
     qscfloat iota, iota_N, grid_max_curvature, grid_max_elongation, mean_elongation;
     std::string order_r_option;
-    Vector d_X1c_d_varphi, d_Y1s_d_varphi, d_Y1c_d_varphi;
+    bool at_least_order_r2;
+    Vector X20, X2s, X2c, Y20, Y2s, Y2c, Z20, Z2s, Z2c;
+    Vector d_X1c_d_varphi, d_Y1s_d_varphi, d_Y1c_d_varphi, B20, B20_anomaly;
     Rank3Tensor grad_B_tensor;
-    qscfloat grid_min_L_grad_B;
+    qscfloat grid_min_L_grad_B, beta_1s, B20_mean, B20_residual, B20_variation;
+    Vector d_curvature_d_varphi, d_torsion_d_varphi;
+    Vector d_X20_d_varphi, d_X2s_d_varphi, d_X2c_d_varphi;
+    Vector d_Y20_d_varphi, d_Y2s_d_varphi, d_Y2c_d_varphi;
+    Vector d_Z20_d_varphi, d_Z2s_d_varphi, d_Z2c_d_varphi;
+    Vector d2_X1c_d_varphi2, d2_Y1c_d_varphi2, d2_Y1s_d_varphi2;
     
     Qsc();
     Qsc(std::string);
     void input(std::string);
     void defaults();
+    void validate();
     void allocate();
     void init_axis();
     void solve_sigma_equation();
     void r1_diagnostics();
+    void calculate_r2();
     void calculate();
     void write_netcdf(std::string);
     void read_netcdf(std::string, char);

@@ -90,6 +90,7 @@ void Qsc::r1_diagnostics() {
   }
 
   iota_N = iota + helicity * nfp;
+  I2_over_B0 = I2 / B0;
   
   Y1s = (sG * spsi / eta_bar) * curvature;
   Y1c = Y1s * sigma;

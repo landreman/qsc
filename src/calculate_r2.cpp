@@ -1,0 +1,129 @@
+#include <ctime>
+#include <chrono>
+#include "qsc.hpp"
+
+using namespace qsc;
+
+/** Solve the O(r^2) equations for X2, Y2, Z2, and B20.
+ */
+void Qsc::calculate_r2() {
+  std::time_t start_time, end_time;
+  std::chrono::time_point<std::chrono::steady_clock> start;
+  if (verbose > 0) {
+    start_time = std::clock();
+    start = std::chrono::steady_clock::now();
+  }
+  
+  if (abs(iota_N) < 1.0e-8)
+    std::cerr <<
+      "Warning: |iota_N| is very small so O(r^2) solve will be poorly conditioned. iota_N="
+	      << iota_N << std::endl;
+
+  if (verbose > 0) std::cout << "Beginning O(r^2) calculation" << std::endl;
+
+  qscfloat half = 0.5;
+  
+  V1 = X1c * X1c + Y1c * Y1c + Y1s * Y1s;
+  V2 = 2 * Y1s * Y1c;
+  V3 = X1c * X1c + Y1c * Y1c - Y1s * Y1s;
+
+  qscfloat factor = - B0_over_abs_G0 / 8.0;
+  matrix_vector_product(d_d_varphi, V1, Z20);
+  matrix_vector_product(d_d_varphi, V2, Z2s);
+  matrix_vector_product(d_d_varphi, V3, Z2c);
+  Z20 *= factor;
+  Z2s = factor * (Z2s - 2 * iota_N * V3);
+  Z2c = factor * (Z2c + 2 * iota_N * V2);
+
+  matrix_vector_product(d_d_varphi, Z20, d_Z20_d_varphi);
+  matrix_vector_product(d_d_varphi, Z2s, d_Z2s_d_varphi);
+  matrix_vector_product(d_d_varphi, Z2c, d_Z2c_d_varphi);
+
+  qs = -iota_N * X1c - abs_G0_over_B0 * Y1s * torsion;
+  
+  matrix_vector_product(d_d_varphi, X1c, qc);
+  qc -= abs_G0_over_B0 * Y1c * torsion;
+
+  matrix_vector_product(d_d_varphi, Y1s, rs);
+  rs -= iota_N * Y1c;
+
+  matrix_vector_product(d_d_varphi, Y1c, rc);
+  rc += iota_N * Y1s + X1c * torsion * abs_G0_over_B0;
+
+  matrix_vector_product(d_d_varphi, Z2s, X2s);
+  X2s = B0_over_abs_G0 * (X2s - (2 * iota_N) * Z2c + B0_over_abs_G0 * ( abs_G0_over_B0 * abs_G0_over_B0 * B2s / B0 + (qc * qs + rc * rs) * half)) / curvature;
+
+  matrix_vector_product(d_d_varphi, Z2c, X2c);
+  X2c = B0_over_abs_G0 * (X2c + (2 * iota_N) * Z2s - B0_over_abs_G0 * (-abs_G0_over_B0 * abs_G0_over_B0 * B2c / B0 + abs_G0_over_B0 * abs_G0_over_B0 * eta_bar * eta_bar / 2.0 - (qc * qc - qs * qs + rc * rc - rs * rs) * 0.25)) / curvature;
+
+  matrix_vector_product(d_d_varphi, X2s, d_X2s_d_varphi);
+  matrix_vector_product(d_d_varphi, X2c, d_X2c_d_varphi);
+  
+  beta_1s = -4 * spsi * sG * mu0 * p2 * eta_bar * abs_G0_over_B0 / (iota_N * B0 * B0);
+
+  Y2s_from_X20 = -sG * spsi * curvature * curvature / (eta_bar * eta_bar);
+  Y2s_inhomogeneous = sG * spsi * (-curvature/2 + curvature*curvature/(eta_bar*eta_bar)*(-X2c + X2s * sigma));
+
+  Y2c_from_X20 = -sG * spsi * curvature * curvature * sigma / (eta_bar * eta_bar);
+  Y2c_inhomogeneous = sG * spsi * curvature * curvature / (eta_bar * eta_bar) * (X2s + X2c * sigma);
+
+  /* Note: in the fX* and fY* quantities below, I've omitted the
+     contributions from X20 and Y20 to the d/dzeta terms. These
+     contributions are handled later when we assemble the large
+     matrix.
+  */
+  fX0_from_X20 = -4 * sG * spsi * abs_G0_over_B0 * (Y2c_from_X20 * Z2s - Y2s_from_X20 * Z2c);
+  fX0_from_Y20 = -torsion * abs_G0_over_B0 - 4 * sG * spsi * abs_G0_over_B0 * (Z2s)
+    - spsi * I2_over_B0 * (-2) * abs_G0_over_B0;
+  fX0_inhomogeneous = curvature * abs_G0_over_B0 * Z20 - 4 * sG * spsi * abs_G0_over_B0 * (Y2c_inhomogeneous * Z2s - Y2s_inhomogeneous * Z2c) 
+    - (spsi * I2_over_B0 * half * sG * spsi * abs_G0_over_B0) * curvature + beta_1s * abs_G0_over_B0 / 2 * Y1c;
+
+  fXs_from_X20 = -torsion * abs_G0_over_B0 * Y2s_from_X20 - 4 * spsi * sG * abs_G0_over_B0 * (Y2c_from_X20 * Z20) 
+    - spsi * I2_over_B0 * (- 2 * Y2s_from_X20) * abs_G0_over_B0;
+  fXs_from_Y20 = - 4 * spsi * sG * abs_G0_over_B0 * (-Z2c + Z20);
+  fXs_inhomogeneous = d_X2s_d_varphi - 2 * iota_N * X2c - torsion * abs_G0_over_B0 * Y2s_inhomogeneous + curvature * abs_G0_over_B0 * Z2s
+    - 4 * spsi * sG * abs_G0_over_B0 * (Y2c_inhomogeneous * Z20)
+    - spsi * I2_over_B0 * ((half * spsi * sG) * curvature - 2 * Y2s_inhomogeneous) * abs_G0_over_B0
+    - (half) * abs_G0_over_B0 * beta_1s * Y1s;
+
+  fXc_from_X20 = - torsion * abs_G0_over_B0 * Y2c_from_X20 - 4 * spsi * sG * abs_G0_over_B0 * (-Y2s_from_X20 * Z20)
+    - spsi * I2_over_B0 * (- 2 * Y2c_from_X20) * abs_G0_over_B0;
+  fXc_from_Y20 = - torsion * abs_G0_over_B0 - 4 * spsi * sG * abs_G0_over_B0 * (Z2s)
+    - spsi * I2_over_B0 * (-2) * abs_G0_over_B0;
+  fXc_inhomogeneous = d_X2c_d_varphi + 2 * iota_N * X2s - torsion * abs_G0_over_B0 * Y2c_inhomogeneous + curvature * abs_G0_over_B0 * Z2c
+    - 4 * spsi * sG * abs_G0_over_B0 * (-Y2s_inhomogeneous * Z20)
+    - spsi * I2_over_B0 * ((half * sG * spsi) * curvature - 2 * Y2c_inhomogeneous) * abs_G0_over_B0
+    - (half) * abs_G0_over_B0 * beta_1s * Y1c;
+
+  fY0_from_X20 = torsion * abs_G0_over_B0 - spsi * I2_over_B0 * (2) * abs_G0_over_B0;
+  fY0_from_Y20 = 0; // Could save a little time here?
+  fY0_inhomogeneous = -4 * spsi * sG * abs_G0_over_B0 * (X2s * Z2c - X2c * Z2s)
+    - spsi * I2_over_B0 * (-half * curvature * X1c * X1c) * abs_G0_over_B0 - (half) * abs_G0_over_B0 * beta_1s * X1c;
+
+  fYs_from_X20 = -2 * iota_N * Y2c_from_X20 - 4 * spsi * sG * abs_G0_over_B0 * (Z2c);
+  fYs_from_Y20 = -2 * iota_N; // Note this is independent of phi
+  matrix_vector_product(d_d_varphi, Y2s_inhomogeneous, work1);
+  fYs_inhomogeneous = work1 - 2 * iota_N * Y2c_inhomogeneous + torsion * abs_G0_over_B0 * X2s
+    - 4 * spsi * sG * abs_G0_over_B0 * (-X2c * Z20) - 2 * spsi * I2_over_B0 * X2s * abs_G0_over_B0;
+
+  fYc_from_X20 = 2 * iota_N * Y2s_from_X20 - 4 * spsi * sG * abs_G0_over_B0 * (-Z2s);
+  fYc_from_Y20 = 0; // Could save a little time here?
+  matrix_vector_product(d_d_varphi, Y2c_inhomogeneous, work1);
+  fYc_inhomogeneous = work1 + 2 * iota_N * Y2s_inhomogeneous + torsion * abs_G0_over_B0 * X2c
+    - 4 * spsi * sG * abs_G0_over_B0 * (X2s * Z20)
+    - spsi * I2_over_B0 * (-half * curvature * X1c * X1c + 2 * X2c) * abs_G0_over_B0 + half * abs_G0_over_B0 * beta_1s * X1c;
+  
+  ////////////////////////////////////////////////////////////
+  
+  if (verbose > 0) {
+    end_time = std::clock();
+    auto end = std::chrono::steady_clock::now();
+    
+    std::chrono::duration<double> elapsed = end - start;
+    std::cout << "Time for calculate_r2 from chrono:           "
+              << elapsed.count() << " seconds" << std::endl;
+    std::cout << "Time for calculate_r2 from ctime (CPU time): "
+              << double(end_time - start_time) / CLOCKS_PER_SEC
+              << " seconds" << std::endl;
+  }
+}
