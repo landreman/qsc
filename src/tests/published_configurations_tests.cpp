@@ -107,7 +107,7 @@ TEST_CASE("Compare published configurations to fortran version of QSC") {
   if (single) {
     tol = 3.0e-3;
   } else {
-    tol = 1.0e-11;
+    tol = 1.0e-10;
   }
   
   Qsc f;
