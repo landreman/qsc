@@ -1,3 +1,4 @@
+#include <cmath>
 #include <ctime>
 #include <chrono>
 #include "qsc.hpp"
@@ -14,7 +15,7 @@ void Qsc::calculate_r2() {
     start = std::chrono::steady_clock::now();
   }
   
-  if (abs(iota_N) < 1.0e-8)
+  if (std::abs(iota_N) < 1.0e-8)
     std::cerr <<
       "Warning: |iota_N| is very small so O(r^2) solve will be poorly conditioned. iota_N="
 	      << iota_N << std::endl;
@@ -23,7 +24,9 @@ void Qsc::calculate_r2() {
 
   qscfloat half = 0.5, quarter = 0.25;
   int j, k;
-  
+
+  G2 = -mu0 * p2 * G0 / (B0 * B0) - iota * I2;
+    
   V1 = X1c * X1c + Y1c * Y1c + Y1s * Y1s;
   V2 = 2 * Y1s * Y1c;
   V3 = X1c * X1c + Y1c * Y1c - Y1s * Y1s;
@@ -197,6 +200,19 @@ void Qsc::calculate_r2() {
 
   B20 = B0 * (curvature * X20 - B0_over_abs_G0 * d_Z20_d_varphi + half * eta_bar * eta_bar - mu0 * p2 / (B0 * B0)
 	      - quarter * B0_over_abs_G0 * B0_over_abs_G0 * (qc * qc + qs * qs + rc * rc + rs * rs));
+
+  B20_grid_variation = B20.max() - B20.min();
+  
+  qscfloat normalizer = 1.0 / d_l_d_phi.sum();
+  work1 = B20 * d_l_d_phi;
+  B20_mean = work1.sum() * normalizer;
+  B20_anomaly = B20 - B20_mean;
+  
+  work1 = B20_anomaly * B20_anomaly * d_l_d_phi;
+  B20_residual = sqrt(work1.sum() * normalizer) / B0;
+  
+  // Diagnostics
+  mercier();
   
   ////////////////////////////////////////////////////////////
   

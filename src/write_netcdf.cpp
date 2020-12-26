@@ -237,6 +237,13 @@ void Qsc::write_netcdf(std::string filename) {
     nc.put("p2", p2, "r^2 term in p(r), the pressure profile", "Pascal/(meter^2)");
     nc.put("G2", G2, "r^2 term in G(r), which is the poloidal current outside the flux surface times mu0/(2pi)", "Tesla/meter");
     nc.put("beta_1s", beta_1s, "r * sin(theta) component of beta, the coefficient of grad psi in the Boozer covariant representation of B", "meter^{-2}");
+    nc.put("B20_mean", B20_mean, "", "Tesla/(meter^2)");
+    nc.put("B20_residual", B20_residual, "", "Telsa/(meter^2)");
+    nc.put("B20_grid_variation", B20_grid_variation, "", "Telsa/(meter^2)");
+    nc.put("d2_volume_d_psi2", d2_volume_d_psi2, "", "");
+    nc.put("DGeod_times_r2", DGeod_times_r2, "", "");
+    nc.put("DWell_times_r2", DWell_times_r2, "", "");
+    nc.put("DMerc_times_r2", DMerc_times_r2, "", "");
   }
   /*
   nc.put("", , "", "");
@@ -283,6 +290,7 @@ void Qsc::write_netcdf(std::string filename) {
     nc.put(nphi_dim, "Z2c", Z2c, "r^2*cos(2*theta) term in Z, the component of the position vector in the direction of the tangent vector", "1/meter");
 
     nc.put(nphi_dim, "B20", B20, "r^2*cos(0*theta) term in the magnetic field magnitude B", "Telsa/(meter^2)");
+    nc.put(nphi_dim, "B20_anomaly", B20_anomaly, "B20 - B20_mean, i.e. the toroidal variation of B that breaks O(r^2) quasisymmetry", "Telsa/(meter^2)");
 	   
     nc.put(nphi_dim, "d_X20_d_varphi", d_X20_d_varphi, "Derivative of X20 with respect to the Boozer toroidal angle varphi", "1/meter");
     nc.put(nphi_dim, "d_X2s_d_varphi", d_X2s_d_varphi, "Derivative of X2s with respect to the Boozer toroidal angle varphi", "1/meter");

@@ -141,6 +141,12 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
       nc.get("p2", p2);
       nc.get("B2s", B2s);
       nc.get("B2c", B2c);
+      nc.get("B20_mean", B20_mean);
+      nc.get("B20_residual", B20_residual);
+      nc.get("d2_volume_d_psi2", d2_volume_d_psi2);
+      nc.get("DWell_times_r2", DWell_times_r2);
+      nc.get("DGeod_times_r2", DGeod_times_r2);
+      nc.get("DMerc_times_r2", DMerc_times_r2);
     }
     
     // Vectors
@@ -174,12 +180,13 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
     // Data saved by the C++ version
     
     nc.get("nphi", nphi);
-    allocate();
-    
-    // Scalars
     int tempint;
     nc.get("at_least_order_r2", tempint);
     at_least_order_r2 = (bool) tempint;
+
+    allocate();
+    
+    // Scalars
     nc.get("nfp", nfp);
     nc.get("eta_bar", eta_bar);
     nc.get("sigma0", sigma0);
@@ -214,6 +221,13 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
       nc.get("p2", p2);
       nc.get("G2", G2);
       nc.get("beta_1s", beta_1s);
+      nc.get("B20_mean", B20_mean);
+      nc.get("B20_residual", B20_residual);
+      nc.get("B20_grid_variation", B20_grid_variation);
+      nc.get("d2_volume_d_psi2", d2_volume_d_psi2);
+      nc.get("DWell_times_r2", DWell_times_r2);
+      nc.get("DGeod_times_r2", DGeod_times_r2);
+      nc.get("DMerc_times_r2", DMerc_times_r2);
     }
 
     // Vectors
@@ -246,6 +260,7 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
       nc.get("Z2s", Z2s);
       nc.get("Z2c", Z2c);
       nc.get("B20", B20);
+      nc.get("B20_anomaly", B20_anomaly);
       nc.get("d_X20_d_varphi", d_X20_d_varphi);
       nc.get("d_X2s_d_varphi", d_X2s_d_varphi);
       nc.get("d_X2c_d_varphi", d_X2c_d_varphi);

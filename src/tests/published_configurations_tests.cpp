@@ -103,11 +103,13 @@ TEST_CASE("Compare published configurations to fortran version of QSC") {
     "quasisymmetry_out.LandremanSengupta2019_section5.4.nc",
     "quasisymmetry_out.LandremanSengupta2019_section5.5.nc"};
   
-  qscfloat tol;
+  qscfloat tol, well_tol;
   if (single) {
     tol = 3.0e-3;
+    well_tol = 3.0e-4;
   } else {
     tol = 1.0e-10;
+    well_tol = 1.0e-12;
   }
   
   Qsc f;
@@ -141,6 +143,14 @@ TEST_CASE("Compare published configurations to fortran version of QSC") {
       CHECK(Approx(c.p2) == f.p2);
       CHECK(Approx(c.B2s) == f.B2s);
       CHECK(Approx(c.B2c) == f.B2c);
+      CHECK(Approx(c.B20_mean) == f.B20_mean);
+      CHECK(Approx(c.B20_residual) == f.B20_residual);
+      std::cout << "c.B20_mean:" << c.B20_mean << " f.B20_mean:" << f.B20_mean << " difference:" << c.B20_mean - f.B20_mean << std::endl;
+      std::cout << "c.G0:" << c.G0 << " f.abs_G0_over_B0:" << f.abs_G0_over_B0 << " difference:" << c.G0 - f.abs_G0_over_B0 << std::endl;
+      CHECK(Approx(c.d2_volume_d_psi2).epsilon(well_tol) == f.d2_volume_d_psi2);
+      CHECK(Approx(c.DWell_times_r2) == f.DWell_times_r2);
+      CHECK(Approx(c.DGeod_times_r2) == f.DGeod_times_r2);
+      CHECK(Approx(c.DMerc_times_r2) == f.DMerc_times_r2);
     }
     // CHECK(Approx(c.) == f.);
     

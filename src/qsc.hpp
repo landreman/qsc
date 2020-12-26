@@ -45,6 +45,7 @@ namespace qsc {
     static void sigma_eq_residual(Vector&, Vector&, void*);
     static void sigma_eq_jacobian(Vector&, Matrix&, void*);
     void calculate_grad_B_tensor();
+    void mercier();
     
   public:
     int verbose;
@@ -69,12 +70,13 @@ namespace qsc {
     Vector X20, X2s, X2c, Y20, Y2s, Y2c, Z20, Z2s, Z2c;
     Vector d_X1c_d_varphi, d_Y1s_d_varphi, d_Y1c_d_varphi, B20, B20_anomaly;
     Rank3Tensor grad_B_tensor;
-    qscfloat grid_min_L_grad_B, beta_1s, B20_mean, B20_residual, B20_variation;
+    qscfloat grid_min_L_grad_B, beta_1s, B20_mean, B20_residual, B20_grid_variation;
     Vector d_curvature_d_varphi, d_torsion_d_varphi;
     Vector d_X20_d_varphi, d_X2s_d_varphi, d_X2c_d_varphi;
     Vector d_Y20_d_varphi, d_Y2s_d_varphi, d_Y2c_d_varphi;
     Vector d_Z20_d_varphi, d_Z2s_d_varphi, d_Z2c_d_varphi;
     Vector d2_X1c_d_varphi2, d2_Y1c_d_varphi2, d2_Y1s_d_varphi2;
+    qscfloat d2_volume_d_psi2, DGeod_times_r2, DWell_times_r2, DMerc_times_r2;
     
     Qsc();
     Qsc(std::string);
