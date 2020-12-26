@@ -13,6 +13,7 @@ Qsc::Qsc(std::string config_name) :
   d_d_varphi(1, 1),
   work_matrix(1, 1),
   grad_B_tensor(1, 3, 3),
+  grad_grad_B_tensor(1, 3, 3, 3),
   r2_matrix(1, 1)
 {
   defaults();

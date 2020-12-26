@@ -162,6 +162,11 @@ void Qsc::allocate() {
     d2_X1c_d_varphi2.resize(nphi, 0.0);
     d2_Y1c_d_varphi2.resize(nphi, 0.0);
     d2_Y1s_d_varphi2.resize(nphi, 0.0);
+    
+    grad_grad_B_tensor.resize(nphi, 3, 3, 3, 0.0);
+    L_grad_grad_B.resize(nphi, 0.0);
+    L_grad_grad_B_inverse.resize(nphi, 0.0);
+
   }
   
   if (verbose > 0) {

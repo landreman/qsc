@@ -124,6 +124,31 @@ namespace qsc {
     return (*this)[j1 + d1_ * (j2 + d2_ * j3)];
   }
 
+  //////////////////////////////////////////////////////////
+  
+  class Rank4Tensor : public std::valarray<qscfloat> {
+
+  private:
+    index_type d1_, d2_, d3_, d4_, len_;
+
+  public:
+    Rank4Tensor(index_type, index_type, index_type, index_type);
+    void resize(index_type, index_type, index_type, index_type, qscfloat);
+    // For info about matrix indexing:
+    // https://isocpp.org/wiki/faq/operator-overloading#matrix-subscript-op
+    qscfloat& operator()(index_type, index_type, index_type, index_type);
+    qscfloat  operator()(index_type, index_type, index_type, index_type) const;
+    void set_row(Vector&, index_type, index_type, index_type);
+  };
+
+  inline qscfloat& Rank4Tensor::operator()(index_type j1, index_type j2, index_type j3, index_type j4) {
+    return (*this)[j1 + d1_ * (j2 + d2_ * (j3 + d3_ * j4))];
+  }
+
+  inline qscfloat Rank4Tensor::operator()(index_type j1, index_type j2, index_type j3, index_type j4) const {
+    return (*this)[j1 + d1_ * (j2 + d2_ * (j3 + d3_ * j4))];
+  }
+
 
 } // namespace qsc
 

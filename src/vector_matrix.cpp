@@ -167,8 +167,10 @@ void qsc::linear_solve(Matrix& m, Vector& v, std::valarray<int>& IPIV) {
   }
 }
 
+////////////////////////////////////////////////////
+
 Rank3Tensor::Rank3Tensor(index_type d1_in, index_type d2_in, index_type d3_in)
-  : std::valarray<qscfloat>(d1_in * d2_in) // Call constructor of base class.
+  : std::valarray<qscfloat>(d1_in * d2_in * d3_in) // Call constructor of base class.
 {
   d1_ = d1_in;
   d2_ = d2_in;
@@ -188,6 +190,34 @@ void Rank3Tensor::set_row(Vector& v, index_type j2, index_type j3) {
   assert(v.size() == d1_);
   for (int j = 0; j < d1_; j++) {
     (*this)[j + d1_ * (j2 + d2_ * j3)] = v[j];
+  }
+}
+
+////////////////////////////////////////////////////
+
+Rank4Tensor::Rank4Tensor(index_type d1_in, index_type d2_in, index_type d3_in, index_type d4_in)
+  : std::valarray<qscfloat>(d1_in * d2_in * d3_in * d4_in) // Call constructor of base class.
+{
+  d1_ = d1_in;
+  d2_ = d2_in;
+  d3_ = d3_in;
+  d4_ = d4_in;
+  len_ = d1_ * d2_ * d3_ * d4_;
+}
+
+void Rank4Tensor::resize(index_type d1_in, index_type d2_in, index_type d3_in, index_type d4_in, qscfloat v) {
+  d1_ = d1_in;
+  d2_ = d2_in;
+  d3_ = d3_in;
+  d4_ = d4_in;
+  len_ = d1_ * d2_ * d3_ * d4_;
+  std::valarray<qscfloat>::resize(len_, v);
+}
+
+void Rank4Tensor::set_row(Vector& v, index_type j2, index_type j3, index_type j4) {
+  assert(v.size() == d1_);
+  for (int j = 0; j < d1_; j++) {
+    (*this)[j + d1_ * (j2 + d2_ * (j3 + d3_ * j4))] = v[j];
   }
 }
 

@@ -221,6 +221,7 @@ void Qsc::write_netcdf(std::string filename) {
   nc.put("grid_max_curvature", grid_max_curvature, "Maximum curvature of the magnetic axis, maximizing only over the phi grid points and not interpolating in between", "1/meter");
   nc.put("grid_max_elongation", grid_max_elongation, "Maximum elongation (ratio of major to minor axes of the O(r^1) elliptical surfaces in the plane perpendicular to the magnetic axis), maximizing only over the phi grid points and not interpolating in between", "dimensionless");
   nc.put("grid_min_R0", grid_min_R0, "Minimum major radius of the magnetic axis, minimizing only over the phi grid points and not interpolating in between", "meter");
+  nc.put("grid_min_L_grad_B", grid_min_L_grad_B, "Minimum of L_grad_B over the phi grid points", "meter");
   nc.put("mean_elongation", mean_elongation, "Average elongation (ratio of major to minor axes of the O(r^1) elliptical surfaces in the plane perpendicular to the magnetic axis), where the average is taken with respect to arclength", "dimensionless");
   nc.put("mean_R", mean_R, "Average major radius of the magnetic axis, where the average is taken with respect to arclength", "meter");
   nc.put("mean_Z", mean_Z, "Average Z coordinate of the magnetic axis, where the average is taken with respect to arclength", "meter");
@@ -244,6 +245,7 @@ void Qsc::write_netcdf(std::string filename) {
     nc.put("DGeod_times_r2", DGeod_times_r2, "", "");
     nc.put("DWell_times_r2", DWell_times_r2, "", "");
     nc.put("DMerc_times_r2", DMerc_times_r2, "", "");
+    nc.put("grid_min_L_grad_grad_B", grid_min_L_grad_grad_B, "Minimum of L_grad_grad_B over the phi grid points", "meter");
   }
   /*
   nc.put("", , "", "");
@@ -301,6 +303,9 @@ void Qsc::write_netcdf(std::string filename) {
     nc.put(nphi_dim, "d_Z20_d_varphi", d_Z20_d_varphi, "Derivative of Z20 with respect to the Boozer toroidal angle varphi", "1/meter");
     nc.put(nphi_dim, "d_Z2s_d_varphi", d_Z2s_d_varphi, "Derivative of Z2s with respect to the Boozer toroidal angle varphi", "1/meter");
     nc.put(nphi_dim, "d_Z2c_d_varphi", d_Z2c_d_varphi, "Derivative of Z2c with respect to the Boozer toroidal angle varphi", "1/meter");
+    
+    nc.put(nphi_dim, "L_grad_grad_B", L_grad_grad_B, "Scale length associated with second derivatives of the magnetic field, eq (3.2) in Landreman J Plasma Physics (2021)", "meter");
+    nc.put(nphi_dim, "L_grad_grad_B_inverse", L_grad_grad_B_inverse, "1 / L_grad_grad_B", "1/meter");
   }
   /*
   nc.put(nphi_dim, "", , "", "");

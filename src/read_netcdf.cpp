@@ -205,6 +205,7 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
     nc.get("grid_max_curvature", grid_max_curvature);
     nc.get("grid_max_elongation", grid_max_elongation);
     nc.get("grid_min_R0", grid_min_R0);
+    nc.get("grid_min_L_grad_B", grid_min_L_grad_B);
     nc.get("mean_elongation", mean_elongation);
     nc.get("mean_R", mean_R);
     nc.get("mean_Z", mean_Z);
@@ -228,6 +229,7 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
       nc.get("DWell_times_r2", DWell_times_r2);
       nc.get("DGeod_times_r2", DGeod_times_r2);
       nc.get("DMerc_times_r2", DMerc_times_r2);
+      nc.get("grid_min_L_grad_grad_B", grid_min_L_grad_grad_B);
     }
 
     // Vectors
@@ -270,6 +272,8 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
       nc.get("d_Z20_d_varphi", d_Z20_d_varphi);
       nc.get("d_Z2s_d_varphi", d_Z2s_d_varphi);
       nc.get("d_Z2c_d_varphi", d_Z2c_d_varphi);
+      nc.get("L_grad_grad_B", L_grad_grad_B);
+      nc.get("L_grad_grad_B_inverse", L_grad_grad_B_inverse);
     }
   }
   // nc.get("", );

@@ -59,6 +59,7 @@ TEST_CASE("netcdf") {
     CHECK(Approx(qfile.grid_max_curvature) == q11.grid_max_curvature);
     CHECK(Approx(qfile.grid_max_elongation) == q11.grid_max_elongation);
     CHECK(Approx(qfile.grid_min_R0) == q11.grid_min_R0);
+    CHECK(Approx(qfile.grid_min_L_grad_B) == q11.grid_min_L_grad_B);
     CHECK(Approx(qfile.newton_tolerance) == q11.newton_tolerance);
     CHECK(qfile.max_newton_iterations == q11.max_newton_iterations);
     CHECK(qfile.max_linesearch_iterations == q11.max_linesearch_iterations);
@@ -74,6 +75,7 @@ TEST_CASE("netcdf") {
       CHECK(Approx(qfile.DWell_times_r2) == q11.DWell_times_r2);
       CHECK(Approx(qfile.DGeod_times_r2) == q11.DGeod_times_r2);
       CHECK(Approx(qfile.DMerc_times_r2) == q11.DMerc_times_r2);
+      CHECK(Approx(qfile.grid_min_L_grad_grad_B) == q11.grid_min_L_grad_grad_B);
     }
     // CHECK(Approx(qfile.) == q11.);
     
@@ -118,6 +120,8 @@ TEST_CASE("netcdf") {
 	CHECK(Approx(qfile.d_Z20_d_varphi[j]) == q11.d_Z20_d_varphi[j]);
 	CHECK(Approx(qfile.d_Z2s_d_varphi[j]) == q11.d_Z2s_d_varphi[j]);
 	CHECK(Approx(qfile.d_Z2c_d_varphi[j]) == q11.d_Z2c_d_varphi[j]);
+	CHECK(Approx(qfile.L_grad_grad_B[j]) == q11.L_grad_grad_B[j]);
+	CHECK(Approx(qfile.L_grad_grad_B_inverse[j]) == q11.L_grad_grad_B_inverse[j]);
       }
     }
   }

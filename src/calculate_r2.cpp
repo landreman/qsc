@@ -213,6 +213,7 @@ void Qsc::calculate_r2() {
   
   // Diagnostics
   mercier();
+  calculate_grad_grad_B_tensor();
   
   ////////////////////////////////////////////////////////////
   
