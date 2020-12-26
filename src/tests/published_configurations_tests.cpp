@@ -181,6 +181,8 @@ TEST_CASE("Compare published configurations to fortran version of QSC") {
 	CHECK(Approx(c.Z20[j]).epsilon(tol) == f.Z20[j]);
 	CHECK(Approx(c.Z2s[j]).epsilon(tol) == f.Z2s[j]);
 	CHECK(Approx(c.Z2c[j]).epsilon(tol) == f.Z2c[j]);
+	CHECK(Approx(c.L_grad_grad_B_inverse[j]).epsilon(tol) == f.L_grad_grad_B_inverse[j]);
+	std::cout << "Diff in L_grad_grad_B_inverse: " << c.L_grad_grad_B_inverse[j] - f.L_grad_grad_B_inverse[j] << std::endl;
       }
     }
   }

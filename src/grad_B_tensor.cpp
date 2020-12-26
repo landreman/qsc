@@ -513,7 +513,7 @@ void Qsc::calculate_grad_grad_B_tensor() {
 					  grad_grad_B_tensor(j, 2, 1, 2) * grad_grad_B_tensor(j, 2, 1, 2) +
 					  grad_grad_B_tensor(j, 2, 2, 0) * grad_grad_B_tensor(j, 2, 2, 0) +
 					  grad_grad_B_tensor(j, 2, 2, 1) * grad_grad_B_tensor(j, 2, 2, 1) +
-					  grad_grad_B_tensor(j, 2, 2, 2) * grad_grad_B_tensor(j, 2, 2, 1) ));
+					  grad_grad_B_tensor(j, 2, 2, 2) * grad_grad_B_tensor(j, 2, 2, 2) ));
   }
   L_grad_grad_B_inverse = ((qscfloat)1.0) / L_grad_grad_B;
   grid_min_L_grad_grad_B = L_grad_grad_B.min();

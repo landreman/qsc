@@ -22,10 +22,11 @@ void qsc::Qsc::mercier() {
     * integral;
 
   d2_volume_d_psi2 = 4*pi*pi*abs_G0/(B0*B0*B0)*(3*eta_bar*eta_bar - 4*B20_mean/B0 + 2*(G2+iota*I2)/G0);
+  /*
   std::cout << "etabar term: " << 4*pi*pi*abs_G0/(B0*B0*B0)*(3*eta_bar*eta_bar)
 	    << "  B20 term: " << 4*pi*pi*abs_G0/(B0*B0*B0)*( - 4*B20_mean/B0)
 	    << "  p2 term: " << 4*pi*pi*abs_G0/(B0*B0*B0)*( 2*(G2+iota*I2)/G0) << std::endl;
-  
+  */
   DWell_times_r2 = (mu0 * p2 * abs_G0 / (8 * pi * pi * pi * pi * B0 * B0 * B0)) * (d2_volume_d_psi2 - 8 * pi * pi * mu0 * p2 * abs_G0 / (B0 * B0 * B0 * B0 * B0));
 
   DMerc_times_r2 = DWell_times_r2 + DGeod_times_r2;

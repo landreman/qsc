@@ -174,6 +174,8 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
       nc.get("Z2s", Z2s);
       nc.get("Z2c", Z2c);
       nc.get("B20", B20);
+      nc.get("grad_grad_B_inverse_scale_length_vs_zeta", L_grad_grad_B_inverse);
+      L_grad_grad_B = ((qscfloat)1.0) / L_grad_grad_B_inverse;
     }
     
   } else {
