@@ -87,6 +87,8 @@ void Qsc::allocate() {
   L_grad_B_inverse.resize(nphi, 0.0);
 
   if (at_least_order_r2) {
+    B20.resize(nphi, 0.0);
+
     X20.resize(nphi, 0.0);
     X2s.resize(nphi, 0.0);
     X2c.resize(nphi, 0.0);

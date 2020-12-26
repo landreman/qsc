@@ -30,6 +30,8 @@ namespace qsc {
     void get(std::string, qscfloat&);
     // Vectors
     void get(std::string, Vector&);
+    // Strings
+    void get(std::string, std::string&);
 	     
     void close();
   };
@@ -45,6 +47,7 @@ qsc::NetCDFReader::NetCDFReader(std::string filename) {
 }
 
 void qsc::NetCDFReader::ERR(int e) {
+  std::cout << "NetCDF Error! " << nc_strerror(e) << std::endl;
   throw std::runtime_error(nc_strerror(e));
 }
 
@@ -66,10 +69,30 @@ void qsc::NetCDFReader::get(std::string varname, qscfloat& var) {
 
 void qsc::NetCDFReader::get(std::string varname, Vector& var) {
   int var_id, retval;
+  std::cout << "Reading field " << varname << std::endl;
   if ((retval = nc_inq_varid(ncid, varname.c_str(), &var_id)))
       ERR(retval);
   if ((retval = nc_get_var_qscfloat(ncid, var_id, &var[0])))
       ERR(retval);
+}
+
+void qsc::NetCDFReader::get(std::string varname, std::string& var) {
+  int var_id, retval;
+  char nc_string[50]; // 50 is hard-coded as the string length in quasisymmetry_variables.f90
+  if ((retval = nc_inq_varid(ncid, varname.c_str(), &var_id)))
+      ERR(retval);
+  if ((retval = nc_get_var_text(ncid, var_id, nc_string)))
+      ERR(retval);
+  // Convert char array to std::string
+  //std::cout << "nc_string:" << nc_string << std::endl;
+  var = std::string(nc_string);
+  //std::cout << "var:" << var << " size=" << var.size() << " var[2]=" << ((int)var[2])
+  //	    << " var[3]=" << ((int)var[3]) << std::endl;
+  // NetCDF pads the strings with spaces (ascii 32) no ascii 0.
+  int index = var.find(" ");
+  //std::cout << "index=" << index << std::endl;
+  var.resize(index);
+  //std::cout << "After resize, var:" << var << " size=" << var.size() << std::endl;
 }
 
 void qsc::NetCDFReader::close() {
@@ -93,12 +116,12 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
 
   if (fortran) {
     nc.get("N_phi", nphi);
-  } else {
-    nc.get("nphi", nphi);
-  }
-  allocate();
+    nc.get("order_r_option", order_r_option);
+    std::cout << "order_r_option:" << order_r_option << std::endl;
+    at_least_order_r2 = !(order_r_option.compare("r1") == 0);
+    std::cout << "at_least_order_r2:" << at_least_order_r2 << std::endl;
+    allocate();
 
-  if (fortran) {
     // Scalars
     nc.get("nfp", nfp);
     nc.get("sign_G", sG);
@@ -114,11 +137,11 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
     nc.get("standard_deviation_of_Z", standard_deviation_of_Z);
     nc.get("axis_helicity", helicity);
     nc.get("B0", B0);
-    /*
-    nc.get("p2", p2);
-    nc.get("B2s", B2s);
-    nc.get("B2c", B2c);
-    */
+    if (at_least_order_r2) {
+      nc.get("p2", p2);
+      nc.get("B2s", B2s);
+      nc.get("B2c", B2c);
+    }
     
     // Vectors
     nc.get("phi", phi);
@@ -134,9 +157,24 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
     nc.get("elongation", elongation);    
     nc.get("d_l_d_phi", d_l_d_phi);
     nc.get("modBinv_sqrt_half_grad_B_colon_grad_B", L_grad_B_inverse);
+    if (at_least_order_r2) {
+      nc.get("X20", X20);
+      nc.get("X2s", X2s);
+      nc.get("X2c", X2c);
+      nc.get("Y20", Y20);
+      nc.get("Y2s", Y2s);
+      nc.get("Y2c", Y2c);
+      nc.get("Z20", Z20);
+      nc.get("Z2s", Z2s);
+      nc.get("Z2c", Z2c);
+      nc.get("B20", B20);
+    }
     
   } else {
     // Data saved by the C++ version
+    
+    nc.get("nphi", nphi);
+    allocate();
     
     // Scalars
     int tempint;
