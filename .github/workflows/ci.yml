@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        precision: ["single", "double"]
+        precision: ['single', 'double']
 
     name: ${{ matrix.precision }} precision
 
@@ -88,30 +88,30 @@ jobs:
 
     - name: CMake configure, double precision
       run: cmake .
-      if: matrix.precision == "double"
+      if: matrix.precision == 'double'
 
     - name: CMake configure, single precision
       run: cmake -DSINGLE=1 .
-      if: matrix.precision == "single"
+      if: matrix.precision == 'single'
 
     - name: Compile
       run: make
 
     - name: Run driver, double precision
       run: bin/xqsc qsc_in.foo
-      if: matrix.precision == "double"
+      if: matrix.precision == 'double'
 
     - name: Run driver, single precision
       run: bin/xqsc_single qsc_in.foo
-      if: matrix.precision == "single"
+      if: matrix.precision == 'single'
 
     - name: Run driver with MPI, double precision
       run: mpiexec -n 2 bin/xqsc qsc_in.foo
-      if: matrix.precision == "double"
+      if: matrix.precision == 'double'
 
     - name: Run driver with MPI, single precision
       run: mpiexec -n 2 bin/xqsc_single qsc_in.foo
-      if: matrix.precision == "single"
+      if: matrix.precision == 'single'
 
     - name: Run tests
       run: make test
