@@ -322,6 +322,12 @@ void Qsc::write_netcdf(std::string filename) {
   nc.put(nphi_nbt_nbt_dim, "grad_B_tensor", &grad_B_tensor(0, 0, 0),
 	 "The grad B tensor at each grid point along the magnetic axis, eq (3.12) in Landreman J Plasma Physics (2021)", "Tesla/meter");
 
+  std::vector<dim_id_type> nphi_nbt_nbt_nbt_dim {nphi_dim, nbt_dim, nbt_dim, nbt_dim};
+  if (at_least_order_r2) {
+    nc.put(nphi_nbt_nbt_nbt_dim, "grad_grad_B_tensor", &grad_grad_B_tensor(0, 0, 0, 0),
+	   "The grad grad B tensor at each grid point along the magnetic axis, eq (3.13) in Landreman J Plasma Physics (2021)", "Tesla/(meter^2)");
+  }
+  
   // Done defining the NetCDF data.
   nc.write_and_close();
   

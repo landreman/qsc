@@ -35,19 +35,6 @@ int main(int argc, char* argv[]) {
 
   q.calculate();
 
-  if (q.at_least_order_r2) {
-    auto grad_grad_B_alt = q.calculate_grad_grad_B_tensor_alt();
-    for (int j2 = 0; j2 < 3; j2++) {
-      for (int j3 = 0; j3 < 3; j3++) {
-	for (int j4 = 0; j4 < 3; j4++) {
-	  std::cout << "grad_grad_B(0," << j2 << "," << j3 << "," << j4 << ")="
-		    << q.grad_grad_B_tensor(0, j2, j3, j4) << " or "
-		    << grad_grad_B_alt(0, j2, j3, j4) << std::endl;
-	}
-      }
-    }
-  }
-
   q.write_netcdf(directory_and_outfile);
   
   end_time = std::clock();
