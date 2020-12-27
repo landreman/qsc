@@ -92,6 +92,7 @@ namespace qsc {
     void r1_diagnostics();
     void calculate_r2();
     void calculate();
+    Rank4Tensor calculate_grad_grad_B_tensor_alt();
     void write_netcdf(std::string);
     void read_netcdf(std::string, char);
   };

@@ -69,7 +69,6 @@ void qsc::NetCDFReader::get(std::string varname, qscfloat& var) {
 
 void qsc::NetCDFReader::get(std::string varname, Vector& var) {
   int var_id, retval;
-  std::cout << "Reading field " << varname << std::endl;
   if ((retval = nc_inq_varid(ncid, varname.c_str(), &var_id)))
       ERR(retval);
   if ((retval = nc_get_var_qscfloat(ncid, var_id, &var[0])))

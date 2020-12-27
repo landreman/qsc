@@ -197,6 +197,11 @@ void Qsc::calculate_r2() {
   matrix_vector_product(d_d_varphi, Y20, d_Y20_d_varphi);
   matrix_vector_product(d_d_varphi, Y2s, d_Y2s_d_varphi);
   matrix_vector_product(d_d_varphi, Y2c, d_Y2c_d_varphi);
+  matrix_vector_product(d_d_varphi, d_X1c_d_varphi, d2_X1c_d_varphi2);
+  matrix_vector_product(d_d_varphi, d_Y1c_d_varphi, d2_Y1c_d_varphi2);
+  matrix_vector_product(d_d_varphi, d_Y1s_d_varphi, d2_Y1s_d_varphi2);
+  matrix_vector_product(d_d_varphi, curvature, d_curvature_d_varphi);
+  matrix_vector_product(d_d_varphi, torsion, d_torsion_d_varphi);
 
   B20 = B0 * (curvature * X20 - B0_over_abs_G0 * d_Z20_d_varphi + half * eta_bar * eta_bar - mu0 * p2 / (B0 * B0)
 	      - quarter * B0_over_abs_G0 * B0_over_abs_G0 * (qc * qc + qs * qs + rc * rc + rs * rs));

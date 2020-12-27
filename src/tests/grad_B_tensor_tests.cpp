@@ -1,3 +1,4 @@
+#include <vector>
 #include "doctest.h"
 #include "qsc.hpp"
 
@@ -89,8 +90,17 @@ TEST_CASE("grad B tensor for an axisymmetric vacuum field") {
  */
 TEST_CASE("grad grad B tensor for an axisymmetric vacuum field") {
   Qsc q;
-  qscfloat val;
-  q.I2 = 1.0e-7; // A slight nonzero iota is needed, or else the O(r^2) linear solve is rank-deficient
+  qscfloat val, tol, zero_tol;
+  // A slight nonzero iota is needed, or else the O(r^2) linear solve is rank-deficient
+  if (single) {
+    q.I2 = 1.0e-4;
+    zero_tol = 1.0e-2;
+    tol = 1.0e-4;
+  } else {
+    q.I2 = 1.0e-7;
+    zero_tol = 1.0e-5;
+    tol = 1.0e-8;
+  }
   q.sigma0 = 0.0;
   q.verbose = 0;
   q.order_r_option = ORDER_R_OPTION_R2;
@@ -146,15 +156,15 @@ TEST_CASE("grad grad B tensor for an axisymmetric vacuum field") {
 			      CAPTURE(j3);
 			      if (j1 == 2 && j2 == 2 && j3 == 2) {
 				// ttt component
-				CHECK(Approx(q.grad_grad_B_tensor(jphi, j1, j2, j3)) == -val);
+				CHECK(Approx(q.grad_grad_B_tensor(jphi, j1, j2, j3)).epsilon(tol) == -val);
 			      } else if ((j1 == 2 && j2 == 0 && j3 == 0) ||
 					 (j1 == 0 && j2 == 2 && j3 == 0) ||
 					 (j1 == 0 && j2 == 0 && j3 == 2)) {
 				// tnn, ntn, and nnt components
-				CHECK(Approx(q.grad_grad_B_tensor(jphi, j1, j2, j3)) == val);
+				CHECK(Approx(q.grad_grad_B_tensor(jphi, j1, j2, j3)).epsilon(tol) == val);
 			      } else {
 				// All other components
-				CHECK(Approx(q.grad_grad_B_tensor(jphi, j1, j2, j3)) == 0.0);
+				CHECK(Approx(q.grad_grad_B_tensor(jphi, j1, j2, j3)).epsilon(zero_tol) == 0.0);
 			      }
 			    }
 			  }
@@ -173,3 +183,62 @@ TEST_CASE("grad grad B tensor for an axisymmetric vacuum field") {
   }
 }
 
+/** Compare Rogerio's derivation to mine to ensure the results
+ * coincide.  Also verify symmetry in the first two components.
+ */
+TEST_CASE("grad grad B tensor alternative derivation and symmetry") {
+  std::vector<std::string> configs = {
+    "r2 section 5.1",
+    "r2 section 5.2",
+    "r2 section 5.3",
+    "r2 section 5.4",
+    "r2 section 5.5"};
+
+  qscfloat tol;
+  if (single) {
+    tol = 3.0e-3;
+  } else {
+    tol = 1.0e-8;
+  }
+  for (int jconfig = 0; jconfig < configs.size(); jconfig++) {
+    std::cout << "jconfig=" << jconfig << std::endl;
+    CAPTURE(jconfig);
+    
+    Qsc q(configs[jconfig]);
+    q.nphi = 65;
+  
+    for (int sG = -1; sG <= 1; sG += 2) {
+      for (int spsi = -1; spsi <= 1; spsi += 2) {
+	for (qscfloat B0 = 0.9; B0 < 2.0; B0 += 0.7) {
+	  q.sG = sG;
+	  q.spsi = spsi;
+	  q.B0 = B0;
+	  q.calculate();
+	  auto tensor = q.calculate_grad_grad_B_tensor_alt();
+	  
+	  for (int j3 = 0; j3 < 3; j3++) {
+	    CAPTURE(j3);
+	    for (int j2 = 0; j2 < 3; j2++) {
+	      CAPTURE(j2);
+	      for (int j1 = 0; j1 < 3; j1++) {
+		CAPTURE(j1);
+		for (int jphi = 0; jphi < q.nphi; jphi++) {
+		  CAPTURE(jphi);
+		  CHECK(Approx(q.grad_grad_B_tensor(jphi, j1, j2, j3)).epsilon(tol) == tensor(jphi, j1, j2, j3));
+
+		  // For all configs, the tensor should be symmetric in the 1st 2 indices:
+		  CHECK(Approx(q.grad_grad_B_tensor(jphi, j1, j2, j3)).epsilon(tol) == q.grad_grad_B_tensor(jphi, j2, j1, j3));
+
+		  // For curl-free fields, the tensor should also be symmetric in the last 2 indices:
+		  if (jconfig == 0 || jconfig == 1 || jconfig == 3) {
+		    CHECK(Approx(q.grad_grad_B_tensor(jphi, j1, j2, j3)).epsilon(tol) == q.grad_grad_B_tensor(jphi, j1, j3, j2));
+		  }
+		}
+	      }
+	    }
+	  }
+	}
+      }
+    }
+  }
+}
