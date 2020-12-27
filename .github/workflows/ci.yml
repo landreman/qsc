@@ -21,7 +21,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        single-precision: [0, 1]
+        precision: ["single", "double"]
+
+    name: ${{ matrix.precision }} precision
 
     steps:
     # First print out lots of information. We do this in separate 
@@ -84,27 +86,32 @@ jobs:
     - name: env after adding python
       run: env
 
-    - name: CMake configure
-      run: cmake -DSINGLE=${{ matrix.single-precision }} .
+    - name: CMake configure, double precision
+      run: cmake .
+      if: matrix.precision == "double"
+
+    - name: CMake configure, single precision
+      run: cmake -DSINGLE=1 .
+      if: matrix.precision == "single"
 
     - name: Compile
       run: make
 
     - name: Run driver, double precision
       run: bin/xqsc qsc_in.foo
-      if: matrix.single-precision == 0
+      if: matrix.precision == "double"
 
     - name: Run driver, single precision
       run: bin/xqsc_single qsc_in.foo
-      if: matrix.single-precision == 1
+      if: matrix.precision == "single"
 
     - name: Run driver with MPI, double precision
       run: mpiexec -n 2 bin/xqsc qsc_in.foo
-      if: matrix.single-precision == 0
+      if: matrix.precision == "double"
 
     - name: Run driver with MPI, single precision
       run: mpiexec -n 2 bin/xqsc_single qsc_in.foo
-      if: matrix.single-precision == 1
+      if: matrix.precision == "single"
 
     - name: Run tests
       run: make test
