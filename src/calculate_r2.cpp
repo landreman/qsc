@@ -226,7 +226,8 @@ void Qsc::calculate_r2() {
 
   mercier();
   calculate_grad_grad_B_tensor();
-
+  calculate_r_singularity();
+  
   if (verbose > 0) {
     diag_end_time = std::clock();
     diag_end = std::chrono::steady_clock::now();

@@ -246,6 +246,7 @@ void Qsc::write_netcdf(std::string filename) {
     nc.put("DWell_times_r2", DWell_times_r2, "", "");
     nc.put("DMerc_times_r2", DMerc_times_r2, "", "");
     nc.put("grid_min_L_grad_grad_B", grid_min_L_grad_grad_B, "Minimum of L_grad_grad_B over the phi grid points", "meter");
+    nc.put("r_singularity_robust", r_singularity_robust, "Robust estimate of the minor radius at which the flux surface shapes become singular, r_c, as detailed in section 4.2 of Landreman, J Plasma Physics (2021)", "meter");
   }
   /*
   nc.put("", , "", "");
@@ -306,6 +307,7 @@ void Qsc::write_netcdf(std::string filename) {
     
     nc.put(nphi_dim, "L_grad_grad_B", L_grad_grad_B, "Scale length associated with second derivatives of the magnetic field, eq (3.2) in Landreman J Plasma Physics (2021)", "meter");
     nc.put(nphi_dim, "L_grad_grad_B_inverse", L_grad_grad_B_inverse, "1 / L_grad_grad_B", "1/meter");
+    nc.put(nphi_dim, "r_hat_singularity_robust", r_hat_singularity_robust, "Robust estimate of the minor radius at which the flux surface shapes become singular, hat{r}_c(varphi), as detailed in section 4.2 of Landreman, J Plasma Physics (2021)", "meter");
   }
   /*
   nc.put(nphi_dim, "", , "", "");

@@ -1,3 +1,5 @@
+#include <ctime>
+#include <chrono>
 #include "qsc.hpp"
 
 #define lp abs_G0_over_B0
@@ -57,6 +59,12 @@ void Qsc::calculate_grad_grad_B_tensor() {
   // The elements that follow are computed in the Mathematica notebook "20200407-01 Grad grad B tensor near axis"
   // and then formatted for fortran by the python script process_grad_grad_B_tensor_code
 
+  std::time_t start_time, end_time;
+  std::chrono::time_point<std::chrono::steady_clock> start;
+  if (verbose > 0) {
+    start_time = std::clock();
+    start = std::chrono::steady_clock::now();
+  }
   if (verbose > 0) std::cout << "Beginning grad_grad_B tensor calculation" << std::endl;
   
   // The order is (normal, binormal, tangent). So element 012 means nbt.
@@ -517,6 +525,17 @@ void Qsc::calculate_grad_grad_B_tensor() {
   }
   L_grad_grad_B_inverse = ((qscfloat)1.0) / L_grad_grad_B;
   grid_min_L_grad_grad_B = L_grad_grad_B.min();
+
+  if (verbose > 0) {
+    end_time = std::clock();
+    auto end = std::chrono::steady_clock::now();
+    
+    std::chrono::duration<double> elapsed = end - start;
+    std::cout << "Time for grad_grad_B from chrono:           "
+              << elapsed.count() << std::endl;
+    std::cout << "Time for grad_grad_B from ctime (CPU time): "
+              << double(end_time - start_time) / CLOCKS_PER_SEC << std::endl;
+  }
 }
 
 /** Build the whole grad grad B tensor again using Rogerio's approach,

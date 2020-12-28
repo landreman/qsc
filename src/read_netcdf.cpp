@@ -146,6 +146,7 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
       nc.get("DWell_times_r2", DWell_times_r2);
       nc.get("DGeod_times_r2", DGeod_times_r2);
       nc.get("DMerc_times_r2", DMerc_times_r2);
+      nc.get("r_singularity", r_singularity_robust);
     }
     
     // Vectors
@@ -175,6 +176,7 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
       nc.get("B20", B20);
       nc.get("grad_grad_B_inverse_scale_length_vs_zeta", L_grad_grad_B_inverse);
       L_grad_grad_B = ((qscfloat)1.0) / L_grad_grad_B_inverse;
+      nc.get("r_singularity_vs_zeta", r_hat_singularity_robust);
     }
     
   } else {
@@ -231,6 +233,7 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
       nc.get("DGeod_times_r2", DGeod_times_r2);
       nc.get("DMerc_times_r2", DMerc_times_r2);
       nc.get("grid_min_L_grad_grad_B", grid_min_L_grad_grad_B);
+      nc.get("r_singularity_robust", r_singularity_robust);
     }
 
     // Vectors
@@ -275,6 +278,7 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
       nc.get("d_Z2c_d_varphi", d_Z2c_d_varphi);
       nc.get("L_grad_grad_B", L_grad_grad_B);
       nc.get("L_grad_grad_B_inverse", L_grad_grad_B_inverse);
+      nc.get("r_hat_singularity_robust", r_hat_singularity_robust);
     }
   }
   // nc.get("", );

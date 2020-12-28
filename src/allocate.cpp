@@ -167,7 +167,7 @@ void Qsc::allocate() {
     L_grad_grad_B.resize(nphi, 0.0);
     L_grad_grad_B_inverse.resize(nphi, 0.0);
 
-    r_singularity_robust.resize(nphi, 0.0);
+    r_hat_singularity_robust.resize(nphi, 0.0);
   }
   
   if (verbose > 0) {

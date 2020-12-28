@@ -1,3 +1,5 @@
+#include <ctime>
+#include <chrono>
 #include "qsc.hpp"
 #include "quartic_roots.hpp"
 
@@ -12,6 +14,18 @@ void Qsc::calculate_r_singularity() {
   qscfloat coefficients[5], real_parts[4], imag_parts[4];
   qscfloat g0, g1c, g20, g2s, g2c;
   qscfloat g3s1, g3s3, g3c1, g3c3, g40, g4s2, g4s4, g4c2, g4c4;
+  qscfloat rc, sin2theta, abs_cos2theta, residual_if_varpi_plus, residual_if_varpi_minus, cos2theta;
+  int varpi, jr;
+  qscfloat abs_costheta, costheta, sintheta, sintheta_at_rc, costheta_at_rc;
+  qscfloat quadratic_A, quadratic_B, quadratic_C, radical, rr, residual;
+  int varsigma, sign_quadratic;
+
+  std::time_t start_time, end_time;
+  std::chrono::time_point<std::chrono::steady_clock> start;
+  if (verbose > 0) {
+    start_time = std::clock();
+    start = std::chrono::steady_clock::now();
+  }
 
   for (j = 0; j < nphi; j++) {
      // Write sqrt(g) = r * [g0 + r*g1c*cos(theta) + (r^2)*(g20 + g2s*sin(2*theta) + g2c*cos(2*theta) + ...]
@@ -219,6 +233,150 @@ void Qsc::calculate_r_singularity() {
     coefficients[4] = (K0 + K4c)*(K0 + K4c) - K2c*K2c;
 
     quartic_roots(coefficients, real_parts, imag_parts);
+
+    // Set a default value for rc that is huge to indicate a true solution has not yet been found.
+    rc = 1.0e+30;
+
+    for (jr = 0; jr < 4; jr++) { // Loop over the roots of the equation for w.
+      // If root is not purely real, skip it.
+      if (std::abs(imag_parts[jr]) > 1e-7) {
+	if (verbose > 1) std::cout << "Skipping root with jr=" << jr <<
+			   " since imag part is" << imag_parts[jr] << std::endl;
+	break;
+      }
+
+      sin2theta = real_parts[jr];
+
+      // Discard any roots that have magnitude larger than 1. (I'm not
+      // sure this ever happens, but check to be sure.)
+      if (std::abs(sin2theta) > 1) {
+	if (verbose > 1) std::cout << "Skipping root with jr=" << jr <<
+			   " since sin2theta=" << sin2theta << std::endl;
+	break;
+      }
+
+      // Determine varpi by checking which choice gives the smaller residual in the K equation
+      abs_cos2theta = sqrt(1 - sin2theta * sin2theta);
+      residual_if_varpi_plus  = abs(K0 + K2s * sin2theta + K2c *   abs_cos2theta 
+				    + K4s * 2 * sin2theta *   abs_cos2theta
+				    + K4c * (1 - 2 * sin2theta * sin2theta));
+      residual_if_varpi_minus = abs(K0 + K2s * sin2theta + K2c * (-abs_cos2theta) 
+				    + K4s * 2 * sin2theta * (-abs_cos2theta)
+				    + K4c * (1 - 2 * sin2theta * sin2theta));
+
+      if (residual_if_varpi_plus > residual_if_varpi_minus) {
+	varpi = -1;
+      } else {
+	varpi = 1;
+      }
+      cos2theta = varpi * abs_cos2theta;
+
+      // The next few lines give an older method for computing varpi, which has problems in edge cases
+      // where w (the root of the quartic polynomial) is very close to +1 or -1, giving varpi
+      // not very close to +1 or -1 due to bad loss of precision.
+      //
+      //varpi_denominator = ((K4s*2*sin2theta + K2c) * sqrt(1 - sin2theta*sin2theta))
+      //if (abs(varpi_denominator) < 1e-8) print *,"WARNING////// varpi_denominator=",varpi_denominator
+      //varpi = -(K0 + K2s * sin2theta + K4c*(1 - 2*sin2theta*sin2theta)) / varpi_denominator
+      //if (abs(varpi*varpi-1) > 1e-3) print *,"WARNING////// abs(varpi*varpi-1) =",abs(varpi*varpi-1)
+      //varpi = nint(varpi) // Ensure varpi is exactly either +1 or -1.
+      //cos2theta = varpi * sqrt(1 - sin2theta*sin2theta)
+
+      abs_costheta = sqrt(0.5 * (1 + cos2theta));
+      if (verbose > 1) std::cout << "  jr=" << jr << "  sin2theta=" << sin2theta
+				 << "  cos2theta=" << cos2theta << std::endl;
+      for(varsigma = -1; varsigma <= 1; varsigma += 2) { // so varsigma will be either -1 or +1.
+	costheta = varsigma * abs_costheta;
+	sintheta = sin2theta / (2 * costheta);
+	if (verbose > 1) std::cout << "    varsigma=" << varsigma << "  costheta=" << costheta
+				   << "  sintheta=" << sintheta << std::endl;
+
+	// Sanity test
+	if (std::abs(costheta*costheta + sintheta*sintheta - 1) > 1.0e-4) {
+	  std::cout << "Error: sintheta=" << sintheta << "  costheta=" << costheta << std::endl;
+	  std::cout << "j=" << j << "  jr=" << jr << "  sin2theta=" << sin2theta << "  cos2theta=" << cos2theta << std::endl;
+	  std::cout << "abs(costheta*costheta + sintheta*sintheta - 1):" << std::abs(costheta*costheta + sintheta*sintheta - 1)
+		    << std::endl;
+	  //if (trim(general_option)==general_option_single) stop
+	  throw std::runtime_error("sin^2 + cos^2 is far from 1.");
+	}
+
+	quadratic_A = g20 + g2s * sin2theta + g2c * cos2theta;
+	quadratic_B = costheta * g1c;
+	quadratic_C = g0;
+	radical = sqrt(quadratic_B * quadratic_B - 4 * quadratic_A * quadratic_C);
+	// sign_quadratic = -1 or +1:
+	for (sign_quadratic = -1; sign_quadratic <= 1; sign_quadratic += 2) {
+	  rr = (-quadratic_B + sign_quadratic * radical) / (2 * quadratic_A); // This is the quadratic formula.
+	  residual = -g1c*sintheta + 2*rr*(g2s*cos2theta - g2c*sin2theta); // Residual in the equation d sqrt(g) / d theta = 0.
+	  if (verbose > 1) std::cout << "    Quadratic method: rr=" << rr
+				     << "  residual=" << residual << std::endl;
+	  if ((rr>0 && std::abs(residual) < 1.0e-5)) {
+	    if (rr < rc) {// If this is a new minimum
+	      rc = rr;
+	      sintheta_at_rc = sintheta;
+	      costheta_at_rc = costheta;
+	      if (verbose > 1) std::cout << "      New minimum: rc =" << rc << std::endl;
+	    }
+	  }
+	}
+      } // loop over 2 signs of varsigma
+    } // loop over the 4 roots of w polynomial
+    r_hat_singularity_robust[j] = rc;
+  } // loop over nphi
+  
+  r_singularity_robust = r_hat_singularity_robust.min();
+  
+  if (verbose > 0) {
+    end_time = std::clock();
+    auto end = std::chrono::steady_clock::now();
+    
+    std::chrono::duration<double> elapsed = end - start;
+    std::cout << "Time for r_singularity from chrono:           "
+              << elapsed.count() << std::endl;
+    std::cout << "Time for r_singularity from ctime (CPU time): "
+              << double(end_time - start_time) / CLOCKS_PER_SEC << std::endl;
   }
 }
 
+
+    /*
+           // Try to get r using the simpler method, the equation that is linear in r.
+           denominator = 2*(g2s*cos2theta - g2c*sin2theta)
+           //if (abs(denominator) > 1e-8) then // This method cannot be used if we would need to divide by 0
+           if (.false.) then
+              rr = g1c*sintheta / denominator
+              residual = g0 + rr*g1c*costheta + rr*rr*(g20 + g2s*sin2theta + g2c*cos2theta) // Residual in the equation sqrt(g)=0.
+              if (local_verbose) print *,"    Linear method: rr=",rr,"  residual=",residual
+              if ((rr>0) .and. (abs(residual) < 1e-5)) then
+                 if (rr < rc) then // If this is a new minimum
+                    rc = rr
+                    sintheta_at_rc = sintheta
+                    costheta_at_rc = costheta
+                    if (local_verbose) print *,"      New minimum: rc =",rc
+                 end if
+              end if
+           else
+              // Use the more complicated method to determine rr by solving a quadratic equation.
+              quadratic_A = g20 + g2s * sin2theta + g2c * cos2theta
+              quadratic_B = costheta * g1c
+              quadratic_C = g0
+              radical = sqrt(quadratic_B * quadratic_B - 4 * quadratic_A * quadratic_C)
+              do sign_quadratic = -1, 1, 2 // So sign_quadratic = +1 or -1
+                 rr = (-quadratic_B + sign_quadratic * radical) / (2 * quadratic_A) // This is the quadratic formula.
+                 residual = -g1c*sintheta + 2*rr*(g2s*cos2theta - g2c*sin2theta) // Residual in the equation d sqrt(g) / d theta = 0.
+                 if (local_verbose) print *,"    Quadratic method: rr=",rr,"  residual=",residual
+                 if ((rr>0) .and. (abs(residual) < 1e-5)) then
+                    if (rr < rc) then // If this is a new minimum
+                       rc = rr
+                       sintheta_at_rc = sintheta
+                       costheta_at_rc = costheta
+                       if (local_verbose) print *,"      New minimum: rc =",rc
+                    end if
+                 end if
+              end do
+           end if
+        end do
+     end do
+     r_singularity_basic_vs_zeta(j) = rc
+    */
