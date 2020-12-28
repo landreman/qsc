@@ -19,7 +19,7 @@ void Qsc::calculate_r_singularity() {
   qscfloat abs_costheta, abs_sintheta, costheta, sintheta, sintheta_at_rc, costheta_at_rc;
   qscfloat quadratic_A, quadratic_B, quadratic_C, radical, rr, residual;
   int varsigma, sign_quadratic;
-  qscfloat sin2_cos2_1_tol;
+  qscfloat sin2_cos2_1_tol, acceptable_residual;
   bool get_cos_from_cos2;
 
   std::time_t start_time, end_time;
@@ -31,8 +31,11 @@ void Qsc::calculate_r_singularity() {
 
   if (single) {
     sin2_cos2_1_tol = 1.0e-6;
+    acceptable_residual = 1.0e-3;
   } else {
+    // Double precision
     sin2_cos2_1_tol = 1.0e-13;
+    acceptable_residual = 1.0e-5;
   }
   
   for (j = 0; j < nphi; j++) {
@@ -336,7 +339,7 @@ void Qsc::calculate_r_singularity() {
 	}
 	if (verbose > 1) std::cout << "    varsigma=" << varsigma << "  costheta=" << costheta
 				   << "  sintheta=" << sintheta << " get_cos_from_cos2=" << get_cos_from_cos2
-				   << "abs(costheta*costheta + sintheta*sintheta - 1):"
+				   << " abs(costheta*costheta + sintheta*sintheta - 1):"
 				   << std::abs(costheta*costheta + sintheta*sintheta - 1) << std::endl;
 
 	// Sanity test
@@ -359,7 +362,7 @@ void Qsc::calculate_r_singularity() {
 	  residual = -g1c*sintheta + 2*rr*(g2s*cos2theta - g2c*sin2theta); // Residual in the equation d sqrt(g) / d theta = 0.
 	  if (verbose > 1) std::cout << "    Quadratic method: rr=" << rr
 				     << "  residual=" << residual << std::endl;
-	  if ((rr>0 && std::abs(residual) < 1.0e-5)) {
+	  if ((rr>0 && std::abs(residual) < acceptable_residual)) {
 	    if (rr < rc) {// If this is a new minimum
 	      rc = rr;
 	      sintheta_at_rc = sintheta;

@@ -103,15 +103,17 @@ TEST_CASE("Compare published configurations to fortran version of QSC") {
     "quasisymmetry_out.LandremanSengupta2019_section5.4.nc",
     "quasisymmetry_out.LandremanSengupta2019_section5.5.nc"};
   
-  qscfloat tol, well_tol, L_grad_grad_B_tol;
+  qscfloat tol, well_tol, L_grad_grad_B_tol, r_singularity_tol;
   if (single) {
     tol = 3.0e-3;
     well_tol = 3.0e-4;
     L_grad_grad_B_tol = 3.0e-2;
+    r_singularity_tol = 3.0e-3;
   } else {
     tol = 1.0e-10;
     well_tol = 1.0e-12;
     L_grad_grad_B_tol = 1.0e-10;
+    r_singularity_tol = 1.0e-11;
   }
   
   Qsc f;
@@ -188,7 +190,7 @@ TEST_CASE("Compare published configurations to fortran version of QSC") {
 	std::cout << "Diff in L_grad_grad_B_inverse:    " <<
 	  c.L_grad_grad_B_inverse[j] - f.L_grad_grad_B_inverse[j] << std::endl;
 	
-	CHECK(Approx(c.r_hat_singularity_robust[j]) == f.r_hat_singularity_robust[j]);
+	CHECK(Approx(c.r_hat_singularity_robust[j]).epsilon(r_singularity_tol) == f.r_hat_singularity_robust[j]);
 	std::cout << "Diff in r_hat_singularity_robust: " <<
 	  c.r_hat_singularity_robust[j] - f.r_hat_singularity_robust[j] << std::endl;
       }
