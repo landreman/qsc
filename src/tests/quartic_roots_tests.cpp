@@ -9,19 +9,19 @@ TEST_CASE("Quartic roots 1") {
   qscfloat real_parts[4], imag_parts[4];
   
   quartic_roots(coefficients, real_parts, imag_parts);
-  /*
+  
   std::cout << "Roots found:" << std::endl;
   for (int j = 0; j < 4; j++) {
     std::cout << "  " << real_parts[j] << " + " << imag_parts[j] << "i" << std::endl;
   }
-  */
+  
 
   // I'm not sure the order of the roots returned is the same for all
   // implementations of LAPACK. This complicates checking the answer.
   int root1found = 0, root2found = 0, root3found = 0, root4found = 0;
   qscfloat tol;
   if (single) {
-    tol = 1.0e-6;
+    tol = 1.0e-5;
   } else {
     tol = 1.0e-12;
   }
@@ -49,19 +49,19 @@ TEST_CASE("Quartic roots 2") {
   qscfloat real_parts[4], imag_parts[4];
   
   quartic_roots(coefficients, real_parts, imag_parts);
-  /*
+  
   std::cout << "Roots found:" << std::endl;
   for (int j = 0; j < 4; j++) {
     std::cout << "  " << real_parts[j] << " + " << imag_parts[j] << "i" << std::endl;
   }
-  */
+  
 
   // I'm not sure the order of the roots returned is the same for all
   // implementations of LAPACK. This complicates checking the answer.
   int root1found = 0, root2found = 0, root3found = 0, root4found = 0;
   qscfloat tol;
   if (single) {
-    tol = 1.0e-6;
+    tol = 1.0e-5;
   } else {
     tol = 1.0e-12;
   }
