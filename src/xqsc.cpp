@@ -21,8 +21,14 @@ int main(int argc, char* argv[]) {
 
   if (qsc::single) {
     std::cout << "Using SINGLE precision." << std::endl;
+    // Make sure all output is written with full precision
+    std::cout.precision(8);
+    std::cerr.precision(8);
   } else {
     std::cout << "Using DOUBLE precision." << std::endl;
+    // Make sure all output is written with full precision
+    std::cout.precision(15);
+    std::cerr.precision(15);
   }
 
   std::time_t start_time, end_time;

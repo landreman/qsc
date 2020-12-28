@@ -183,8 +183,14 @@ TEST_CASE("Compare published configurations to fortran version of QSC") {
 	CHECK(Approx(c.Z20[j]).epsilon(tol) == f.Z20[j]);
 	CHECK(Approx(c.Z2s[j]).epsilon(tol) == f.Z2s[j]);
 	CHECK(Approx(c.Z2c[j]).epsilon(tol) == f.Z2c[j]);
+	
 	CHECK(Approx(c.L_grad_grad_B_inverse[j]).epsilon(L_grad_grad_B_tol) == f.L_grad_grad_B_inverse[j]);
-	std::cout << "Diff in L_grad_grad_B_inverse: " << c.L_grad_grad_B_inverse[j] - f.L_grad_grad_B_inverse[j] << std::endl;
+	std::cout << "Diff in L_grad_grad_B_inverse:    " <<
+	  c.L_grad_grad_B_inverse[j] - f.L_grad_grad_B_inverse[j] << std::endl;
+	
+	CHECK(Approx(c.r_hat_singularity_robust[j]) == f.r_hat_singularity_robust[j]);
+	std::cout << "Diff in r_hat_singularity_robust: " <<
+	  c.r_hat_singularity_robust[j] - f.r_hat_singularity_robust[j] << std::endl;
       }
     }
   }

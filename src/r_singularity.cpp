@@ -16,9 +16,11 @@ void Qsc::calculate_r_singularity() {
   qscfloat g3s1, g3s3, g3c1, g3c3, g40, g4s2, g4s4, g4c2, g4c4;
   qscfloat rc, sin2theta, abs_cos2theta, residual_if_varpi_plus, residual_if_varpi_minus, cos2theta;
   int varpi, jr;
-  qscfloat abs_costheta, costheta, sintheta, sintheta_at_rc, costheta_at_rc;
+  qscfloat abs_costheta, abs_sintheta, costheta, sintheta, sintheta_at_rc, costheta_at_rc;
   qscfloat quadratic_A, quadratic_B, quadratic_C, radical, rr, residual;
   int varsigma, sign_quadratic;
+  qscfloat sin2_cos2_1_tol;
+  bool get_cos_from_cos2;
 
   std::time_t start_time, end_time;
   std::chrono::time_point<std::chrono::steady_clock> start;
@@ -27,6 +29,12 @@ void Qsc::calculate_r_singularity() {
     start = std::chrono::steady_clock::now();
   }
 
+  if (single) {
+    sin2_cos2_1_tol = 1.0e-6;
+  } else {
+    sin2_cos2_1_tol = 1.0e-13;
+  }
+  
   for (j = 0; j < nphi; j++) {
     if (verbose > 1) std::cout << "---- r_singularity calculation for jphi = " << j << " ----" << std::endl;
     
@@ -267,7 +275,7 @@ void Qsc::calculate_r_singularity() {
       if (std::abs(imag_parts[jr]) > 1e-7) {
 	if (verbose > 1) std::cout << "Skipping root with jr=" << jr <<
 			   " since imag part is" << imag_parts[jr] << std::endl;
-	break;
+	continue;
       }
 
       sin2theta = real_parts[jr];
@@ -277,7 +285,7 @@ void Qsc::calculate_r_singularity() {
       if (std::abs(sin2theta) > 1) {
 	if (verbose > 1) std::cout << "Skipping root with jr=" << jr <<
 			   " since sin2theta=" << sin2theta << std::endl;
-	break;
+	continue;
       }
 
       // Determine varpi by checking which choice gives the smaller residual in the K equation
@@ -307,17 +315,32 @@ void Qsc::calculate_r_singularity() {
       //varpi = nint(varpi) // Ensure varpi is exactly either +1 or -1.
       //cos2theta = varpi * sqrt(1 - sin2theta*sin2theta)
 
-      abs_costheta = sqrt(0.5 * (1 + cos2theta));
       if (verbose > 1) std::cout << "  jr=" << jr << "  sin2theta=" << sin2theta
 				 << "  cos2theta=" << cos2theta << std::endl;
+
+      // To get (sin theta, cos theta) from (sin 2 theta, cos 2 theta), we consider two cases to
+      // avoid precision loss when cos2theta is added to or subtracted from 1:
+      get_cos_from_cos2 = cos2theta > 0;
+      if (get_cos_from_cos2) {
+	abs_costheta = sqrt(0.5 * (1 + cos2theta));
+      } else {
+	abs_sintheta = sqrt(0.5 * (1 - cos2theta));
+      }
       for(varsigma = -1; varsigma <= 1; varsigma += 2) { // so varsigma will be either -1 or +1.
-	costheta = varsigma * abs_costheta;
-	sintheta = sin2theta / (2 * costheta);
+	if (get_cos_from_cos2) {
+	  costheta = varsigma * abs_costheta;
+	  sintheta = sin2theta / (2 * costheta);
+	} else {
+	  sintheta = varsigma * abs_sintheta;
+	  costheta = sin2theta / (2 * sintheta);
+	}
 	if (verbose > 1) std::cout << "    varsigma=" << varsigma << "  costheta=" << costheta
-				   << "  sintheta=" << sintheta << std::endl;
+				   << "  sintheta=" << sintheta << " get_cos_from_cos2=" << get_cos_from_cos2
+				   << "abs(costheta*costheta + sintheta*sintheta - 1):"
+				   << std::abs(costheta*costheta + sintheta*sintheta - 1) << std::endl;
 
 	// Sanity test
-	if (std::abs(costheta*costheta + sintheta*sintheta - 1) > 1.0e-4) {
+	if (std::abs(costheta*costheta + sintheta*sintheta - 1) > sin2_cos2_1_tol) {
 	  std::cout << "Error: sintheta=" << sintheta << "  costheta=" << costheta << std::endl;
 	  std::cout << "j=" << j << "  jr=" << jr << "  sin2theta=" << sin2theta << "  cos2theta=" << cos2theta << std::endl;
 	  std::cout << "abs(costheta*costheta + sintheta*sintheta - 1):" << std::abs(costheta*costheta + sintheta*sintheta - 1)

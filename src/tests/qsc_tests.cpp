@@ -9,9 +9,16 @@
 int main( int argc, char* argv[] ) {
   if (qsc::single) {
     std::cout << "Running unit tests with SINGLE precision." << std::endl;
+    // Make sure all output is written with full precision
+    std::cout.precision(8);
+    std::cerr.precision(8);
   } else {
     std::cout << "Running unit tests with DOUBLE precision." << std::endl;
+    // Make sure all output is written with full precision
+    std::cout.precision(15);
+    std::cerr.precision(15);
   }
+  
   doctest::Context context;
   context.applyCommandLine(argc, argv);
   MPI_Init(&argc, &argv);
