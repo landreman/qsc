@@ -124,6 +124,7 @@ TEST_CASE("Compare published configurations to fortran version of QSC") {
     f.read_netcdf(fconfigs[jconfig], 'F');
     std::cout << "Read NetCDF fortran file" << std::endl;
     Qsc c(cconfigs[jconfig]);
+    c.verbose = ((jconfig == 5) ? 2 : 0);
     c.nphi = f.nphi;
     c.calculate();
     
