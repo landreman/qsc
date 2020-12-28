@@ -47,6 +47,7 @@ namespace qsc {
     void calculate_grad_B_tensor();
     void calculate_grad_grad_B_tensor();
     void mercier();
+    void calculate_r_singularity();
     
   public:
     int verbose;
@@ -80,6 +81,7 @@ namespace qsc {
     Vector d_Z20_d_varphi, d_Z2s_d_varphi, d_Z2c_d_varphi;
     Vector d2_X1c_d_varphi2, d2_Y1c_d_varphi2, d2_Y1s_d_varphi2;
     qscfloat d2_volume_d_psi2, DGeod_times_r2, DWell_times_r2, DMerc_times_r2;
+    Vector r_singularity_robust;
     
     Qsc();
     Qsc(std::string);
