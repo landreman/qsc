@@ -160,6 +160,7 @@ TEST_CASE("Compare published configurations to fortran version of QSC") {
     
     // Vectors
     for (int j = 0; j < f.nphi; j++) {
+      CAPTURE(j);
       CHECK(Approx(c.phi[j]) == f.phi[j]);
       CHECK(Approx(c.curvature[j]) == f.curvature[j]);
       CHECK(Approx(c.torsion[j]) == f.torsion[j]);

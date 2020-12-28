@@ -1,5 +1,6 @@
 #include <ctime>
 #include <chrono>
+#include <cmath>
 #include "qsc.hpp"
 #include "quartic_roots.hpp"
 
@@ -31,7 +32,7 @@ void Qsc::calculate_r_singularity() {
 
   if (single) {
     sin2_cos2_1_tol = 1.0e-6;
-    acceptable_residual = 1.0e-3;
+    acceptable_residual = 3.0e-3; // 1e-3
   } else {
     // Double precision
     sin2_cos2_1_tol = 1.0e-13;
@@ -293,10 +294,10 @@ void Qsc::calculate_r_singularity() {
 
       // Determine varpi by checking which choice gives the smaller residual in the K equation
       abs_cos2theta = sqrt(1 - sin2theta * sin2theta);
-      residual_if_varpi_plus  = abs(K0 + K2s * sin2theta + K2c *   abs_cos2theta 
+      residual_if_varpi_plus  = std::abs(K0 + K2s * sin2theta + K2c *   abs_cos2theta 
 				    + K4s * 2 * sin2theta *   abs_cos2theta
 				    + K4c * (1 - 2 * sin2theta * sin2theta));
-      residual_if_varpi_minus = abs(K0 + K2s * sin2theta + K2c * (-abs_cos2theta) 
+      residual_if_varpi_minus = std::abs(K0 + K2s * sin2theta + K2c * (-abs_cos2theta) 
 				    + K4s * 2 * sin2theta * (-abs_cos2theta)
 				    + K4c * (1 - 2 * sin2theta * sin2theta));
 
