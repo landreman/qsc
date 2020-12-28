@@ -28,13 +28,15 @@ void Qsc::calculate_r_singularity() {
   }
 
   for (j = 0; j < nphi; j++) {
-     // Write sqrt(g) = r * [g0 + r*g1c*cos(theta) + (r^2)*(g20 + g2s*sin(2*theta) + g2c*cos(2*theta) + ...]
-     // The coefficients are evaluated in "20200322-02 Max r for Garren Boozer.nb", in the section "Order r^2 construction, quasisymmetry"
+    if (verbose > 1) std::cout << "---- r_singularity calculation for jphi = " << j << " ----" << std::endl;
+    
+    // Write sqrt(g) = r * [g0 + r*g1c*cos(theta) + (r^2)*(g20 + g2s*sin(2*theta) + g2c*cos(2*theta) + ...]
+    // The coefficients are evaluated in "20200322-02 Max r for Garren Boozer.nb", in the section "Order r^2 construction, quasisymmetry"
 
     g0 = lp * X1c[j] * Y1s[j];
 
-     //g1s = -2*X20[j]*Y1c[j] + 2*X2c[j]*Y1c[j] + 2*X2s[j]*Y1s[j] + 2*X1c[j]*Y20[j] - 2*X1c[j]*Y2c[j]
-     // g1s vanishes for quasisymmetry.
+    // g1s = -2*X20[j]*Y1c[j] + 2*X2c[j]*Y1c[j] + 2*X2s[j]*Y1s[j] + 2*X1c[j]*Y20[j] - 2*X1c[j]*Y2c[j]
+    // g1s vanishes for quasisymmetry.
 
     g1c = lp*(-2*X2s[j]*Y1c[j] + 2*X20[j]*Y1s[j] + 2*X2c[j]*Y1s[j] + 2*X1c[j]*Y2s[j] - X1c[j]*X1c[j]*Y1s[j]*curvature[j]);
 
@@ -234,6 +236,29 @@ void Qsc::calculate_r_singularity() {
 
     quartic_roots(coefficients, real_parts, imag_parts);
 
+    if (verbose > 1) {
+      std::cout << "g0: " << g0 << "  g1c: " << g1c << std::endl;
+      std::cout << "g20: " << g20 << "  g2s: " << g2s << "  g2c: " << g2c << std::endl;
+      std::cout << "K0: " << K0 << "  K2s: " << K2s << "  K2c: " << K2c << std::endl;
+      std::cout << "K4s: " << K4s << "  K4c: " << K4c << std::endl;
+      std::cout << "coefficients: "
+		<< coefficients[0] << " "
+		<< coefficients[1] << " "
+		<< coefficients[2] << " "
+		<< coefficients[3] << " "
+		<< coefficients[4] << std::endl;
+      std::cout << "real parts: "
+		<< real_parts[0] << " "
+		<< real_parts[1] << " "
+		<< real_parts[2] << " "
+		<< real_parts[3] << std::endl;
+      std::cout << "imag parts: "
+		<< imag_parts[0] << " "
+		<< imag_parts[1] << " "
+		<< imag_parts[2] << " "
+		<< imag_parts[3] << std::endl;
+    }
+    
     // Set a default value for rc that is huge to indicate a true solution has not yet been found.
     rc = 1.0e+30;
 
