@@ -1,3 +1,6 @@
+#ifndef QSC_QUARTIC_ROOTS_H
+#define QSC_QUARTIC_ROOTS_H
+
 #include "vector_matrix.hpp"
 
 /** Find the roots of a quartic equation, using the companion matrix.
@@ -7,3 +10,5 @@
  *  real_parts and imag_parts should have 4 elements.
  */
 void quartic_roots(qsc::qscfloat* coefficients, qsc::qscfloat* real_parts, qsc::qscfloat* imag_parts);
+
+#endif

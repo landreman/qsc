@@ -2,6 +2,7 @@
 #define QSC_H
 
 #include <string>
+#include "toml.hpp"
 #include "vector_matrix.hpp"
 
 namespace qsc {  
@@ -19,6 +20,8 @@ namespace qsc {
 
   const std::string ORDER_R_OPTION_R1 = "r1";
   const std::string ORDER_R_OPTION_R2 = "r2";
+
+  int driver(int, char**);
   
   class Qsc {
   private:
@@ -86,7 +89,7 @@ namespace qsc {
     
     Qsc();
     Qsc(std::string);
-    void input(std::string);
+    void input(toml::value);
     void defaults();
     void validate();
     void allocate();

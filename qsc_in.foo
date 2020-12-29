@@ -1,8 +1,11 @@
 # This is a sample input file
+
+general_option = 'single'
+
+[qsc]
 nfp = 1
 # I can put comments here
 nphi = 5
-#order_r_option="r2"
 eta_bar = -1.1
 #R0c = [1.0, 0.3, 0.09]
 

@@ -1,92 +1,25 @@
-#include <exception>
-#include <stdexcept>
-#include <algorithm>
+//#include <algorithm>
 #include <ctime>
 #include <chrono>
 #include "qsc.hpp"
 #include "toml.hpp"
+#include "toml_util.hpp"
 
 using namespace qsc;
 
-void toml_read(std::vector<std::string>& varlist, toml::value indata, std::string varname, int& var) {
-  // toml11's find_or does not seem to give informative error messages
-  // like it's "find" method does, hence my little function here.
-  if (indata.contains(varname)) {
-    var = toml::find<int>(indata, varname);
-  }
-  varlist.push_back(varname);
-  /*
-  try {
-    var = toml::find_or(indata, varname, var);
-  } catch (std::exception) {
-    std::cerr << "Unable to read variable " << varname << " from input file " << filename << std::endl;
-    throw;
-  }
-  */
-}
-
-/** Handle floats
- */
-void toml_read(std::vector<std::string>& varlist, toml::value indata, std::string varname, qscfloat& var) {
-  if (indata.contains(varname)) {
-    // toml11 documentation suggests the following to handle the case
-    // in which an int is provided rather than a float.
-    auto vx = toml::find(indata, varname);
-    if (vx.is_floating()) {
-      var = vx.as_floating(std::nothrow);
-    } else {
-      var = static_cast<double>(vx.as_integer());
-    }
-    //var = toml::find<double>(indata, varname);
-  }
-  varlist.push_back(varname);
-}
-
-/** Handle strings
- */
-void toml_read(std::vector<std::string>& varlist, toml::value indata, std::string varname, std::string& var) {
-  if (indata.contains(varname)) {
-    var = toml::find<std::string>(indata, varname);
-  }
-  varlist.push_back(varname);
-}
-
-/** Handle Vectors
- */
-void toml_read(std::vector<std::string>& varlist, toml::value indata, std::string varname, Vector& var) {
-  if (indata.contains(varname)) {
-    auto indata_vector = toml::find<std::vector<double>>(indata, varname);
-    // Convert the std::vector<double> to a Vector:
-    var.resize(indata_vector.size(), 0.0);
-    for (int j = 0; j < indata_vector.size(); j++) var[j] = (qscfloat)indata_vector[j];
-  }
-  varlist.push_back(varname);
-}
-
-/** Expand a Vector to a longer size, padding with zeros.
- */
-void pad_vector(Vector& v, std::size_t newsize) {
-  assert(v.size() <= newsize);
-  Vector vcopy(v);
-
-  v.resize(newsize, 0.0);
-  for (int j = 0; j < vcopy.size(); j++) v[j] = vcopy[j];
-}
-
 /** Read in a configuration input file
  */
-void Qsc::input(std::string filename) {
+void Qsc::input(toml::value toml_file) {
   std::time_t start_time, end_time;
   std::chrono::time_point<std::chrono::steady_clock> start;
   if (verbose > 0) {
     start_time = std::clock();
     start = std::chrono::steady_clock::now();
-
-    std::cout << "About to try loading input file " << filename << std::endl;
   }
   
-  auto indata = toml::parse(filename);
-
+  // auto toml_file = toml::parse(filename);
+  auto indata = toml::find(toml_file, "qsc");
+  
   std::vector<std::string> varlist;
   //auto varlist = std::vector<std::string>({"R0c", "R0s", "Z0c", "Z0s"});
   
@@ -111,29 +44,8 @@ void Qsc::input(std::string filename) {
   toml_read(varlist, indata, "Z0c", Z0c);
   toml_read(varlist, indata, "Z0s", Z0s);
 
-  std::cout << "varlist:";
-  int j;
-  for (j = 0; j < varlist.size(); j++) std::cout << " " << varlist[j];
-  std::cout << std::endl;
-
-  // Check to see if there are any unused keys in the input file:
-  int found_match;
-  for (auto item : indata.as_table()) {
-    // I believe "item" has type std::pair, representing a key-value pair.
-    auto key = item.first;
-    std::cout << "Found key: " << key << std::endl;
-    found_match = 0;
-    for (j = 0; j < varlist.size(); j++) {
-      if (key.compare(varlist[j]) == 0) {
-	found_match = 1;
-	break;
-      }
-    }
-    if (found_match == 0) {
-      throw std::runtime_error(std::string("Unused key in input file: ") + key);
-    }
-  }
-
+  toml_unused(varlist, indata);
+  
   // Now, make {R0c, R0s, Z0c, Z0s} have the same size.
   std::size_t newsize = 0;
   newsize = std::max(newsize, R0c.size());
