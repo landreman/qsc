@@ -124,7 +124,7 @@ TEST_CASE("Compare published configurations to fortran version of QSC") {
     f.read_netcdf(fconfigs[jconfig], 'F');
     std::cout << "Read NetCDF fortran file" << std::endl;
     Qsc c(cconfigs[jconfig]);
-    c.verbose = ((jconfig == 5) ? 2 : 0);
+    c.verbose = ((jconfig == 5 || jconfig == 7) ? 2 : 0);
     c.nphi = f.nphi;
     c.calculate();
     
@@ -198,4 +198,28 @@ TEST_CASE("Compare published configurations to fortran version of QSC") {
       }
     }
   }
+}
+
+/** Example from Landreman, J Plasma Physics (2021) in figure 2
+ *  and section 4.3.
+ */
+TEST_CASE("r_singularity in Landreman JPP (2021) figure 2") {
+  Qsc q;
+  q.nfp = 2;
+  
+  q.R0c.resize(2, 1.0);
+  q.R0s.resize(2, 0.0);
+  q.Z0c.resize(2, 0.0);
+  q.Z0s.resize(2, 0.0);
+  q.R0c[1] = -0.12;
+  q.Z0s[1] =  0.12;
+  q.eta_bar = -0.7;
+  q.order_r_option = ORDER_R_OPTION_R2;
+  q.B2c = -0.5;
+
+  q.nphi = 101;
+
+  q.calculate();
+
+  CHECK(Approx(q.r_hat_singularity_robust[0]).epsilon(0.0001) == 0.0762);
 }

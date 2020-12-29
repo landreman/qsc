@@ -32,7 +32,7 @@ void Qsc::calculate_r_singularity() {
 
   if (single) {
     sin2_cos2_1_tol = 1.0e-6;
-    acceptable_residual = 1.0e-3;
+    acceptable_residual = 3.0e-3;
     imag_tol = 3.0e-4;
   } else {
     // Double precision
