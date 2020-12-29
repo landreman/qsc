@@ -20,7 +20,7 @@ void Qsc::calculate_r_singularity() {
   qscfloat abs_costheta, abs_sintheta, costheta, sintheta, sintheta_at_rc, costheta_at_rc;
   qscfloat quadratic_A, quadratic_B, quadratic_C, radical, rr, residual;
   int varsigma, sign_quadratic;
-  qscfloat sin2_cos2_1_tol, acceptable_residual;
+  qscfloat sin2_cos2_1_tol, acceptable_residual, imag_tol;
   bool get_cos_from_cos2;
 
   std::time_t start_time, end_time;
@@ -32,11 +32,13 @@ void Qsc::calculate_r_singularity() {
 
   if (single) {
     sin2_cos2_1_tol = 1.0e-6;
-    acceptable_residual = 3.0e-2; // 1e-3
+    acceptable_residual = 1.0e-3;
+    imag_tol = 3.0e-4;
   } else {
     // Double precision
     sin2_cos2_1_tol = 1.0e-13;
     acceptable_residual = 1.0e-5;
+    imag_tol = 1.0e-7;
   }
   
   for (j = 0; j < nphi; j++) {
@@ -276,7 +278,7 @@ void Qsc::calculate_r_singularity() {
 
     for (jr = 0; jr < 4; jr++) { // Loop over the roots of the equation for w.
       // If root is not purely real, skip it.
-      if (std::abs(imag_parts[jr]) > 1e-7) {
+      if (std::abs(imag_parts[jr]) > imag_tol) {
 	if (verbose > 1) std::cout << "Skipping root with jr=" << jr <<
 			   " since imag part is" << imag_parts[jr] << std::endl;
 	continue;
