@@ -216,7 +216,27 @@ void Qsc::calculate_r2() {
   work1 = B20_anomaly * B20_anomaly * d_l_d_phi;
   B20_residual = sqrt(work1.sum() * normalizer) / B0;
   
-  // Diagnostics
+  ////////////////////////////////////////////////////////////
+  
+  if (verbose > 0) {
+    end_time = std::clock();
+    auto end = std::chrono::steady_clock::now();
+    
+    std::chrono::duration<double> elapsed = end - start;
+    std::chrono::duration<double> solve_elapsed = solve_end - solve_start;
+    std::cout << "Time for calculate_r2 from chrono:           "
+              << elapsed.count() << " seconds, " << solve_elapsed.count()
+	      << " for solve" << std::endl;
+    std::cout << "Time for calculate_r2 from ctime (CPU time): "
+              << double(end_time - start_time) / CLOCKS_PER_SEC
+              << " seconds, " << double(solve_end_time - solve_start_time) / CLOCKS_PER_SEC
+	      << " for solve" << std::endl;
+  }
+}
+
+/////////////////////////////////////////
+
+void Qsc::r2_diagnostics() {
   std::time_t diag_start_time, diag_end_time;
   std::chrono::time_point<std::chrono::steady_clock> diag_start, diag_end;
   if (verbose > 0) {
@@ -231,25 +251,12 @@ void Qsc::calculate_r2() {
   if (verbose > 0) {
     diag_end_time = std::clock();
     diag_end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> diag_elapsed = diag_end - diag_start;
+    std::cout << "Time for r2_diagnostics from chrono:           "
+              << diag_elapsed.count() << std::endl;
+    std::cout << "Time for calculate_r2 from ctime (CPU time): "
+              << double(diag_end_time - diag_start_time) / CLOCKS_PER_SEC
+	      << std::endl;
   }
 
-  ////////////////////////////////////////////////////////////
-  
-  if (verbose > 0) {
-    end_time = std::clock();
-    auto end = std::chrono::steady_clock::now();
-    
-    std::chrono::duration<double> elapsed = end - start;
-    std::chrono::duration<double> solve_elapsed = solve_end - solve_start;
-    std::chrono::duration<double> diag_elapsed = diag_end - diag_start;
-    std::cout << "Time for calculate_r2 from chrono:           "
-              << elapsed.count() << " seconds, " << solve_elapsed.count()
-	      << " for solve, " << diag_elapsed.count() << " for diagnostics"
-	      << std::endl;
-    std::cout << "Time for calculate_r2 from ctime (CPU time): "
-              << double(end_time - start_time) / CLOCKS_PER_SEC
-              << " seconds, " << double(solve_end_time - solve_start_time) / CLOCKS_PER_SEC
-	      << " for solve, " << double(diag_end_time - diag_start_time) / CLOCKS_PER_SEC
-	      << " for diagnostics" << std::endl;
-  }
 }

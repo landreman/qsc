@@ -2,7 +2,6 @@
 #define QSC_H
 
 #include <string>
-#include "toml.hpp"
 #include "vector_matrix.hpp"
 
 namespace qsc {  
@@ -48,9 +47,6 @@ namespace qsc {
     static void sigma_eq_residual(Vector&, Vector&, void*);
     static void sigma_eq_jacobian(Vector&, Matrix&, void*);
     void calculate_grad_B_tensor();
-    void calculate_grad_grad_B_tensor();
-    void mercier();
-    void calculate_r_singularity();
     
   public:
     int verbose;
@@ -89,7 +85,7 @@ namespace qsc {
     
     Qsc();
     Qsc(std::string);
-    void input(toml::value);
+    void input(std::string);
     void defaults();
     void validate();
     void allocate();
@@ -97,10 +93,15 @@ namespace qsc {
     void solve_sigma_equation();
     void r1_diagnostics();
     void calculate_r2();
+    void r2_diagnostics();
     void calculate();
     Rank4Tensor calculate_grad_grad_B_tensor_alt();
     void write_netcdf(std::string);
     void read_netcdf(std::string, char);
+    void run(std::string);
+    void calculate_grad_grad_B_tensor();
+    void mercier();
+    void calculate_r_singularity();
   };
   
   std::string outfile(std::string);

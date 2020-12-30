@@ -24,16 +24,18 @@ namespace qsc {
     qscfloat B2s_min, B2s_max, B2c_min, B2c_max;
     Vector R0c_min, R0c_max, R0s_min, R0s_max, Z0c_min, Z0c_max, Z0s_min, Z0s_max;
     qscfloat max_seconds;
-    big n_scan, max_keep_per_proc;
-    qscfloat min_iota_to_keep, min_R0_to_keep, max_elongation_to_keep;
-    qscfloat min_L_grad_B_to_keep, min_L_grad_grad_B_to_keep, min_r_singularity_to_keep;
+    big n_scan;
+    int max_keep_per_proc; // Can I read in a "big" from toml?
+    qscfloat min_R0_to_keep, min_iota_to_keep, max_elongation_to_keep;
+    qscfloat min_L_grad_B_to_keep, min_L_grad_grad_B_to_keep;
+    qscfloat max_B20_variation_to_keep, min_r_singularity_to_keep;
     qscfloat max_d2_volume_d_psi2_to_keep, min_DMerc_to_keep;
-    bool keep_all;
+    bool keep_all, deterministic;
 
     Scan();
     void run(std::string);
     void input(std::string);
-    
+    void random();
   };
 }
 

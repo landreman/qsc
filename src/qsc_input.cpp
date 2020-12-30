@@ -1,4 +1,3 @@
-//#include <algorithm>
 #include <ctime>
 #include <chrono>
 #include "qsc.hpp"
@@ -9,7 +8,7 @@ using namespace qsc;
 
 /** Read in a configuration input file
  */
-void Qsc::input(toml::value toml_file) {
+void qsc::Qsc::input(std::string filename) {
   std::time_t start_time, end_time;
   std::chrono::time_point<std::chrono::steady_clock> start;
   if (verbose > 0) {
@@ -17,7 +16,7 @@ void Qsc::input(toml::value toml_file) {
     start = std::chrono::steady_clock::now();
   }
   
-  // auto toml_file = toml::parse(filename);
+  auto toml_file = toml::parse(filename);
   auto indata = toml::find(toml_file, "qsc");
   
   std::vector<std::string> varlist;

@@ -1,6 +1,6 @@
 # This is a sample input file
 
-general_option = 'single'
+general_option = 'random'
 
 [qsc]
 nfp = 1
@@ -9,7 +9,7 @@ nphi = 5
 eta_bar = -1.1
 #R0c = [1.0, 0.3, 0.09]
 
-verbose = 1
+verbose = 0
 sG=-1
 
 # order_r_option = "r2"
@@ -18,3 +18,11 @@ sG=-1
 #Z0s = [0.0]
  R0c = [1.0, 0.04, 0.002]
  Z0s = [0.0, 0.03]
+
+[scan]
+
+eta_bar_max = 10
+eta_bar_min = 0.1
+
+keep_all = false
+max_seconds = 1

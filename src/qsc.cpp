@@ -68,6 +68,7 @@ void Qsc::calculate() {
   r1_diagnostics();
   if (at_least_order_r2) {
     calculate_r2();
+    r2_diagnostics();
   }
 
   if (verbose > 0) {
@@ -82,4 +83,11 @@ void Qsc::calculate() {
               << " seconds" << std::endl;
   }
 
+}
+
+void Qsc::run(std::string directory_and_infile) {
+  std::string directory_and_outfile = qsc::outfile(directory_and_infile);
+  input(directory_and_infile);
+  calculate();
+  write_netcdf(directory_and_outfile);
 }

@@ -8,6 +8,10 @@ namespace qsc {
 
   void toml_read(std::vector<std::string>& varlist, toml::value indata, std::string varname, int& var);
   
+  /** Handle bools
+   */
+  void toml_read(std::vector<std::string>& varlist, toml::value indata, std::string varname, bool& var);
+
   /** Handle floats
    */
   void toml_read(std::vector<std::string>& varlist, toml::value indata, std::string varname, qscfloat& var);

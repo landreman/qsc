@@ -22,6 +22,15 @@ void qsc::toml_read(std::vector<std::string>& varlist, toml::value indata, std::
   */
 }
 
+/** Handle bools
+ */
+void qsc::toml_read(std::vector<std::string>& varlist, toml::value indata, std::string varname, bool& var) {
+  if (indata.contains(varname)) {
+    var = toml::find<bool>(indata, varname);
+  }
+  varlist.push_back(varname);
+}
+
 /** Handle floats
  */
 void qsc::toml_read(std::vector<std::string>& varlist, toml::value indata, std::string varname, qscfloat& var) {
