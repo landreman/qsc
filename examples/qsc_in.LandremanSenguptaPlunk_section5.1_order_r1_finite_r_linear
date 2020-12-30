@@ -6,6 +6,7 @@
 # general_option = 'single'
 # !general_option = 'scan'
 
+[qsc]
  nphi = 31
 
 # max_N_phi = 1000
