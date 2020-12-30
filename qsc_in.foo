@@ -3,7 +3,7 @@
 general_option = 'random'
 
 [qsc]
-nfp = 1
+nfp = 4
 # I can put comments here
 nphi = 51
 eta_bar = -1.1
@@ -21,9 +21,16 @@ sG=-1
 
 [scan]
 
-eta_bar_max = 10
-eta_bar_min = 0.1
+eta_bar_max = 5
+eta_bar_min = 0.2
 
-keep_all = false
+R0c_min = [1.0, -0.3]
+R0c_max = [1.0,  0.3]
+
+Z0s_min = [0.0, -0.5]
+Z0s_max = [0.0,  0.5]
+
+keep_all = true
+
 max_seconds = 10
 max_attempts_per_proc = 100

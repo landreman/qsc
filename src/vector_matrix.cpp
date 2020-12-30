@@ -37,6 +37,15 @@ extern "C" {
 
 using namespace qsc;
 
+// Default constructor: set size to 1 x 1
+Matrix::Matrix()
+  : std::valarray<qscfloat>(1) // Call constructor of base class.
+{
+  nrows_ = 1;
+  ncols_ = 1;
+  len_ = 1;
+}
+
 Matrix::Matrix(index_type nrows_in, index_type ncols_in)
   : std::valarray<qscfloat>(nrows_in * ncols_in) // Call constructor of base class.
 {
@@ -169,6 +178,16 @@ void qsc::linear_solve(Matrix& m, Vector& v, std::valarray<int>& IPIV) {
 
 ////////////////////////////////////////////////////
 
+// Default constructor: set all dimensions to 1
+Rank3Tensor::Rank3Tensor()
+  : std::valarray<qscfloat>(1) // Call constructor of base class.
+{
+  d1_ = 1;
+  d2_ = 1;
+  d3_ = 1;
+  len_ = 1;
+}
+
 Rank3Tensor::Rank3Tensor(index_type d1_in, index_type d2_in, index_type d3_in)
   : std::valarray<qscfloat>(d1_in * d2_in * d3_in) // Call constructor of base class.
 {
@@ -194,6 +213,17 @@ void Rank3Tensor::set_row(Vector& v, index_type j2, index_type j3) {
 }
 
 ////////////////////////////////////////////////////
+
+// Default constructor: set all dimensions to 1
+Rank4Tensor::Rank4Tensor()
+  : std::valarray<qscfloat>(1) // Call constructor of base class.
+{
+  d1_ = 1;
+  d2_ = 1;
+  d3_ = 1;
+  d4_ = 1;
+  len_ = 1;
+}
 
 Rank4Tensor::Rank4Tensor(index_type d1_in, index_type d2_in, index_type d3_in, index_type d4_in)
   : std::valarray<qscfloat>(d1_in * d2_in * d3_in * d4_in) // Call constructor of base class.

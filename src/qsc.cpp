@@ -33,15 +33,7 @@ void Qsc::defaults() {
   order_r_option = "r1";
 }
 
-Qsc::Qsc() :
-  // Call constructor of member objects:
-  d_d_phi(1, 1),
-  d_d_varphi(1, 1),
-  work_matrix(1, 1),
-  grad_B_tensor(1, 3, 3),
-  grad_grad_B_tensor(1, 3, 3, 3),
-  r2_matrix(1, 1)
-{
+Qsc::Qsc() {
   defaults();
   
   R0c.resize(1, 1.0);
@@ -49,6 +41,25 @@ Qsc::Qsc() :
   Z0c.resize(1, 0.0);
   Z0s.resize(1, 0.0);
 
+  grid_min_R0 = 0.0;
+  curvature = 0.0;
+  grid_max_curvature = 0.0;
+  iota = 0.0;
+  elongation = 0.0;
+  grid_max_elongation = 0.0;
+  L_grad_B = 0.0;
+  grid_min_L_grad_B = 0.0;
+  L_grad_grad_B = 0.0;
+  grid_min_L_grad_grad_B = 0.0;
+  r_singularity_robust = 0.0;
+  r_hat_singularity_robust = 0.0;
+  helicity = 0;
+  B20_grid_variation = 0.0;
+  B20_residual = 0.0;
+  d2_volume_d_psi2 = 0.0;
+  DMerc_times_r2 = 0.0;
+  DGeod_times_r2 = 0.0;
+  DWell_times_r2 = 0.0;
 }
 
 /** High-level routine to call the low-level routines.

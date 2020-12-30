@@ -1,6 +1,8 @@
 #include <chrono>
 #include <vector>
 #include <mpi.h>
+#include <iostream>
+#include <iomanip>
 #include "qsc.hpp"
 #include "scan.hpp"
 #include "random.hpp"
@@ -12,8 +14,9 @@ void Scan::random() {
   const int n_int_parameters = 1;
   const int axis_nmax_plus_1 = R0c_max.size();
   const int n_big_parameters = 13;
+  const int n_fourier_parameters = axis_nmax_plus_1 * 4;
   Matrix parameters_local(n_parameters, max_keep_per_proc);
-  Matrix fourier_parameters_local(axis_nmax_plus_1 * 4, max_keep_per_proc);
+  Matrix fourier_parameters_local(n_fourier_parameters, max_keep_per_proc);
   std::valarray<int> int_parameters_local(n_int_parameters * max_keep_per_proc);
   std::valarray<big> big_parameters_local(n_big_parameters), big_parameters;
   big j_scan = 0, attempts_local = 0;
@@ -218,21 +221,26 @@ void Scan::random() {
 
   MPI_Barrier(MPI_COMM_QSC);
 
-  // Send all results to proc 0
-  if (proc0) {
+  if (!proc0) {
+    // Procs other than 0: Send all results to proc 0
+
+    // Note mpi_rank is used as the tag
+    MPI_Send(    &big_parameters_local[0],              n_big_parameters, MPI_UNSIGNED_LONG, 0, mpi_rank, MPI_COMM_QSC);
+    MPI_Send(        &parameters_local[0],         n_parameters * j_scan,      MPI_QSCFLOAT, 0, mpi_rank, MPI_COMM_QSC);
+    MPI_Send(&fourier_parameters_local[0], n_fourier_parameters * j_scan,      MPI_QSCFLOAT, 0, mpi_rank, MPI_COMM_QSC);
+    MPI_Send(    &int_parameters_local[0],     n_int_parameters * j_scan,           MPI_INT, 0, mpi_rank, MPI_COMM_QSC);
+    
+  } else {
+    // Proc 0 does this following block.
+    
     std::cout << "##################################################################################" << std::endl;
     std::cout << "Transferring results to proc 0" << std::endl;
 
     big_parameters.resize(n_big_parameters * n_procs, 0);
     std::valarray<big> n_solves_kept(n_procs);
     std::valarray<big> attempts_per_proc(n_procs);
-    /*
-    n_solves_kept[0] = j_scan;
-    attempts_per_proc[0] = attempts_local;
-    attempts = attempts_local;
-    n_scan = j_scan;
-    */
     for (j = 0; j < n_big_parameters; j++) big_parameters[j] = big_parameters_local[j];
+    // Receive results from all procs about how many runs were kept, etc
     for (j = 1; j < n_procs; j++) {
       // Use mpi_rank as the tag
       MPI_Recv(&big_parameters[n_big_parameters * j], n_big_parameters,
@@ -273,19 +281,86 @@ void Scan::random() {
     std::cout << "Total # of attempts: " << attempts << std::endl;
     std::cout << "Total # of solves kept: " << n_scan << std::endl;
 
+    // Now that we know the total # of runs that succeeded, we can
+    // allocate big arrays to store the combined results from all
+    // procs.
     Matrix parameters(n_parameters, n_scan);
-    
-  } else {
-    // Procs other than 0
+    Matrix fourier_parameters(n_fourier_parameters, n_scan);
+    std::valarray<int> int_parameters(n_int_parameters * n_scan);
+    // Copy proc0 results to the final arrays:
+    for (j = 0; j < j_scan; j++) {
+      for (k = 0; k < n_parameters; k++) {
+	parameters(k, j) = parameters_local(k, j);
+      }
+      for (k = 0; k < n_fourier_parameters; k++) {
+	fourier_parameters(k, j) = fourier_parameters_local(k, j);
+      }
+      for (k = 0; k < n_int_parameters; k++) {
+	int_parameters[k + n_int_parameters * j] = int_parameters_local[k + n_int_parameters * j];
+      }
+    }
+    // Receive results from other procs:
+    big offset = j_scan;
+    for (j = 1; j < n_procs; j++) {
+      // Use mpi_rank as the tag
+      MPI_Recv(&parameters(0, offset), n_parameters * n_solves_kept[j],
+	       MPI_QSCFLOAT, j, j, MPI_COMM_QSC, &mpi_status);
+      MPI_Recv(&fourier_parameters(0, offset), n_fourier_parameters * n_solves_kept[j],
+	       MPI_QSCFLOAT, j, j, MPI_COMM_QSC, &mpi_status);
+      MPI_Recv(&int_parameters[offset * n_int_parameters], n_int_parameters * n_solves_kept[j],
+	       MPI_INT, j, j, MPI_COMM_QSC, &mpi_status);
+      offset += n_solves_kept[j];
+    }
 
-    // Note mpi_rank is used as the tag
-    MPI_Send(    &big_parameters_local[0],              n_big_parameters, MPI_UNSIGNED_LONG, 0, mpi_rank, MPI_COMM_QSC);
-    /*
-    MPI_Send(        &parameters_local[0],         n_parameters * j_scan,      MPI_QSCFLOAT, 0, mpi_rank, MPI_COMM_QSC);
-    MPI_Send(    &int_parameters_local[0],     n_int_parameters * j_scan,           MPI_INT, 0, mpi_rank, MPI_COMM_QSC);
-    MPI_Send(&fourier_parameters_local[0], axis_nmax_plus_1 * 4 * j_scan,      MPI_QSCFLOAT, 0, mpi_rank, MPI_COMM_QSC);
-    */
-  }
+    scan_eta_bar.resize(n_scan, 0.0);
+    scan_sigma0.resize(n_scan, 0.0);
+    scan_B2c.resize(n_scan, 0.0);
+    scan_B2s.resize(n_scan, 0.0);
+    scan_min_R0.resize(n_scan, 0.0);
+    scan_max_curvature.resize(n_scan, 0.0);
+    scan_iota.resize(n_scan, 0.0);
+    scan_max_elongation.resize(n_scan, 0.0);
+    scan_min_L_grad_B.resize(n_scan, 0.0);
+    scan_min_L_grad_grad_B.resize(n_scan, 0.0);
+    scan_r_singularity.resize(n_scan, 0.0);
+    scan_d2_volume_d_psi2.resize(n_scan, 0.0);
+    scan_DMerc_times_r2.resize(n_scan, 0.0);
+    scan_B20_variation.resize(n_scan, 0.0);
+
+    scan_helicity.resize(n_scan * n_int_parameters, 0);
+
+    scan_R0c.resize(axis_nmax_plus_1, n_scan, 0.0);
+    scan_R0s.resize(axis_nmax_plus_1, n_scan, 0.0);
+    scan_Z0c.resize(axis_nmax_plus_1, n_scan, 0.0);
+    scan_Z0s.resize(axis_nmax_plus_1, n_scan, 0.0);
+    
+    // Unpack parameters
+    for (j = 0; j < n_scan; j++) {
+      scan_eta_bar[j]           = parameters( 0, j);
+      scan_sigma0[j]            = parameters( 1, j);
+      scan_B2c[j]               = parameters( 2, j);
+      scan_B2s[j]               = parameters( 3, j);
+      scan_min_R0[j]            = parameters( 4, j);
+      scan_max_curvature[j]     = parameters( 5, j);
+      scan_iota[j]              = parameters( 6, j);
+      scan_max_elongation[j]    = parameters( 7, j);
+      scan_min_L_grad_B[j]      = parameters( 8, j);
+      scan_min_L_grad_grad_B[j] = parameters( 9, j);
+      scan_r_singularity[j]     = parameters(10, j);
+      scan_d2_volume_d_psi2[j]  = parameters(11, j);
+      scan_DMerc_times_r2[j]    = parameters(12, j);
+      scan_B20_variation[j]     = parameters(13, j);
+      
+      scan_helicity[j] = int_parameters[0 + j * n_int_parameters];
+      
+      for (k = 0; k < axis_nmax_plus_1; k++) {
+	scan_R0c(k, j) = fourier_parameters(k + 0 * axis_nmax_plus_1, j);
+	scan_R0s(k, j) = fourier_parameters(k + 1 * axis_nmax_plus_1, j);
+	scan_Z0c(k, j) = fourier_parameters(k + 2 * axis_nmax_plus_1, j);
+	scan_Z0s(k, j) = fourier_parameters(k + 3 * axis_nmax_plus_1, j);
+      }
+    }
+  } // end of MPI communication of results.
   
   big total_rejected = rejected_due_to_R0_crude
     + rejected_due_to_R0
@@ -315,6 +390,20 @@ void Scan::random() {
     std::cout << "  Rejected due to r_singularity:     " << rejected_due_to_r_singularity << std::endl;
     std::cout << "  Kept:                              " << n_scan << std::endl;
     std::cout << "  Kept + rejected:                   " << n_scan + total_rejected << std::endl;
+    if (n_scan < 1000) {
+      std::cout << std::setprecision(2) << std::endl;
+      std::cout << "min_R0: " << scan_min_R0 << std::endl;
+      std::cout << std::endl;
+      std::cout << "iota: " << scan_iota << std::endl;
+      std::cout << std::endl;
+      std::cout << "max_elongation: " << scan_max_elongation << std::endl;
+      std::cout << std::endl;
+      std::cout << "helicity:";
+      for (j = 0; j < n_scan; j++) std::cout << " " << scan_helicity[j];
+      std::cout << std::endl;
+      std::cout << std::endl;
+      std::cout << "r_singularity: " << scan_r_singularity << std::endl;
+    }
   }
 
   MPI_Barrier(MPI_COMM_QSC);

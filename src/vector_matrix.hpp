@@ -24,6 +24,7 @@ namespace qsc {
     index_type nrows_, ncols_, len_;
 
   public:
+    Matrix();
     Matrix(index_type, index_type);
     index_type nrows();
     index_type ncols();
@@ -107,6 +108,7 @@ namespace qsc {
     index_type d1_, d2_, d3_, len_;
 
   public:
+    Rank3Tensor();
     Rank3Tensor(index_type, index_type, index_type);
     void resize(index_type, index_type, index_type, qscfloat);
     // For info about matrix indexing:
@@ -132,6 +134,7 @@ namespace qsc {
     index_type d1_, d2_, d3_, d4_, len_;
 
   public:
+    Rank4Tensor();
     Rank4Tensor(index_type, index_type, index_type, index_type);
     void resize(index_type, index_type, index_type, index_type, qscfloat);
     // For info about matrix indexing:
