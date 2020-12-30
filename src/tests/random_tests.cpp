@@ -115,3 +115,13 @@ TEST_CASE("Test Random class for 2-sided log distribution") {
   }
 }
 
+TEST_CASE("Test Random::set_to_nth") {
+  qsc::qscfloat min = -3.0, max = -2.0;
+  bool deterministic = true;
+  qsc::Random r1(deterministic, "linear", min, max);
+  qsc::Random r2(deterministic, "linear", min, max);
+  int pos = 17;
+  for (int j = 0; j < pos; j++) r1.get();
+  r2.set_to_nth(pos);
+  CHECK(Approx(r1.get()) == r2.get());
+}

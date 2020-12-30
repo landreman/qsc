@@ -1,7 +1,14 @@
 #ifndef QSC_SCAN_H
 #define QSC_SCAN_H
 
+#include <mpi.h>
 #include "qsc.hpp"
+
+#ifdef SINGLE
+#define MPI_QSCFLOAT MPI_FLOAT
+#else
+#define MPI_QSCFLOAT MPI_DOUBLE
+#endif
 
 namespace qsc {
 
@@ -24,13 +31,18 @@ namespace qsc {
     qscfloat B2s_min, B2s_max, B2c_min, B2c_max;
     Vector R0c_min, R0c_max, R0s_min, R0s_max, Z0c_min, Z0c_max, Z0s_min, Z0s_max;
     qscfloat max_seconds;
-    big n_scan;
-    int max_keep_per_proc; // Can I read in a "big" from toml?
+    big n_scan, attempts;
+    int max_keep_per_proc, max_attempts_per_proc; // Can I read in a "big" from toml?
     qscfloat min_R0_to_keep, min_iota_to_keep, max_elongation_to_keep;
     qscfloat min_L_grad_B_to_keep, min_L_grad_grad_B_to_keep;
     qscfloat max_B20_variation_to_keep, min_r_singularity_to_keep;
     qscfloat max_d2_volume_d_psi2_to_keep, min_DMerc_to_keep;
     bool keep_all, deterministic;
+    big rejected_due_to_R0_crude, rejected_due_to_R0, rejected_due_to_curvature;
+    big rejected_due_to_iota, rejected_due_to_elongation;
+    big rejected_due_to_L_grad_B, rejected_due_to_L_grad_grad_B;
+    big rejected_due_to_B20_variation, rejected_due_to_r_singularity;
+    big rejected_due_to_d2_volume_d_psi2, rejected_due_to_DMerc;
 
     Scan();
     void run(std::string);

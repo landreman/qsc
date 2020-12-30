@@ -1,4 +1,5 @@
 #include <cmath>
+#include <chrono>
 #include <random>
 #include <stdexcept>
 #include "random.hpp"
@@ -19,6 +20,9 @@ Random::Random(bool deterministic_in,
   logmax = log(max);
   last = 0.0;
 
+  unsigned my_seed = std::chrono::steady_clock::now().time_since_epoch().count();
+  generator.seed(my_seed);
+  
   // Convert string to int for speed later.
   if (distrib_in.compare(RANDOM_OPTION_LINEAR) == 0) {
     distrib = RANDOM_INT_OPTION_LINEAR;
@@ -63,4 +67,12 @@ qscfloat Random::get() {
   }
   
   return val;
+}
+
+/** For deterministic=true, set the position in the "random" number
+ * sequence to the 0-based position n. For deterministic=false this
+ * function has no effect.
+ */
+void Random::set_to_nth(int n) {
+  last = std::fmod(n * gamma, (qscfloat)1.0);
 }

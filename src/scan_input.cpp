@@ -43,6 +43,7 @@ void Scan::input(std::string filename) {
   toml_read(varlist, indata, "deterministic", deterministic);
   toml_read(varlist, indata, "max_seconds", max_seconds);
   toml_read(varlist, indata, "max_keep_per_proc", max_keep_per_proc);
+  toml_read(varlist, indata, "max_attempts_per_proc", max_attempts_per_proc);
 
   toml_read(varlist, indata, "keep_all", keep_all);
   toml_read(varlist, indata, "min_R0_to_keep", min_R0_to_keep);

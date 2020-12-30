@@ -25,4 +25,5 @@ eta_bar_max = 10
 eta_bar_min = 0.1
 
 keep_all = false
-max_seconds = 1
+max_seconds = 10
+max_attempts_per_proc = 100

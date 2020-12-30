@@ -28,6 +28,7 @@ namespace qsc {
   public:    
     Random(bool, std::string, qscfloat, qscfloat);
     qscfloat get();
+    void set_to_nth(int);
   };
 }
 
