@@ -5,7 +5,7 @@ general_option = 'random'
 [qsc]
 nfp = 1
 # I can put comments here
-nphi = 5
+nphi = 51
 eta_bar = -1.1
 #R0c = [1.0, 0.3, 0.09]
 

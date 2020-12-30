@@ -1,3 +1,5 @@
+#include <chrono>
+#include <mpi.h>
 #include "qsc.hpp"
 #include "scan.hpp"
 #include "random.hpp"
@@ -10,7 +12,7 @@ void Scan::random() {
   const int axis_nmax_plus_1 = R0c_max.size();
   Matrix parameters_local(max_keep_per_proc, n_parameters);
   Matrix int_parameters_local(max_keep_per_proc, n_int_parameters);
-  Matrix fourier_parameters_local(axis_nmax_plus_1 * 4, n_parameters);
+  Matrix fourier_parameters_local(max_keep_per_proc, axis_nmax_plus_1 * 4);
   big j_scan = 0, attempts, attempts_local = 0, n_kept;
   big rejected_due_to_R0_crude = 0, rejected_due_to_R0 = 0, rejected_due_to_curvature = 0;
   big rejected_due_to_iota = 0, rejected_due_to_elongation = 0;
@@ -19,6 +21,14 @@ void Scan::random() {
   big rejected_due_to_d2_volume_d_psi2 = 0, rejected_due_to_DMerc = 0;
   int j;
   qscfloat R0_at_0, R0_at_half_period, val;
+  int mpi_rank, mpi_size;
+  MPI_Comm MPI_COMM_QSC = MPI_COMM_WORLD;
+
+  // Initialize MPI
+  MPI_Init(NULL, NULL);
+  MPI_Comm_rank(MPI_COMM_QSC, &mpi_rank);
+  MPI_Comm_size(MPI_COMM_QSC, &mpi_size);
+  bool proc0 = (mpi_rank == 0);
   
   // Initialize random distributions:
   Random random_eta_bar(deterministic, eta_bar_scan_option, eta_bar_min, eta_bar_max);
@@ -40,15 +50,12 @@ void Scan::random() {
   start_time = std::chrono::steady_clock::now();
   std::chrono::duration<double> elapsed;
 
+  // Initialize the Qsc object:
   q.validate();
   q.allocate();
   
   bool keep_going = true;
   while (keep_going) {
-    end_time = std::chrono::steady_clock::now();
-    elapsed = end_time - start_time;
-    if (elapsed.count() > max_seconds) keep_going = false;
-
     attempts_local++;
 
     // Initialize R0c, and do a crude check of whether R0 goes negative:
@@ -155,11 +162,28 @@ void Scan::random() {
 
     int_parameters_local(j_scan, 0) = q.helicity;
     
+    for (j = 0; j < axis_nmax_plus_1; j++) {
+      fourier_parameters_local(j_scan, j + 0 * axis_nmax_plus_1) = q.R0c[j];
+      fourier_parameters_local(j_scan, j + 1 * axis_nmax_plus_1) = q.R0s[j];
+      fourier_parameters_local(j_scan, j + 2 * axis_nmax_plus_1) = q.Z0c[j];
+      fourier_parameters_local(j_scan, j + 3 * axis_nmax_plus_1) = q.Z0s[j];
+    }
+    
     j_scan++;
 
     if (j_scan >= max_keep_per_proc) keep_going = false;
+
+    end_time = std::chrono::steady_clock::now();
+    elapsed = end_time - start_time;
+    if (elapsed.count() > max_seconds) keep_going = false;
   }
 
+  std::cout << "Proc " << mpi_rank << " finished after " << elapsed.count() << " seconds" << std::endl;
+
+  MPI_Barrier(MPI_COMM_QSC);
+
+  // Send all results to proc 0
+  
   big total_rejected = rejected_due_to_R0_crude
     + rejected_due_to_R0
     + rejected_due_to_curvature
@@ -187,4 +211,6 @@ void Scan::random() {
   std::cout << "  Rejected due to r_singularity:     " << rejected_due_to_r_singularity << std::endl;
   std::cout << "  Kept:                              " << j_scan << std::endl;
   std::cout << "  Kept + rejected:                   " << j_scan + total_rejected << std::endl;
+
+  MPI_Finalize();
 }
