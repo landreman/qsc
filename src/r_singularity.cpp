@@ -238,6 +238,14 @@ void Qsc::calculate_r_singularity() {
 
     K4c = g1c*g1c*g2c - 8*g0*g2c*g2c + 8*g0*g2s*g2s;
 
+    // To avoid overflow in single precision, scale everything by 1 / K4c
+    qscfloat factor = 1.0 / K4c;
+    K0  *= factor;
+    K2s *= factor;
+    K2c *= factor;
+    K4s *= factor;
+    K4c *= factor;
+    
     coefficients[0] = 4*(K4c*K4c + K4s*K4s);
 
     coefficients[1] = 4*(K4s*K2c - K2s*K4c);

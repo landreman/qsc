@@ -144,15 +144,11 @@ void Qsc::init_axis() {
   
   torsion = torsion_numerator / torsion_denominator;
 
-  etabar_squared_over_curvature_squared = (eta_bar * eta_bar) / (curvature * curvature);
   for (k = 0; k < nphi; k++) {
     for (j = 0; j < nphi; j++) {
       d_d_varphi(j, k) = d_d_phi(j, k) / (B0_over_abs_G0 * d_l_d_phi[j]);
     }
   }
-
-  X1s = 0;
-  X1c = eta_bar / curvature;
 
   // Compute the Boozer toroidal angle along the axis, which is
   // proportional (for QA or QH) to arclength along the axis.

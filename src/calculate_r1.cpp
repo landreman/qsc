@@ -59,6 +59,10 @@ void Qsc::solve_sigma_equation() {
     start = std::chrono::steady_clock::now();
   }
   
+  etabar_squared_over_curvature_squared = (eta_bar * eta_bar) / (curvature * curvature);
+  X1s = 0;
+  X1c = eta_bar / curvature;
+
   state = sigma0; // Initial guess for sigma
   state[0] = 0.0; // Initial guess for iota
     

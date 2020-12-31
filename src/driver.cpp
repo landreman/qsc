@@ -2,6 +2,7 @@
 #include <iostream>
 #include <ctime>
 #include <chrono>
+#include <mpi.h>
 #include "toml.hpp"
 #include "qsc.hpp"
 #include "scan.hpp"
@@ -53,8 +54,12 @@ int qsc::driver(int argc, char* argv[]) {
     q.run(infile);
 
   } else if (general_option.compare(GENERAL_OPTION_RANDOM) == 0) {
+    MPI_Init(NULL, NULL);
+    
     qsc::Scan scan;
     scan.run(infile);
+
+    MPI_Finalize();
     
   } else {
     throw std::runtime_error("Unrecognized setting for general_option");

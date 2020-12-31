@@ -20,7 +20,6 @@ void Scan::random() {
   std::valarray<int> int_parameters_local(n_int_parameters * max_keep_per_proc);
   std::valarray<big> big_parameters_local(n_big_parameters), big_parameters;
   big j_scan = 0, attempts_local = 0;
-  big attempts, n_scan;
   int j, k;
   qscfloat R0_at_0, R0_at_half_period, val;
   int mpi_rank, n_procs;
@@ -28,7 +27,6 @@ void Scan::random() {
   MPI_Status mpi_status;
   
   // Initialize MPI
-  MPI_Init(NULL, NULL);
   MPI_Comm_rank(MPI_COMM_QSC, &mpi_rank);
   MPI_Comm_size(MPI_COMM_QSC, &n_procs);
   bool proc0 = (mpi_rank == 0);
@@ -52,9 +50,10 @@ void Scan::random() {
     random_Z0c[j] = new Random(deterministic, fourier_scan_option, Z0c_min[j], Z0c_max[j]);
     random_Z0s[j] = new Random(deterministic, fourier_scan_option, Z0s_min[j], Z0s_max[j]);
     random_R0c[j]->set_to_nth(mpi_rank * max_attempts_per_proc);
-    random_R0s[j]->set_to_nth(mpi_rank * max_attempts_per_proc);
-    random_Z0c[j]->set_to_nth(mpi_rank * max_attempts_per_proc);
-    random_Z0s[j]->set_to_nth(mpi_rank * max_attempts_per_proc);
+    random_R0s[j]->set_to_nth(mpi_rank * max_attempts_per_proc + 1);
+    random_Z0c[j]->set_to_nth(mpi_rank * max_attempts_per_proc + 2);
+    random_Z0s[j]->set_to_nth(mpi_rank * max_attempts_per_proc + 3);
+    // Above, the +1 .. +3 is so R0c/R0s/Z0c/Z0s are a bit less correlated
   }
   
   rejected_due_to_R0_crude = 0;
@@ -68,7 +67,12 @@ void Scan::random() {
   rejected_due_to_r_singularity = 0;
   rejected_due_to_d2_volume_d_psi2 = 0;
   rejected_due_to_DMerc = 0;
-  
+
+  q.R0c.resize(axis_nmax_plus_1, 0.0);
+  q.R0s.resize(axis_nmax_plus_1, 0.0);
+  q.Z0c.resize(axis_nmax_plus_1, 0.0);
+  q.Z0s.resize(axis_nmax_plus_1, 0.0);
+
   std::chrono::time_point<std::chrono::steady_clock> start_time, end_time;
   start_time = std::chrono::steady_clock::now();
   std::chrono::duration<double> elapsed;
@@ -104,7 +108,7 @@ void Scan::random() {
     for (j = 0; j < axis_nmax_plus_1; j++) {
       q.R0s[j] = random_R0s[j]->get();
       q.Z0s[j] = random_Z0s[j]->get();
-      q.Z0c[j] = random_Z0s[j]->get();
+      q.Z0c[j] = random_Z0c[j]->get();
     }
     q.init_axis();
     if (q.grid_min_R0 < min_R0_to_keep) {
@@ -407,5 +411,4 @@ void Scan::random() {
   }
 
   MPI_Barrier(MPI_COMM_QSC);
-  MPI_Finalize();
 }

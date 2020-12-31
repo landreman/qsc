@@ -80,8 +80,11 @@ void qsc::newton_solve(residual_function_type residual_function,
       if (residual_norm_sq < last_residual_norm_sq) break;
       step_scale /= 2.0;
     }
-    if (verbose > 0 && residual_norm_sq > last_residual_norm_sq) {
-      std::cout << "Line search failed to reduce residual." << std::endl;
+    if (residual_norm_sq > last_residual_norm_sq) {
+      if (verbose > 0) std::cout << "Line search failed to reduce residual." << std::endl;
+      // If the line search fails, stop the Newton iteration:
+      //state = state0;
+      //break;
     }
   }
 }

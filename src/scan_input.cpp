@@ -76,10 +76,6 @@ void Scan::input(std::string filename) {
   pad_vector(R0s_max, newsize);
   pad_vector(Z0c_max, newsize);
   pad_vector(Z0s_max, newsize);
-  q.R0c.resize(newsize, 0.0);
-  q.R0s.resize(newsize, 0.0);
-  q.Z0c.resize(newsize, 0.0);
-  q.Z0s.resize(newsize, 0.0);
 
   std::cout << "----- Scan parameters -----" << std::endl;
   std::cout << "eta_bar range: " << eta_bar_min << " to " << eta_bar_max << std::endl;
