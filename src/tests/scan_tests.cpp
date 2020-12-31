@@ -23,7 +23,7 @@ TEST_CASE("Each scan result should match a standalone Qsc. [mpi]") {
       CAPTURE(j_keep_all);
       scan.q.nfp = 3;
       scan.q.nphi = 31;
-      scan.q.verbose = 1;
+      scan.q.verbose = 0;
       scan.q.p2 = -1.0e+4; // Include nonzero pressure so DMerc is nonzero.
       scan.deterministic = true;
       if (order == 1) {
@@ -74,6 +74,7 @@ TEST_CASE("Each scan result should match a standalone Qsc. [mpi]") {
       scan.max_attempts_per_proc = 5;
       scan.max_keep_per_proc = 20;
       scan.max_seconds = 30;
+      scan.max_elongation_to_keep = 15;
       scan.keep_all = (bool) j_keep_all;
       
       // Run the scan (without reading an input file):

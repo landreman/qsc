@@ -221,6 +221,8 @@ void Scan::random() {
   big_parameters_local[11] = rejected_due_to_DMerc;
   big_parameters_local[12] = rejected_due_to_r_singularity;
 
+  end_time = std::chrono::steady_clock::now();
+  elapsed = end_time - start_time;
   std::cout << "Proc " << mpi_rank << " finished after " << elapsed.count() << " seconds" << std::endl;
 
   MPI_Barrier(MPI_COMM_QSC);
