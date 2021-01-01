@@ -1,9 +1,11 @@
+#include <mpi.h>
 #include "scan.hpp"
 
 using namespace qsc;
 
 void Scan::defaults() {
   // Set defaults.
+  mpi_comm = MPI_COMM_WORLD;
   max_seconds = 60;
   max_keep_per_proc = 1000;
   max_attempts_per_proc = 10000;

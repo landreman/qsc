@@ -23,12 +23,11 @@ void Scan::random() {
   int j, k;
   qscfloat R0_at_0, R0_at_half_period, val;
   int mpi_rank, n_procs;
-  MPI_Comm MPI_COMM_QSC = MPI_COMM_WORLD;
   MPI_Status mpi_status;
   
   // Initialize MPI
-  MPI_Comm_rank(MPI_COMM_QSC, &mpi_rank);
-  MPI_Comm_size(MPI_COMM_QSC, &n_procs);
+  MPI_Comm_rank(mpi_comm, &mpi_rank);
+  MPI_Comm_size(mpi_comm, &n_procs);
   bool proc0 = (mpi_rank == 0);
   
   // Initialize random distributions:
@@ -36,10 +35,10 @@ void Scan::random() {
   Random random_sigma0(deterministic, sigma0_scan_option, sigma0_min, sigma0_max);
   Random random_B2c(deterministic, B2c_scan_option, B2c_min, B2c_max);
   Random random_B2s(deterministic, B2s_scan_option, B2s_min, B2s_max);
-  random_eta_bar.set_to_nth(mpi_rank * max_attempts_per_proc);
-  random_sigma0.set_to_nth(mpi_rank * max_attempts_per_proc);
-  random_B2c.set_to_nth(mpi_rank * max_attempts_per_proc);
-  random_B2s.set_to_nth(mpi_rank * max_attempts_per_proc);
+  random_eta_bar.set_to_nth(mpi_rank * max_attempts_per_proc + 0);
+  random_sigma0.set_to_nth(mpi_rank * max_attempts_per_proc + 1);
+  random_B2c.set_to_nth(mpi_rank * max_attempts_per_proc + 2);
+  random_B2s.set_to_nth(mpi_rank * max_attempts_per_proc + 3);
   Random* random_R0c[axis_nmax_plus_1];
   Random* random_R0s[axis_nmax_plus_1];
   Random* random_Z0c[axis_nmax_plus_1];
@@ -49,11 +48,14 @@ void Scan::random() {
     random_R0s[j] = new Random(deterministic, fourier_scan_option, R0s_min[j], R0s_max[j]);
     random_Z0c[j] = new Random(deterministic, fourier_scan_option, Z0c_min[j], Z0c_max[j]);
     random_Z0s[j] = new Random(deterministic, fourier_scan_option, Z0s_min[j], Z0s_max[j]);
-    random_R0c[j]->set_to_nth(mpi_rank * max_attempts_per_proc);
-    random_R0s[j]->set_to_nth(mpi_rank * max_attempts_per_proc + 1);
-    random_Z0c[j]->set_to_nth(mpi_rank * max_attempts_per_proc + 2);
-    random_Z0s[j]->set_to_nth(mpi_rank * max_attempts_per_proc + 3);
-    // Above, the +1 .. +3 is so R0c/R0s/Z0c/Z0s are a bit less correlated
+    random_R0c[j]->set_to_nth(mpi_rank * max_attempts_per_proc + 4);
+    random_R0s[j]->set_to_nth(mpi_rank * max_attempts_per_proc + 5);
+    random_Z0c[j]->set_to_nth(mpi_rank * max_attempts_per_proc + 6);
+    random_Z0s[j]->set_to_nth(mpi_rank * max_attempts_per_proc + 7);
+    // The set_to_nth() calls are so we can test that results are
+    // independent of the number of MPI procs for deterministic
+    // runs. Also, the +1, +2, ... in these calls is so the parameters
+    // are a bit less correlated for deterministic runs.
   }
   
   rejected_due_to_R0_crude = 0;
@@ -87,11 +89,30 @@ void Scan::random() {
     
     attempts_local++;
 
-    // Initialize R0c, and do a crude check of whether R0 goes negative:
+    // Pick random parameters. A small amount of time could be saved
+    // if random numbers were requested later, only when needed, if
+    // you make it past initial filters. However this makes it hard to
+    // test that the results are independent of the # of MPI
+    // processes, because then proc j would need a seed that depends
+    // on how many cases pass the filters on proc j-1. I don't think
+    // the random number generation is likely to take much of the
+    // overall time for a scan, so let's just get the random values
+    // here.
+    q.eta_bar = random_eta_bar.get();
+    q.sigma0 = random_sigma0.get();
+    if (q.at_least_order_r2) {
+      q.B2c = random_B2c.get();
+      q.B2s = random_B2s.get();
+    }
+    // Initialize axis, and do a crude check of whether R0 goes negative:
     R0_at_half_period = 0;
     for (j = 0; j < axis_nmax_plus_1; j++) {
+      q.R0s[j] = random_R0s[j]->get();
+      q.Z0s[j] = random_Z0s[j]->get();
+      q.Z0c[j] = random_Z0c[j]->get();
       val = random_R0c[j]->get();
       q.R0c[j] = val;
+
       if (j % 2 == 0) {
 	R0_at_half_period += val;
       } else {
@@ -104,14 +125,8 @@ void Scan::random() {
       continue;
     }
 
-    // Initialize the rest of the axis shape:
-    for (j = 0; j < axis_nmax_plus_1; j++) {
-      q.R0s[j] = random_R0s[j]->get();
-      q.Z0s[j] = random_Z0s[j]->get();
-      q.Z0c[j] = random_Z0c[j]->get();
-    }
     q.init_axis();
-    if (q.grid_min_R0 < min_R0_to_keep) {
+    if (!keep_all && q.grid_min_R0 < min_R0_to_keep) {
       rejected_due_to_R0++;
       continue;
     }
@@ -119,10 +134,6 @@ void Scan::random() {
       rejected_due_to_curvature++;
       continue;
     }
-
-    // Initialize the rest of the O(r^1) parameters:
-    q.eta_bar = random_eta_bar.get();
-    q.sigma0 = random_sigma0.get();
 
     // Here is the main O(r^1) solve:
     q.solve_sigma_equation();
@@ -137,10 +148,6 @@ void Scan::random() {
     }
 
     if (q.at_least_order_r2) {
-      // Initialize the rest of the O(r^2) parameters:
-      q.B2c = random_B2c.get();
-      q.B2s = random_B2s.get();
-
       // Here is the main O(r^2) solve:
       q.calculate_r2();
 
@@ -225,16 +232,16 @@ void Scan::random() {
   elapsed = end_time - start_time;
   std::cout << "Proc " << mpi_rank << " finished after " << elapsed.count() << " seconds" << std::endl;
 
-  MPI_Barrier(MPI_COMM_QSC);
+  MPI_Barrier(mpi_comm);
 
   if (!proc0) {
     // Procs other than 0: Send all results to proc 0
 
     // Note mpi_rank is used as the tag
-    MPI_Send(    &big_parameters_local[0],              n_big_parameters, MPI_UNSIGNED_LONG, 0, mpi_rank, MPI_COMM_QSC);
-    MPI_Send(        &parameters_local[0],         n_parameters * j_scan,      MPI_QSCFLOAT, 0, mpi_rank, MPI_COMM_QSC);
-    MPI_Send(&fourier_parameters_local[0], n_fourier_parameters * j_scan,      MPI_QSCFLOAT, 0, mpi_rank, MPI_COMM_QSC);
-    MPI_Send(    &int_parameters_local[0],     n_int_parameters * j_scan,           MPI_INT, 0, mpi_rank, MPI_COMM_QSC);
+    MPI_Send(    &big_parameters_local[0],              n_big_parameters, MPI_UNSIGNED_LONG, 0, mpi_rank, mpi_comm);
+    MPI_Send(        &parameters_local[0],         n_parameters * j_scan,      MPI_QSCFLOAT, 0, mpi_rank, mpi_comm);
+    MPI_Send(&fourier_parameters_local[0], n_fourier_parameters * j_scan,      MPI_QSCFLOAT, 0, mpi_rank, mpi_comm);
+    MPI_Send(    &int_parameters_local[0],     n_int_parameters * j_scan,           MPI_INT, 0, mpi_rank, mpi_comm);
     
   } else {
     // Proc 0 does this following block.
@@ -250,7 +257,7 @@ void Scan::random() {
     for (j = 1; j < n_procs; j++) {
       // Use mpi_rank as the tag
       MPI_Recv(&big_parameters[n_big_parameters * j], n_big_parameters,
-	       MPI_UNSIGNED_LONG, j, j, MPI_COMM_QSC, &mpi_status);
+	       MPI_UNSIGNED_LONG, j, j, mpi_comm, &mpi_status);
     }
     // Add up numbers from all procs:
     std::valarray<big> total_big_parameters;
@@ -310,11 +317,11 @@ void Scan::random() {
     for (j = 1; j < n_procs; j++) {
       // Use mpi_rank as the tag
       MPI_Recv(&parameters(0, offset), n_parameters * n_solves_kept[j],
-	       MPI_QSCFLOAT, j, j, MPI_COMM_QSC, &mpi_status);
+	       MPI_QSCFLOAT, j, j, mpi_comm, &mpi_status);
       MPI_Recv(&fourier_parameters(0, offset), n_fourier_parameters * n_solves_kept[j],
-	       MPI_QSCFLOAT, j, j, MPI_COMM_QSC, &mpi_status);
+	       MPI_QSCFLOAT, j, j, mpi_comm, &mpi_status);
       MPI_Recv(&int_parameters[offset * n_int_parameters], n_int_parameters * n_solves_kept[j],
-	       MPI_INT, j, j, MPI_COMM_QSC, &mpi_status);
+	       MPI_INT, j, j, mpi_comm, &mpi_status);
       offset += n_solves_kept[j];
     }
 
@@ -412,5 +419,5 @@ void Scan::random() {
     }
   }
 
-  MPI_Barrier(MPI_COMM_QSC);
+  MPI_Barrier(mpi_comm);
 }

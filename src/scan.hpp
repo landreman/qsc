@@ -25,6 +25,7 @@ namespace qsc {
     
   public:
     Qsc q;
+    MPI_Comm mpi_comm;
     std::string eta_bar_scan_option, sigma0_scan_option;
     std::string B2s_scan_option, B2c_scan_option, fourier_scan_option;
     qscfloat eta_bar_min, eta_bar_max, sigma0_min, sigma0_max;
