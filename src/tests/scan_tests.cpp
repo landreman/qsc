@@ -131,6 +131,9 @@ TEST_CASE("Each scan result should match a standalone Qsc. [mpi]") {
   }
 }
 
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+
 TEST_CASE("Verify results of a deterministic scan are independent of number of mpi procs. [mpi]") {
   int j, k;
   qsc::qscfloat amplitude;
@@ -322,6 +325,258 @@ TEST_CASE("Verify results of a deterministic scan are independent of number of m
 	    CHECK(Approx(scan1.scan_R0s(k, j)) == scan2.scan_R0s(k, j));
 	    CHECK(Approx(scan1.scan_Z0c(k, j)) == scan2.scan_Z0c(k, j));
 	    CHECK(Approx(scan1.scan_Z0s(k, j)) == scan2.scan_Z0s(k, j));
+	  }
+	}
+      }
+    }
+  }
+}
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+
+TEST_CASE("Verify scan results with and without filters are related as expected. [mpi]") {
+  int j, k, n;
+  qsc::qscfloat amplitude;
+  int mpi_rank, n_procs;
+  MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
+  bool proc0 = (mpi_rank == 0);
+
+  // Set up two scans. scan1 will have minimal filters, scan 2 will have an extra filter.
+  qsc::Scan scan1;
+  qsc::Scan scan2;
+  scan1.keep_all = true;
+  scan2.keep_all = false;
+
+  scan1.deterministic = true;
+  scan2.deterministic = scan1.deterministic;
+  
+  scan2.max_attempts_per_proc = 60 / n_procs; // Note integer division
+  scan1.max_attempts_per_proc = scan2.max_attempts_per_proc;
+  
+  scan1.max_keep_per_proc = 1000;
+  scan2.max_keep_per_proc = scan1.max_keep_per_proc;
+  
+  scan1.max_seconds = 30;
+  scan2.max_seconds = scan1.max_seconds;
+  
+  scan1.max_d2_volume_d_psi2_to_keep = 0;
+  scan2.max_d2_volume_d_psi2_to_keep = scan1.max_d2_volume_d_psi2_to_keep;
+
+  scan1.min_DMerc_to_keep = 0;
+  scan2.min_DMerc_to_keep = scan1.min_DMerc_to_keep;
+  
+  scan1.min_L_grad_grad_B_to_keep = 0.05;
+  scan2.min_L_grad_grad_B_to_keep = scan1.min_L_grad_grad_B_to_keep;
+  
+  scan1.q.nfp = 3;
+  scan2.q.nfp = scan1.q.nfp;
+  
+  scan1.q.nphi = 31;
+  scan2.q.nphi = scan1.q.nphi;
+  
+  scan1.q.verbose = 0;
+  scan2.q.verbose = scan1.q.verbose;
+  
+  scan1.q.p2 = -1.0e+4; // Include nonzero pressure so DMerc is nonzero.
+  scan2.q.p2 = scan1.q.p2;
+  
+  int nf = 2;
+  scan1.R0c_min.resize(nf, 0.0);
+  scan1.R0c_max.resize(nf, 0.0);
+  scan1.R0s_min.resize(nf, 0.0);
+  scan1.R0s_max.resize(nf, 0.0);
+  scan1.Z0c_min.resize(nf, 0.0);
+  scan1.Z0c_max.resize(nf, 0.0);
+  scan1.Z0s_min.resize(nf, 0.0);
+  scan1.Z0s_max.resize(nf, 0.0);
+  
+  scan2.R0c_min.resize(nf, 0.0);
+  scan2.R0c_max.resize(nf, 0.0);
+  scan2.R0s_min.resize(nf, 0.0);
+  scan2.R0s_max.resize(nf, 0.0);
+  scan2.Z0c_min.resize(nf, 0.0);
+  scan2.Z0c_max.resize(nf, 0.0);
+  scan2.Z0s_min.resize(nf, 0.0);
+  scan2.Z0s_max.resize(nf, 0.0);
+  
+  scan1.eta_bar_min = 0.7;
+  scan1.eta_bar_max = 1.4;
+  scan2.eta_bar_min = scan1.eta_bar_min;
+  scan2.eta_bar_max = scan1.eta_bar_max;
+      
+  scan1.sigma0_min = -0.3;
+  scan1.sigma0_max = 0.6;
+  scan2.sigma0_min = scan1.sigma0_min;
+  scan2.sigma0_max = scan1.sigma0_max;
+      
+  scan1.B2c_min = -1.0;
+  scan1.B2c_max = 1.0;
+  scan2.B2c_min = scan1.B2c_min;
+  scan2.B2c_max = scan1.B2c_max;
+      
+  scan1.B2s_min = -1.0;
+  scan1.B2s_max = 1.0;
+  scan2.B2s_min = scan1.B2s_min;
+  scan2.B2s_max = scan1.B2s_max;
+            
+  // Try both O(r^1) and O(r^2):
+  for (int order = 1; order < 3; order++) {
+    CAPTURE(order);
+    if (order == 1) {
+      scan1.q.order_r_option = "r1";
+    } else if (order == 2) {
+      scan1.q.order_r_option = "r2";
+    } else {
+      throw std::runtime_error("Should not get here");
+    }
+    scan2.q.order_r_option = scan1.q.order_r_option;
+    
+    if (order == 2) {
+      // Stay close to axisymmetry so O(r^2) diagnostics are not crazy
+      scan1.R0c_min[0] = 0.8;
+      scan1.R0c_max[0] = 1.2;
+      amplitude = 0.02;
+    } else {
+      // O(r^1). Try some crazier cases
+      scan1.R0c_min[0] = 0.6;
+      scan1.R0c_max[0] = 1.2;
+      amplitude = 0.8;
+    }
+      
+    scan1.R0c_min[1] = -amplitude;
+    scan1.R0c_max[1] =  amplitude;
+    
+    scan1.R0s_min[1] = -amplitude;
+    scan1.R0s_max[1] =  amplitude;
+    
+    scan1.Z0c_min[1] = -amplitude;
+    scan1.Z0c_max[1] =  amplitude;
+    
+    scan1.Z0s_min[1] = -amplitude;
+    scan1.Z0s_max[1] =  amplitude;
+    
+    scan2.R0c_min = scan1.R0c_min;
+    scan2.R0c_max = scan1.R0c_max;
+    scan2.R0s_min = scan1.R0s_min;
+    scan2.R0s_max = scan1.R0s_max;
+    scan2.Z0c_min = scan1.Z0c_min;
+    scan2.Z0c_max = scan1.Z0c_max;
+    scan2.Z0s_min = scan1.Z0s_min;
+    scan2.Z0s_max = scan1.Z0s_max;
+
+    // Run the scan with no filters:
+    if (proc0) std::cout << "#### Running scan with keep_all" << std::endl;
+    scan1.random();
+
+    int n_filters = 9;
+    for (int j_filter = 0; j_filter <= n_filters; j_filter++) {
+      CAPTURE(j_filter);
+
+      if (j_filter == 1) {
+	scan2.min_R0_to_keep = 0.1;
+      } else {
+	scan2.min_R0_to_keep = -1.0e+30;
+      }
+
+      if (j_filter == 2) {
+	scan2.min_iota_to_keep = 0.04;
+      } else {
+	scan2.min_iota_to_keep = -1.0;
+      }
+
+      if (j_filter == 3) {
+	scan2.max_elongation_to_keep = 50;
+      } else {
+	scan2.max_elongation_to_keep = 1.0e+30;
+      }
+
+      if (j_filter == 4) {
+	scan2.min_L_grad_B_to_keep = 0.25;
+      } else {
+	scan2.min_L_grad_B_to_keep = -1;
+      }
+
+      if (j_filter == 5) {
+	scan2.min_L_grad_grad_B_to_keep = 0.5;
+      } else {
+	scan2.min_L_grad_grad_B_to_keep = -1;
+      }
+
+      if (j_filter == 6) {
+	scan2.max_B20_variation_to_keep = 0.7;
+      } else {
+	scan2.max_B20_variation_to_keep = 1.0e+30;
+      }
+
+      if (j_filter == 7) {
+	scan2.min_r_singularity_to_keep = 0.05;
+      } else {
+	scan2.min_r_singularity_to_keep = -1;
+      }
+
+      if (j_filter == 8) {
+	scan2.max_d2_volume_d_psi2_to_keep = 0;
+      } else {
+	scan2.max_d2_volume_d_psi2_to_keep = 1.0e+30;
+      }
+
+      if (j_filter == 9) {
+	scan2.min_DMerc_to_keep = 0;
+      } else { 
+	scan2.min_DMerc_to_keep = -1.0e+30;
+      }
+      	
+      // Run the scan
+      if (proc0) std::cout << "#### Running scan with order=" << order
+			   << ", j_filter=" << j_filter << std::endl;
+      scan2.random();
+      
+      // Restore printing format:
+      std::cout << std::setprecision(15);
+      
+      if (proc0) {
+	n = -1;
+	for (j = 0; j < scan1.n_scan; j++) {
+	  CAPTURE(j);
+	  CAPTURE(n);
+	  // If O(r^1) filters are satisfied:
+	  if (scan1.scan_min_R0[j] >= scan2.min_R0_to_keep &&
+	      std::abs(scan1.scan_iota[j]) >= scan2.min_iota_to_keep &&
+	      scan1.scan_max_elongation[j] <= scan2.max_elongation_to_keep &&
+	      scan1.scan_min_L_grad_B[j] >= scan2.min_L_grad_B_to_keep &&
+	      (order == 1 || // If O(r^2) filters are satisfied:
+	       (scan1.scan_min_L_grad_grad_B[j] >= scan2.min_L_grad_grad_B_to_keep &&
+		scan1.scan_B20_variation[j] <= scan2.max_B20_variation_to_keep &&
+		scan1.scan_r_singularity[j] >= scan2.min_r_singularity_to_keep &&
+		scan1.scan_d2_volume_d_psi2[j] <= scan2.max_d2_volume_d_psi2_to_keep &&
+		scan1.scan_DMerc_times_r2[j] >= scan2.min_DMerc_to_keep))) {
+	    
+	    n++;
+	    CHECK(Approx(scan1.scan_eta_bar[j]) == scan2.scan_eta_bar[n]);
+	    CHECK(Approx(scan1.scan_sigma0[j]) == scan2.scan_sigma0[n]);
+	    CHECK(Approx(scan1.scan_B2s[j]) == scan2.scan_B2s[n]);
+	    CHECK(Approx(scan1.scan_B2c[j]) == scan2.scan_B2c[n]);
+	    CHECK(Approx(scan1.scan_min_R0[j]) == scan2.scan_min_R0[n]);
+	    CHECK(Approx(scan1.scan_max_curvature[j]) == scan2.scan_max_curvature[n]);
+	    CHECK(Approx(scan1.scan_iota[j]) == scan2.scan_iota[n]);
+	    CHECK(Approx(scan1.scan_max_elongation[j]) == scan2.scan_max_elongation[n]);
+	    CHECK(Approx(scan1.scan_min_L_grad_B[j]) == scan2.scan_min_L_grad_B[n]);
+	    CHECK(Approx(scan1.scan_min_L_grad_grad_B[j]) == scan2.scan_min_L_grad_grad_B[n]);
+	    CHECK(Approx(scan1.scan_r_singularity[j]) == scan2.scan_r_singularity[n]);
+	    CHECK(Approx(scan1.scan_B20_variation[j]) == scan2.scan_B20_variation[n]);
+	    CHECK(Approx(scan1.scan_d2_volume_d_psi2[j]) == scan2.scan_d2_volume_d_psi2[n]);
+	    CHECK(Approx(scan1.scan_DMerc_times_r2[j]) == scan2.scan_DMerc_times_r2[n]);
+	  
+	    CHECK(scan1.scan_helicity[j] == scan2.scan_helicity[n]);
+	  
+	    for (k = 0; k < nf; k++) {
+	      CAPTURE(k);
+	      CHECK(Approx(scan1.scan_R0c(k, j)) == scan2.scan_R0c(k, n));
+	      CHECK(Approx(scan1.scan_R0s(k, j)) == scan2.scan_R0s(k, n));
+	      CHECK(Approx(scan1.scan_Z0c(k, j)) == scan2.scan_Z0c(k, n));
+	      CHECK(Approx(scan1.scan_Z0s(k, j)) == scan2.scan_Z0s(k, n));
+	    }
 	  }
 	}
       }

@@ -138,6 +138,10 @@ void Scan::random() {
     // Here is the main O(r^1) solve:
     q.solve_sigma_equation();
     q.r1_diagnostics();
+    if (!keep_all && std::abs(q.iota) < min_iota_to_keep) {
+      rejected_due_to_iota++;
+      continue;
+    }
     if (!keep_all && q.grid_max_elongation > max_elongation_to_keep) {
       rejected_due_to_elongation++;
       continue;
