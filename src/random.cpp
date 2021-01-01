@@ -74,5 +74,10 @@ qscfloat Random::get() {
  * function has no effect.
  */
 void Random::set_to_nth(int n) {
-  last = std::fmod(n * gamma, (qscfloat)1.0);
+  // This next version introduces roundoff-scale errors that are
+  //sufficient to affect single-precision tests.
+  // last = std::fmod(n * gamma, (qscfloat)1.0);
+  
+  last = 0.0;
+  for (int j = 0; j < n; j++) get();
 }
