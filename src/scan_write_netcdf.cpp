@@ -2,11 +2,12 @@
 #include <chrono>
 #include <vector>
 #include "qsc.hpp"
+#include "scan.hpp"
 #include "netcdf_writer.hpp"
 
 using namespace qsc;
 
-void Qsc::write_netcdf(std::string filename) {
+void Scan::write_netcdf(std::string filename) {
   std::time_t start_time, end_time;
   std::chrono::time_point<std::chrono::steady_clock> start;
   if (verbose > 0) {
@@ -18,30 +19,47 @@ void Qsc::write_netcdf(std::string filename) {
   qsc::NetCDFWriter nc(filename);
 
   // Define dimensions
-  dim_id_type nphi_dim, axis_nmax_plus_1_dim, nbt_dim;
-  nphi_dim = nc.dim("nphi", nphi);
-  axis_nmax_plus_1_dim = nc.dim("axis_nmax_plus_1", R0c.size());
-  nbt_dim = nc.dim("normal_binormal_tangent", 3);
+  dim_id_type nphi_dim, axis_nmax_plus_1_dim, n_scan_dim;
+  nphi_dim = nc.dim("nphi", q.nphi);
+  axis_nmax_plus_1_dim = nc.dim("axis_nmax_plus_1", R0c_max.size());
+  n_scan_dim = nc.dim("n_scan", n_scan);
   
   // Scalars
-  int at_least_order_r2_int = (int) at_least_order_r2;
+  int at_least_order_r2_int = (int) q.at_least_order_r2;
   nc.put("at_least_order_r2", at_least_order_r2_int, "1 if the O(r^2) equations were solved, 0 if not", "dimensionless");
-  nc.put("nfp", nfp, "Number of field periods", "dimensionless");
-  nc.put("nphi", nphi, "Number of grid points in the toroidal angle phi", "dimensionless");
+  nc.put("nfp", q.nfp, "Number of field periods", "dimensionless");
+  nc.put("nphi", q.nphi, "Number of grid points in the toroidal angle phi", "dimensionless");
+  int keep_all_int = (int) keep_all;
+  nc.put("keep_all", keep_all_int, "1 if all configurations from the scan were saved, 0 if some configurations were filtered out", "dimensionless");
+  int deterministic_int = (int) deterministic;
+  nc.put("deterministic", deterministic_int, "1 if a deterministic pseudo-random number generator and seed were used, 1 if a random seed based on the time was used.", "dimensionless");
+  if (!keep_all) {
+    nc.put("min_R0_to_keep", min_R0_to_keep, "Configurations were kept in the scan only if the major radius of the magnetic axis was at least this value", "meter");
+    nc.put("min_iota_to_keep", min_iota_to_keep, "Configurations were kept in the scan only if the absolute value of the on-axis rotational transform was at least this value", "dimensionless");
+    nc.put("max_elongation_to_keep", max_elongation_to_keep, "Configurations were kept in the scan only if the elongation (in the plane perpendicular to the magnetic axis) was no greater than this value at all toroidal angles", "dimensionless");
+    nc.put("min_L_grad_B_to_keep", min_L_grad_B_to_keep, "Configurations were kept in the scan only if the scale length L_grad_B (eq (3.1) in Landreman J Plasma Physics (2021)) is at least this value at each toroidal angle", "meter");
+    if (q.at_least_order_r2) {
+      nc.put("min_L_grad_grad_B_to_keep", min_L_grad_grad_B_to_keep, "Configurations were kept in the scan only if the scale length L_grad_grad_B (eq (3.2) in Landreman J Plasma Physics (2021)) is at least this value at each toroidal angle", "meter");
+      nc.put("max_B20_variation_to_keep", max_B20_variation_to_keep, "Configurations were kept in the scan only if the range (maximum minus minimum) of B20 over toroidal angle is no more than this value", "Tesla/(meter^2)");
+      nc.put("min_r_singularity_to_keep", min_r_singularity_to_keep, "Configurations were kept in the scan only if r_singularity_robust is at least this value. r_singularity_robust is the robust estimate of the minor radius at which the flux surface shapes become singular, r_c, as detailed in section 4.2 of Landreman, J Plasma Physics (2021)", "meter");
+      nc.put("max_d2_volume_d_psi2_to_keep", max_d2_volume_d_psi2_to_keep, "Configurations were kept in the scan only if the magnetic well d2_volume_d_psi2 is no more than this value. d2_volume_d_psi2 is the second derivative of flux surface volume with respect to psi, where 2*pi*psi is the toroidal flux.", "Tesla^{-2} meter^{-1}");
+      nc.put("min_DMerc_to_keep", min_DMerc_to_keep, "Configurations were kept in the scan only if the Mercier stability criterion DMerc_times_r2 is at least this value. DMerc_times_r2 corresponds to r^2 times the quantity DMerc in Landreman and Jorge, J Plasma Phys (2020).", "Tesla^{-2} meter^{-2}");
+    }
+  }
+  nc.put("max_newton_iterations", q.max_newton_iterations, "Maximum iterations of Newton's method for solving the sigma equation", "dimensionless");
+  nc.put("max_linesearch_iterations", q.max_linesearch_iterations, "Maximum number of times the step size is reduced in the line search for each iteration of Newton's method when solving the sigma equation", "dimensionless");
+  nc.put("newton_tolerance", q.newton_tolerance, "L2 norm of the residual used as a stopping criterion for Newton's method when solving the sigma equation", "dimensionless");
+  nc.put("I2", q.I2, "r^2 term in I(r), which is the toroidal current inside the flux surface times mu0/(2pi)", "Tesla/meter");
+  nc.put("d_phi", q.d_phi, "Grid spacing in phi", "dimensionless");
+  nc.put("B0", q.B0, "Magnetic field magnitude on the magnetic axis", "Telsa");
+  nc.put("sG", q.sG, "Sign of G0", "dimensionless");
+  nc.put("spsi", q.spsi, "Sign of the toroidal flux psi", "dimensionless");
+  /*
   //nc.put("axis_nmax_plus_1", R0c.size(), "Length of the arrays R0c, Z0s, etc", "dimensionless");
-  nc.put("eta_bar", eta_bar, "Constant equal to B1c / B0", "1/meter");
-  nc.put("sigma0", sigma0, "Value of sigma at phi=0", "dimensionless");
-  nc.put("I2", I2, "r^2 term in I(r), which is the toroidal current inside the flux surface times mu0/(2pi)", "Tesla/meter");
-  nc.put("d_phi", d_phi, "Grid spacing in phi", "dimensionless");
-  nc.put("B0", B0, "Magnetic field magnitude on the magnetic axis", "Telsa");
-  nc.put("G0", G0, "Value on the magnetic axis of G(r), which is the poloidal current outside the flux surface times mu0/(2pi)", "Tesla*meter");
-  nc.put("sG", sG, "Sign of G0", "dimensionless");
-  nc.put("spsi", spsi, "Sign of the toroidal flux psi", "dimensionless");
   nc.put("axis_length", axis_length, "Total length of the magnetic axis, from phi = 0 to 2pi", "meter");
   nc.put("d_l_d_varphi", d_l_d_varphi, "Differential arclength of the magnetic axis with respect to the Boozer toroidal angle", "meter");
   nc.put("B0_over_abs_G0", B0_over_abs_G0, "", "1/meter");
   nc.put("abs_G0_over_B0", abs_G0_over_B0, "", "meter");
-  nc.put("helicity", helicity, "Number of times the normal vector of the magnetic axis rotates poloidally as the axis is followed toroidally for one field period. The integer N appearing in our papers is equal to -helicity * nfp.", "dimensionless");
   nc.put("rms_curvature", rms_curvature, "Root-mean-squared curvature of the magnetic axis, where the average is taken with respect to arclength", "1/meter");
   nc.put("grid_max_curvature", grid_max_curvature, "Maximum curvature of the magnetic axis, maximizing only over the phi grid points and not interpolating in between", "1/meter");
   nc.put("grid_max_elongation", grid_max_elongation, "Maximum elongation (ratio of major to minor axes of the O(r^1) elliptical surfaces in the plane perpendicular to the magnetic axis), maximizing only over the phi grid points and not interpolating in between", "dimensionless");
@@ -52,9 +70,6 @@ void Qsc::write_netcdf(std::string filename) {
   nc.put("mean_Z", mean_Z, "Average Z coordinate of the magnetic axis, where the average is taken with respect to arclength", "meter");
   nc.put("standard_deviation_of_R", standard_deviation_of_R, "Standard deviation of the major radius of the magnetic axis, where the average is taken with respect to arclength", "meter");
   nc.put("standard_deviation_of_Z", standard_deviation_of_Z, "Standard deviation of the Z coordinate of the magnetic axis, where the average is taken with respect to arclength", "meter");
-  nc.put("max_newton_iterations", max_newton_iterations, "Maximum iterations of Newton's method for solving the sigma equation", "dimensionless");
-  nc.put("max_linesearch_iterations", max_linesearch_iterations, "Maximum number of times the step size is reduced in the line search for each iteration of Newton's method when solving the sigma equation", "dimensionless");
-  nc.put("newton_tolerance", newton_tolerance, "L2 norm of the residual used as a stopping criterion for Newton's method when solving the sigma equation", "dimensionless");
   nc.put("iota", iota, "Rotational transform", "dimensionless");
   nc.put("iota_N", iota_N, "Rotational transform minus N", "dimensionless");
   if (at_least_order_r2) {
@@ -63,22 +78,26 @@ void Qsc::write_netcdf(std::string filename) {
     nc.put("p2", p2, "r^2 term in p(r), the pressure profile", "Pascal/(meter^2)");
     nc.put("G2", G2, "r^2 term in G(r), which is the poloidal current outside the flux surface times mu0/(2pi)", "Tesla/meter");
     nc.put("beta_1s", beta_1s, "r * sin(theta) component of beta, the coefficient of grad psi in the Boozer covariant representation of B", "meter^{-2}");
-    nc.put("B20_mean", B20_mean, "Average over arclength along the magnetic axis of B20", "Tesla/(meter^2)");
+    nc.put("B20_mean", B20_mean, "", "Tesla/(meter^2)");
     nc.put("B20_residual", B20_residual, "", "Telsa/(meter^2)");
-    nc.put("B20_grid_variation", B20_grid_variation, "Maximum of B20 along the magnetic axis minus the minimum of B20 along the magnetic axis. The maximum and minimum are evaluated on the phi grid, without interpolation.", "Telsa/(meter^2)");
-    nc.put("d2_volume_d_psi2", d2_volume_d_psi2, "Magnetic well, the second derivative of flux surface volume with respect to psi, where 2*pi*psi is the toroidal flux. Negative values are favorable for stability.", "Tesla^{-2} meter^{-1}");
-    nc.put("DGeod_times_r2", DGeod_times_r2, "Geodesic curvature term in Mercier's criterion, times the square of the effective minor radius r. DGeod (without the r^2) corresponds to the quantity DGeod in VMEC, and to DGeod in Landreman and Jorge, J Plasma Phys (2020).", "Tesla^{-2} meter^{-2}");
-    nc.put("DWell_times_r2", DWell_times_r2, "Magnetic well term in Mercier's criterion, times the square of the effective minor radius r. DWell (without the r^2) corresponds to the quantity DWell in VMEC, and to DWell in Landreman and Jorge, J Plasma Phys (2020).", "Tesla^{-2} meter^{-2}");
-    nc.put("DMerc_times_r2", DMerc_times_r2, "Overall Mercier stability criterion times the square of the effective minor radius r. DMerc (without the r^2) corresponds to the quantity DMerc in VMEC, and to DMerc in Landreman and Jorge, J Plasma Phys (2020).", "Tesla^{-2} meter^{-2}");
+    nc.put("B20_grid_variation", B20_grid_variation, "", "Telsa/(meter^2)");
+    nc.put("d2_volume_d_psi2", d2_volume_d_psi2, "", "");
+    nc.put("DGeod_times_r2", DGeod_times_r2, "", "");
+    nc.put("DWell_times_r2", DWell_times_r2, "", "");
+    nc.put("DMerc_times_r2", DMerc_times_r2, "", "");
     nc.put("grid_min_L_grad_grad_B", grid_min_L_grad_grad_B, "Minimum of L_grad_grad_B over the phi grid points", "meter");
     nc.put("r_singularity_robust", r_singularity_robust, "Robust estimate of the minor radius at which the flux surface shapes become singular, r_c, as detailed in section 4.2 of Landreman, J Plasma Physics (2021)", "meter");
   }
-  /*
-  nc.put("", , "", "");
   */
 
   // 1D arrays
-  nc.put(nphi_dim, "phi", phi, "The grid in the standard toroidal angle phi", "dimensionless");
+  nc.put(nphi_dim, "phi", q.phi, "The grid in the standard toroidal angle phi", "dimensionless");
+  nc.put(n_scan_dim, "scan_eta_bar", scan_eta_bar, "For each configuration kept from the scan, the constant equal to B1c / B0", "1/meter");
+  nc.put(n_scan_dim, "scan_sigma0", scan_sigma0, "For each configuration kept from the scan, the value of sigma at phi=0", "dimensionless");
+  nc.put(n_scan_dim, "scan_iota", scan_iota, "For each configuration kept from the scan, the rotational transform on axis", "dimensionless");
+  nc.put(n_scan_dim, "scan_min_R0", scan_min_R0, "For each configuration kept from the scan, the minimum value of R0, the major radius of the magnetic axis. This variable corresponds to grid_min_R0 in a single Qsc calculation.", "meter");
+  nc.put(n_scan_dim, "scan_helicity", scan_helicity, "For each configuration kept from the scan, the number of times the normal vector of the magnetic axis rotates poloidally as the axis is followed toroidally for one field period. The integer N appearing in our papers is equal to -helicity * nfp.", "dimensionless");
+  /*
   nc.put(nphi_dim, "curvature", curvature, "Curvature kappa of the magnetic axis", "1/meter");
   nc.put(nphi_dim, "torsion", torsion, "Torsion tau of the magnetic axis", "1/meter");
   nc.put(nphi_dim, "sigma", sigma, "Y1c / Y1s, appearing in eq (2.14) of Landreman and Sengupta, J Plasma Physics (2019)", "dimensionless");
@@ -134,26 +153,10 @@ void Qsc::write_netcdf(std::string filename) {
     nc.put(nphi_dim, "L_grad_grad_B_inverse", L_grad_grad_B_inverse, "1 / L_grad_grad_B", "1/meter");
     nc.put(nphi_dim, "r_hat_singularity_robust", r_hat_singularity_robust, "Robust estimate of the minor radius at which the flux surface shapes become singular, hat{r}_c(varphi), as detailed in section 4.2 of Landreman, J Plasma Physics (2021)", "meter");
   }
+  */
   /*
   nc.put(nphi_dim, "", , "", "");
-  */
-  
-  // ND arrays for N > 1:
-  std::vector<dim_id_type> nphi_nphi_dim {nphi_dim, nphi_dim};
-  nc.put(nphi_nphi_dim, "d_d_phi", &d_d_phi(0, 0),
-	 "Pseudospectral differentiation matrix with respect to the standard toroidal angle phi", "dimensionless");
-  nc.put(nphi_nphi_dim, "d_d_varphi", &d_d_varphi(0, 0),
-	 "Pseudospectral differentiation matrix with respect to the Boozer toroidal angle varphi", "dimensionless");
-
-  std::vector<dim_id_type> nphi_nbt_nbt_dim {nphi_dim, nbt_dim, nbt_dim};
-  nc.put(nphi_nbt_nbt_dim, "grad_B_tensor", &grad_B_tensor(0, 0, 0),
-	 "The grad B tensor at each grid point along the magnetic axis, eq (3.12) in Landreman J Plasma Physics (2021)", "Tesla/meter");
-
-  std::vector<dim_id_type> nphi_nbt_nbt_nbt_dim {nphi_dim, nbt_dim, nbt_dim, nbt_dim};
-  if (at_least_order_r2) {
-    nc.put(nphi_nbt_nbt_nbt_dim, "grad_grad_B_tensor", &grad_grad_B_tensor(0, 0, 0, 0),
-	   "The grad grad B tensor at each grid point along the magnetic axis, eq (3.13) in Landreman J Plasma Physics (2021)", "Tesla/(meter^2)");
-  }
+  */  
   
   // Done defining the NetCDF data.
   nc.write_and_close();

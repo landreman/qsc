@@ -6,6 +6,7 @@ using namespace qsc;
 void Scan::defaults() {
   // Set defaults.
   mpi_comm = MPI_COMM_WORLD;
+  verbose = 1;
   max_seconds = 60;
   max_keep_per_proc = 1000;
   max_attempts_per_proc = 10000;
@@ -56,5 +57,5 @@ void Scan::run(std::string directory_and_infile) {
   input(directory_and_infile);
   random();
   // calculate();
-  // write_netcdf(directory_and_outfile);
+  write_netcdf(directory_and_outfile);
 }

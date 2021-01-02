@@ -44,6 +44,7 @@ namespace qsc {
     big rejected_due_to_L_grad_B, rejected_due_to_L_grad_grad_B;
     big rejected_due_to_B20_variation, rejected_due_to_r_singularity;
     big rejected_due_to_d2_volume_d_psi2, rejected_due_to_DMerc;
+    int verbose;
 
     Vector scan_eta_bar, scan_sigma0, scan_B2s, scan_B2c;
     Matrix scan_R0c, scan_R0s, scan_Z0c, scan_Z0s;
@@ -58,6 +59,7 @@ namespace qsc {
     void run(std::string);
     void input(std::string);
     void random();
+    void write_netcdf(std::string);
   };
 }
 

@@ -30,7 +30,7 @@ R0c_max = [1.0,  0.3]
 Z0s_min = [0.0, -0.5]
 Z0s_max = [0.0,  0.5]
 
-keep_all = true
+keep_all = false
 
 max_seconds = 10
 max_attempts_per_proc = 100
