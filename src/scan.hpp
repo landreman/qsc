@@ -12,8 +12,6 @@
 
 namespace qsc {
 
-  typedef unsigned long int big;
-  
   const std::string SCAN_OPTION_LINEAR = "linear";
   const std::string SCAN_OPTION_LOG = "log";
   const std::string SCAN_OPTION_2_SIDED_LOG = "2 sided log";

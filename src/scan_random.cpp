@@ -242,10 +242,10 @@ void Scan::random() {
     // Procs other than 0: Send all results to proc 0
 
     // Note mpi_rank is used as the tag
-    MPI_Send(    &big_parameters_local[0],              n_big_parameters, MPI_UNSIGNED_LONG, 0, mpi_rank, mpi_comm);
-    MPI_Send(        &parameters_local[0],         n_parameters * j_scan,      MPI_QSCFLOAT, 0, mpi_rank, mpi_comm);
-    MPI_Send(&fourier_parameters_local[0], n_fourier_parameters * j_scan,      MPI_QSCFLOAT, 0, mpi_rank, mpi_comm);
-    MPI_Send(    &int_parameters_local[0],     n_int_parameters * j_scan,           MPI_INT, 0, mpi_rank, mpi_comm);
+    MPI_Send(    &big_parameters_local[0],              n_big_parameters, MPI_UNSIGNED_LONG_LONG, 0, mpi_rank, mpi_comm);
+    MPI_Send(        &parameters_local[0],         n_parameters * j_scan,           MPI_QSCFLOAT, 0, mpi_rank, mpi_comm);
+    MPI_Send(&fourier_parameters_local[0], n_fourier_parameters * j_scan,           MPI_QSCFLOAT, 0, mpi_rank, mpi_comm);
+    MPI_Send(    &int_parameters_local[0],     n_int_parameters * j_scan,                MPI_INT, 0, mpi_rank, mpi_comm);
     
   } else {
     // Proc 0 does this following block.

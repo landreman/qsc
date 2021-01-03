@@ -32,7 +32,7 @@ namespace qsc {
     int ncid;
     std::vector<int> var_ids;
     std::vector<void*> pointers;
-    enum {QSC_NC_INT, QSC_NC_FLOAT};
+    enum {QSC_NC_INT, QSC_NC_FLOAT, QSC_NC_BIG};
     std::vector<int> types;
     static void ERR(int);
     
@@ -44,6 +44,7 @@ namespace qsc {
     // Scalars:
     void put(std::string, int&, std::string, std::string);
     void put(std::string, qscfloat&, std::string, std::string);
+    void put(std::string, big&, std::string, std::string);
     // 1D vectors:
     void put(dim_id_type, std::string, std::valarray<int>&, std::string, std::string);
     void put(dim_id_type, std::string, Vector&, std::string, std::string);

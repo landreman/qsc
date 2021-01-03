@@ -10,6 +10,9 @@ using namespace qsc;
 
 qsc::NetCDFWriter::NetCDFWriter(std::string filename) {
   int retval;
+  // If you want to store long longs, "|NC_NETCDF4" must be included
+  // in the file type, but such files cannot be read with
+  // scipy.io.netcdf.
   if ((retval = nc_create(filename.c_str(), NC_CLOBBER, &ncid))) ERR(retval);
 }
 
@@ -59,6 +62,19 @@ void qsc::NetCDFWriter::put(std::string varname, qscfloat& val, std::string att,
     ERR(retval);
   var_ids.push_back(var_id);
   types.push_back(QSC_NC_FLOAT);
+  pointers.push_back((void*) &val);
+  add_attribute(var_id, att, units);
+}
+
+void qsc::NetCDFWriter::put(std::string varname, big& val, std::string att, std::string units) {
+  // Variant for "bigs"
+  int var_id, retval;
+  std::cout << "About to nc_def a big" << std::endl;
+  if ((retval = nc_def_var(ncid, varname.c_str(), NC_UINT64, 0, NULL, &var_id)))
+    ERR(retval);
+  std::cout << "Just nc_def-ed a big" << std::endl;
+  var_ids.push_back(var_id);
+  types.push_back(QSC_NC_BIG);
   pointers.push_back((void*) &val);
   add_attribute(var_id, att, units);
 }
@@ -113,6 +129,11 @@ void qsc::NetCDFWriter::write_and_close() {
     if (types[j] == QSC_NC_INT) {
       // ints
       if ((retval = nc_put_var_int(ncid, var_ids[j], (int*) pointers[j])))
+	ERR(retval);
+    } else if (types[j] == QSC_NC_BIG) {
+      // bigs
+      std::cout << "About to nc_put a big" << std::endl;
+      if ((retval = nc_put_var_ulonglong(ncid, var_ids[j], (big*) pointers[j])))
 	ERR(retval);
     } else {
       // floats

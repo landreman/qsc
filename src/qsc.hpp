@@ -9,6 +9,8 @@ namespace qsc {
   const qscfloat pi = 3.141592653589793;
   const qscfloat mu0 = (4.0e-7) * pi;
   
+  typedef unsigned long long int big;
+  
   Matrix differentiation_matrix(const int N, const qscfloat xmin, const qscfloat xmax);
 
   typedef void (*residual_function_type)(Vector&, Vector&, void*);
