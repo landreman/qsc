@@ -10,7 +10,7 @@ void Scan::defaults() {
   max_seconds = 60;
   save_period = 60;
   max_keep_per_proc = 1000;
-  max_attempts_per_proc = 10000;
+  max_attempts_per_proc = -1;
   deterministic = false;
   
   eta_bar_min = 1.0;

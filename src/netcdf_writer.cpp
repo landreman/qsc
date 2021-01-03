@@ -67,15 +67,17 @@ void qsc::NetCDFWriter::put(std::string varname, qscfloat& val, std::string att,
 }
 
 void qsc::NetCDFWriter::put(std::string varname, big& val, std::string att, std::string units) {
-  // Variant for "bigs"
+  // Variant for "bigs".
+  // Convert results to qscfloat, since long ints require netcdf4, which scipy.io.netcdf cannot read
+  qscfloat* floatval = new qscfloat;
+  *floatval = (qscfloat) val;
   int var_id, retval;
-  std::cout << "About to nc_def a big" << std::endl;
-  if ((retval = nc_def_var(ncid, varname.c_str(), NC_UINT64, 0, NULL, &var_id)))
+  //if ((retval = nc_def_var(ncid, varname.c_str(), NC_UINT64, 0, NULL, &var_id)))
+  if ((retval = nc_def_var(ncid, varname.c_str(), QSCFLOAT, 0, NULL, &var_id)))
     ERR(retval);
-  std::cout << "Just nc_def-ed a big" << std::endl;
   var_ids.push_back(var_id);
-  types.push_back(QSC_NC_BIG);
-  pointers.push_back((void*) &val);
+  types.push_back(QSC_NC_FLOAT);
+  pointers.push_back((void*) floatval);
   add_attribute(var_id, att, units);
 }
 

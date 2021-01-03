@@ -65,8 +65,9 @@ namespace qsc {
     Vector scan_min_R0, scan_max_curvature;
     Vector scan_iota, scan_max_elongation;
     Vector scan_min_L_grad_B, scan_min_L_grad_grad_B;
-    Vector scan_r_singularity, scan_B20_variation;
+    Vector scan_r_singularity, scan_B20_variation, scan_B20_residual;
     Vector scan_d2_volume_d_psi2, scan_DMerc_times_r2;
+    Vector scan_standard_deviation_of_R, scan_standard_deviation_of_Z;
     std::valarray<int> scan_helicity;
     
     Scan();

@@ -123,6 +123,9 @@ void Scan::collect_results(int n_parameters,
     scan_d2_volume_d_psi2.resize(n_scan, 0.0);
     scan_DMerc_times_r2.resize(n_scan, 0.0);
     scan_B20_variation.resize(n_scan, 0.0);
+    scan_B20_residual.resize(n_scan, 0.0);
+    scan_standard_deviation_of_R.resize(n_scan, 0.0);
+    scan_standard_deviation_of_Z.resize(n_scan, 0.0);
 
     scan_helicity.resize(n_scan * n_int_parameters, 0);
 
@@ -147,6 +150,9 @@ void Scan::collect_results(int n_parameters,
       scan_d2_volume_d_psi2[j]  = parameters(11, j);
       scan_DMerc_times_r2[j]    = parameters(12, j);
       scan_B20_variation[j]     = parameters(13, j);
+      scan_B20_residual[j]      = parameters(14, j);
+      scan_standard_deviation_of_R[j] = parameters(15, j);
+      scan_standard_deviation_of_Z[j] = parameters(16, j);
       
       scan_helicity[j] = int_parameters[0 + j * n_int_parameters];
       

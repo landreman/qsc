@@ -38,6 +38,21 @@ void Scan::write_netcdf() {
   // In the next line, we cast n_scan to an int because long long ints require netcdf-4, which cannot be read by scipy.io.netcdf.
   int n_scan_int = (int)n_scan;
   nc.put("n_scan", n_scan_int, "Number of configurations kept from the scan and saved in this file", "dimensionless");
+  nc.put("attempts", filters[ATTEMPTS], "Number of configurations examined in the scan", "dimensionless");
+  nc.put("n_sigma_eq_solves", filters[N_SIGMA_EQ_SOLVES], "Number of times the sigma equation was solved during the scan", "dimensionless");
+  nc.put("n_r2_solves", filters[N_R2_SOLVES], "Number of times the O(r^2) equations were solved during the scan", "dimensionless");
+  nc.put("rejected_due_to_R0_crude", filters[REJECTED_DUE_TO_R0_CRUDE], "Number of configurations in the scan that were rejected due to R0 becoming <= 0 at toroidal angle 0 or half field period", "dimensionless");
+  nc.put("rejected_due_to_R0", filters[REJECTED_DUE_TO_R0], "Number of configurations in the scan that were rejected due to R0 becoming <= 0", "dimensionless");
+  nc.put("rejected_due_to_curvature", filters[REJECTED_DUE_TO_CURVATURE], "Number of configurations in the scan that were rejected due to the curvature of the magnetic axis exceeding 1 / min_L_grad_B_to_keep", "dimensionless");
+  nc.put("rejected_due_to_iota", filters[REJECTED_DUE_TO_IOTA], "Number of configurations in the scan that were rejected due to the min_iota_to_keep filter", "dimensionless");
+  nc.put("rejected_due_to_elongation", filters[REJECTED_DUE_TO_ELONGATION], "Number of configurations in the scan that were rejected due to the max_elongation_to_keep filter", "dimensionless");
+  nc.put("rejected_due_to_L_grad_B", filters[REJECTED_DUE_TO_L_GRAD_B], "Number of configurations in the scan that were rejected due to the min_L_grad_B_to_keep filter", "dimensionless");
+  nc.put("rejected_due_to_B20_variation", filters[REJECTED_DUE_TO_B20_VARIATION], "Number of configurations in the scan that were rejected due to the max_B20_variation_to_keep filter", "dimensionless");
+  nc.put("rejected_due_to_L_grad_grad_B", filters[REJECTED_DUE_TO_L_GRAD_GRAD_B], "Number of configurations in the scan that were rejected due to the min_L_grad_grad_B_to_keep filter", "dimensionless");
+  nc.put("rejected_due_to_d2_volume_d_psi2", filters[REJECTED_DUE_TO_D2_VOLUME_D_PSI2], "Number of configurations in the scan that were rejected due to the max_d2_volume_d_psi2_to_keep filter", "dimensionless");
+  nc.put("rejected_due_to_DMerc", filters[REJECTED_DUE_TO_DMERC], "Number of configurations in the scan that were rejected due to the min_DMerc_to_keep filter", "dimensionless");
+  nc.put("rejected_due_to_r_singularity", filters[REJECTED_DUE_TO_R_SINGULARITY], "Number of configurations in the scan that were rejected due to the min_r_singularity_to_keep filter", "dimensionless");
+
   int keep_all_int = (int) keep_all;
   nc.put("keep_all", keep_all_int, "1 if all configurations from the scan were saved, 0 if some configurations were filtered out", "dimensionless");
   int deterministic_int = (int) deterministic;
@@ -113,9 +128,12 @@ void Scan::write_netcdf() {
   nc.put(n_scan_dim, "scan_max_elongation", scan_max_elongation, "For each configuration kept from the scan, the maximum along the magnetic axis of the elongation in the plane perpendicular to the axis", "dimensionless");
   nc.put(n_scan_dim, "scan_min_L_grad_B", scan_min_L_grad_B, "For each configuration kept from the scan, the minimum along the magnetic axis of the scale length L_grad_B, (eq (3.1) in Landreman J Plasma Physics (2021). This quantity corresponds to grid_min_L_grad_B for a single Qsc run.", "meter");
   nc.put(n_scan_dim, "scan_helicity", scan_helicity, "For each configuration kept from the scan, the number of times the normal vector of the magnetic axis rotates poloidally as the axis is followed toroidally for one field period. The integer N appearing in our papers is equal to -helicity * nfp.", "dimensionless");
+  nc.put(n_scan_dim, "scan_standard_deviation_of_R", scan_standard_deviation_of_R, "Standard deviation of the major radius of the magnetic axis, with respect to arclength along the axis", "meter");
+  nc.put(n_scan_dim, "scan_standard_deviation_of_Z", scan_standard_deviation_of_Z, "Standard deviation of the Cartesian Z coordinate of the magnetic axis, with respect to arclength along the axis", "meter");
   if (q.at_least_order_r2) {
     nc.put(n_scan_dim, "scan_min_L_grad_grad_B", scan_min_L_grad_grad_B, "For each configuration kept from the scan, the minimum along the magnetic axis of the scale length L_grad_grad_B, (eq (3.2) in Landreman J Plasma Physics (2021). This quantity corresponds to grid_min_L_grad_grad_B for a single Qsc run.", "meter");
     nc.put(n_scan_dim, "scan_B20_variation", scan_B20_variation, "For each configuration kept from the scan, the maximum of B20 along the magnetic axis minus the minimum of B20. This quantity corresponds to B20_grid_variation for a single Qsc run.", "Telsa/(meter^2)");
+    nc.put(n_scan_dim, "scan_B20_residual", scan_B20_residual, "", "");
     nc.put(n_scan_dim, "scan_r_singularity", scan_r_singularity, "For each configuration kept from the scan, the value of r_singularity_robust. r_singularity_robust is the robust estimate of the minor radius at which the flux surface shapes become singular, r_c, as detailed in section 4.2 of Landreman, J Plasma Physics (2021)", "meter");
     nc.put(n_scan_dim, "scan_d2_volume_d_psi2", scan_d2_volume_d_psi2, "For each configuration kept from the scan, the value of magnetic well d2_volume_d_psi2, the second derivative of flux surface volume with respect to psi, where 2*pi*psi is the toroidal flux.", "Tesla^{-2} meter^{-1}");
     nc.put(n_scan_dim, "scan_DMerc_times_r2", scan_DMerc_times_r2, "For each configuration kept from the scan, the overall Mercier stability criterion times the square of the effective minor radius r. This quantity corresponds to DMerc_times_r2 for a single Qsc run. DMerc (without the r^2) corresponds to the quantity DMerc in VMEC, and to DMerc in Landreman and Jorge, J Plasma Phys (2020).", "Tesla^{-2} meter^{-2}");

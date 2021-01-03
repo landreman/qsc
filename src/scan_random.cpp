@@ -10,7 +10,7 @@
 using namespace qsc;
 
 void Scan::random() {
-  const int n_parameters = 14;
+  const int n_parameters = 17;
   const int n_int_parameters = 1;
   const int axis_nmax_plus_1 = R0c_max.size();
   const int n_fourier_parameters = axis_nmax_plus_1 * 4;
@@ -74,7 +74,20 @@ void Scan::random() {
   
   bool keep_going = true;
   while (keep_going) {
-    if (filters_local[ATTEMPTS] >= max_attempts_per_proc) break;
+    end_time = std::chrono::steady_clock::now();
+    elapsed = end_time - start_time;
+    if (elapsed.count() > max_seconds) keep_going = false;
+    
+    end_time = std::chrono::steady_clock::now();
+    elapsed = end_time - checkpoint_time;
+    if (elapsed.count() > save_period) {
+      checkpoint_time = end_time;
+      collect_results(n_parameters, parameters_local, fourier_parameters_local,
+		      n_int_parameters, int_parameters_local, j_scan);
+      write_netcdf();
+    }
+    
+    if (max_attempts_per_proc > 0 && filters_local[ATTEMPTS] >= max_attempts_per_proc) break;
     
     filters_local[ATTEMPTS]++;
 
@@ -191,6 +204,9 @@ void Scan::random() {
     parameters_local(11, j_scan) = q.d2_volume_d_psi2;
     parameters_local(12, j_scan) = q.DMerc_times_r2;
     parameters_local(13, j_scan) = q.B20_grid_variation;
+    parameters_local(14, j_scan) = q.B20_residual;
+    parameters_local(15, j_scan) = q.standard_deviation_of_R;
+    parameters_local(16, j_scan) = q.standard_deviation_of_Z;
 
     int_parameters_local[0 + n_int_parameters * j_scan] = q.helicity;
     
@@ -204,18 +220,6 @@ void Scan::random() {
     j_scan++;
 
     if (j_scan >= max_keep_per_proc) keep_going = false;
-
-    end_time = std::chrono::steady_clock::now();
-    elapsed = end_time - start_time;
-    if (elapsed.count() > max_seconds) keep_going = false;
-    
-    elapsed = end_time - checkpoint_time;
-    if (elapsed.count() > save_period) {
-      checkpoint_time = end_time;
-      collect_results(n_parameters, parameters_local, fourier_parameters_local,
-		      n_int_parameters, int_parameters_local, j_scan);
-      write_netcdf();
-    }
   }
 
   end_time = std::chrono::steady_clock::now();

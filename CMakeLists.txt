@@ -26,6 +26,16 @@ else()
   message("WARNING!! Neither slurm nor mpiexec was detected, so I am not sure how to launch MPI jobs.")
 endif()
 
+# If on a Mac, use the Accelerate framework for BLAS/LAPACK.
+# Otherwise, CMake may use a random BLAS/LAPACK it finds that is not as optimized.
+# To check if we're on a Mac, evaluate 'uname -s'.
+execute_process(COMMAND uname -s OUTPUT_VARIABLE UNAME_S)
+message("Result of uname -s: ${UNAME_S}")
+if ("${UNAME_S}" STREQUAL "Darwin\n")
+  message("Setting BLA_VENDOR to Apple")
+  set(BLA_VENDOR Apple)
+endif()
+
 #set(CMAKE_MODULE_PATH cmake)
 include(cmake/knownHosts.cmake)
 
