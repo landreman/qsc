@@ -1,6 +1,7 @@
 # This is a sample input file
 
-general_option = 'random'
+general_option = 'single'
+# general_option = 'random'
 
 [qsc]
 nfp = 4
@@ -23,6 +24,7 @@ sG=-1
 
 eta_bar_max = 5
 eta_bar_min = 0.2
+eta_bar_scan_option = "log"
 
 R0c_min = [1.0, -0.3]
 R0c_max = [1.0,  0.3]
@@ -32,7 +34,7 @@ Z0s_max = [0.0,  0.5]
 
 keep_all = false
 
-max_seconds = 10
+max_seconds = 0.1
 save_period = 2
 max_attempts_per_proc = 100000
 max_keep_per_proc = 100000

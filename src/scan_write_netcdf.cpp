@@ -31,11 +31,24 @@ void Scan::write_netcdf() {
   n_scan_dim = nc.dim("n_scan", n_scan);
   
   // Scalars
+  std::string general_option = "random";
+  nc.put("general_option", general_option, "Whether this job was a single configuration vs a scan");
+  
   int at_least_order_r2_int = (int) q.at_least_order_r2;
   nc.put("at_least_order_r2", at_least_order_r2_int, "1 if the O(r^2) equations were solved, 0 if not", "dimensionless");
+  nc.put("order_r_option", q.order_r_option, "Whether the Garren-Boozer equations were solved to 1st or 2nd order in the effective minor radius r");
   nc.put("nfp", q.nfp, "Number of field periods", "dimensionless");
   nc.put("nphi", q.nphi, "Number of grid points in the toroidal angle phi", "dimensionless");
   // In the next line, we cast n_scan to an int because long long ints require netcdf-4, which cannot be read by scipy.io.netcdf.
+
+  nc.put("eta_bar_scan_option", eta_bar_scan_option, "Whether a linear vs logarithmic distribution was used for choosing eta_bar");
+  nc.put("sigma0_scan_option", sigma0_scan_option, "Whether a linear vs logarithmic distribution was used for choosing sigma0");
+  nc.put("fourier_scan_option", fourier_scan_option, "Whether a linear vs logarithmic distribution was used for choosing the Fourier amplitudes of the magnetic axis");
+  if (q.at_least_order_r2) {
+    nc.put("B2c_scan_option", B2c_scan_option, "Whether a linear vs logarithmic distribution was used for choosing B2c");
+    nc.put("B2s_scan_option", B2s_scan_option, "Whether a linear vs logarithmic distribution was used for choosing B2s");
+  }
+    
   int n_scan_int = (int)n_scan;
   nc.put("n_scan", n_scan_int, "Number of configurations kept from the scan and saved in this file", "dimensionless");
   nc.put("attempts", filters[ATTEMPTS], "Number of configurations examined in the scan", "dimensionless");
@@ -81,38 +94,6 @@ void Scan::write_netcdf() {
   if (q.at_least_order_r2) {
     nc.put("p2", q.p2, "r^2 term in p(r), the pressure profile", "Pascal/(meter^2)");
   }
-  /*
-  //nc.put("axis_nmax_plus_1", R0c.size(), "Length of the arrays R0c, Z0s, etc", "dimensionless");
-  nc.put("axis_length", axis_length, "Total length of the magnetic axis, from phi = 0 to 2pi", "meter");
-  nc.put("d_l_d_varphi", d_l_d_varphi, "Differential arclength of the magnetic axis with respect to the Boozer toroidal angle", "meter");
-  nc.put("B0_over_abs_G0", B0_over_abs_G0, "", "1/meter");
-  nc.put("abs_G0_over_B0", abs_G0_over_B0, "", "meter");
-  nc.put("rms_curvature", rms_curvature, "Root-mean-squared curvature of the magnetic axis, where the average is taken with respect to arclength", "1/meter");
-  nc.put("grid_max_curvature", grid_max_curvature, "Maximum curvature of the magnetic axis, maximizing only over the phi grid points and not interpolating in between", "1/meter");
-  nc.put("grid_max_elongation", grid_max_elongation, "Maximum elongation (ratio of major to minor axes of the O(r^1) elliptical surfaces in the plane perpendicular to the magnetic axis), maximizing only over the phi grid points and not interpolating in between", "dimensionless");
-  nc.put("grid_min_R0", grid_min_R0, "Minimum major radius of the magnetic axis, minimizing only over the phi grid points and not interpolating in between", "meter");
-  nc.put("grid_min_L_grad_B", grid_min_L_grad_B, "Minimum of L_grad_B over the phi grid points", "meter");
-  nc.put("mean_elongation", mean_elongation, "Average elongation (ratio of major to minor axes of the O(r^1) elliptical surfaces in the plane perpendicular to the magnetic axis), where the average is taken with respect to arclength", "dimensionless");
-  nc.put("mean_R", mean_R, "Average major radius of the magnetic axis, where the average is taken with respect to arclength", "meter");
-  nc.put("mean_Z", mean_Z, "Average Z coordinate of the magnetic axis, where the average is taken with respect to arclength", "meter");
-  nc.put("standard_deviation_of_R", standard_deviation_of_R, "Standard deviation of the major radius of the magnetic axis, where the average is taken with respect to arclength", "meter");
-  nc.put("standard_deviation_of_Z", standard_deviation_of_Z, "Standard deviation of the Z coordinate of the magnetic axis, where the average is taken with respect to arclength", "meter");
-  nc.put("iota", iota, "Rotational transform", "dimensionless");
-  nc.put("iota_N", iota_N, "Rotational transform minus N", "dimensionless");
-  if (at_least_order_r2) {
-    nc.put("G2", G2, "r^2 term in G(r), which is the poloidal current outside the flux surface times mu0/(2pi)", "Tesla/meter");
-    nc.put("beta_1s", beta_1s, "r * sin(theta) component of beta, the coefficient of grad psi in the Boozer covariant representation of B", "meter^{-2}");
-    nc.put("B20_mean", B20_mean, "", "Tesla/(meter^2)");
-    nc.put("B20_residual", B20_residual, "", "Telsa/(meter^2)");
-    nc.put("B20_grid_variation", B20_grid_variation, "", "Telsa/(meter^2)");
-    nc.put("d2_volume_d_psi2", d2_volume_d_psi2, "", "");
-    nc.put("DGeod_times_r2", DGeod_times_r2, "", "");
-    nc.put("DWell_times_r2", DWell_times_r2, "", "");
-    nc.put("DMerc_times_r2", DMerc_times_r2, "", "");
-    nc.put("grid_min_L_grad_grad_B", grid_min_L_grad_grad_B, "Minimum of L_grad_grad_B over the phi grid points", "meter");
-    nc.put("r_singularity_robust", r_singularity_robust, "Robust estimate of the minor radius at which the flux surface shapes become singular, r_c, as detailed in section 4.2 of Landreman, J Plasma Physics (2021)", "meter");
-  }
-  */
 
   // 1D arrays
   nc.put(nphi_dim, "phi", q.phi, "The grid in the standard toroidal angle phi", "dimensionless");
@@ -139,67 +120,14 @@ void Scan::write_netcdf() {
     nc.put(n_scan_dim, "scan_DMerc_times_r2", scan_DMerc_times_r2, "For each configuration kept from the scan, the overall Mercier stability criterion times the square of the effective minor radius r. This quantity corresponds to DMerc_times_r2 for a single Qsc run. DMerc (without the r^2) corresponds to the quantity DMerc in VMEC, and to DMerc in Landreman and Jorge, J Plasma Phys (2020).", "Tesla^{-2} meter^{-2}");
 
   }
-  /*
-  nc.put(nphi_dim, "curvature", curvature, "Curvature kappa of the magnetic axis", "1/meter");
-  nc.put(nphi_dim, "torsion", torsion, "Torsion tau of the magnetic axis", "1/meter");
-  nc.put(nphi_dim, "sigma", sigma, "Y1c / Y1s, appearing in eq (2.14) of Landreman and Sengupta, J Plasma Physics (2019)", "dimensionless");
-  nc.put(nphi_dim, "X1c", X1c, "r*cos(theta) term in X, the component of the position vector in the direction of the normal vector", "dimensionless");
-  nc.put(nphi_dim, "Y1s", Y1s, "r*sin(theta) term in Y, the component of the position vector in the direction of the binormal vector", "dimensionless");
-  nc.put(nphi_dim, "Y1c", Y1c, "r*cos(theta) term in Y, the component of the position vector in the direction of the binormal vector", "dimensionless");
-  nc.put(axis_nmax_plus_1_dim, "R0c", R0c, "Fourier cosine(n*phi) amplitudes defining the major radius R of the magnetic axis shape", "meter");
-  nc.put(axis_nmax_plus_1_dim, "R0s", R0c, "Fourier sine(n*phi) amplitudes defining the major radius R of the magnetic axis shape", "meter");
-  nc.put(axis_nmax_plus_1_dim, "Z0c", Z0c, "Fourier cosine(n*phi) amplitudes defining the Z coordinate of the magnetic axis shape", "meter");
-  nc.put(axis_nmax_plus_1_dim, "Z0s", Z0c, "Fourier sine(n*phi) amplitudes defining the Z coordinate of the magnetic axis shape", "meter");
-  nc.put(nphi_dim, "R0", R0, "Major radius of the magnetic axis", "meter");
-  nc.put(nphi_dim, "Z0", Z0, "Z coordinate of the magnetic axis", "meter");
-  nc.put(nphi_dim, "R0p", R0p, "d / d phi derivative of R0", "meter");
-  nc.put(nphi_dim, "Z0p", Z0p, "d / d phi derivative of Z0", "meter");
-  nc.put(nphi_dim, "R0pp", R0pp, "d^2 / d phi^2 derivative of R0", "meter");
-  nc.put(nphi_dim, "Z0pp", Z0pp, "d^2 / d phi^2 derivative of Z0", "meter");
-  nc.put(nphi_dim, "R0ppp", R0ppp, "d^3 / d phi^3 derivative of R0", "meter");
-  nc.put(nphi_dim, "Z0ppp", Z0ppp, "d^3 / d phi^3 derivative of Z0", "meter");
-  nc.put(nphi_dim, "d_l_d_phi", d_l_d_phi, "Differential arclength of the magnetic axis with respect to the standard toroidal angle phi", "meter");
-  nc.put(nphi_dim, "d2_l_d_phi2", d2_l_d_phi2, "Second derivative of arclength of the magnetic axis with respect to the standard toroidal angle phi", "meter");
-  nc.put(nphi_dim, "elongation", elongation, "Ratio of major to minor axes of the O(r^1) elliptical surfaces in the plane perpendicular to the magnetic axis", "dimensionless");
-  nc.put(nphi_dim, "Boozer_toroidal_angle", Boozer_toroidal_angle, "Boozer toroidal angle varphi", "dimensionless");
-  nc.put(nphi_dim, "L_grad_B", L_grad_B, "Scale length associated with first derivatives of the magnetic field, eq (3.1) in Landreman J Plasma Physics (2021)", "meter");
-  nc.put(nphi_dim, "L_grad_B_inverse", L_grad_B_inverse, "1 / L_grad_B", "1/meter");
-  nc.put(nphi_dim, "d_X1c_d_varphi", d_X1c_d_varphi, "Derivative of X1c with respect to the Boozer toroidal angle varphi", "dimensionless");
-  nc.put(nphi_dim, "d_Y1c_d_varphi", d_Y1c_d_varphi, "Derivative of Y1c with respect to the Boozer toroidal angle varphi", "dimensionless");
-  nc.put(nphi_dim, "d_Y1s_d_varphi", d_Y1s_d_varphi, "Derivative of Y1s with respect to the Boozer toroidal angle varphi", "dimensionless");
-  if (at_least_order_r2) {
-    nc.put(nphi_dim, "X20", X20, "r^2*cos(0*theta) term in X, the component of the position vector in the direction of the normal vector", "1/meter");
-    nc.put(nphi_dim, "X2s", X2s, "r^2*sin(2*theta) term in X, the component of the position vector in the direction of the normal vector", "1/meter");
-    nc.put(nphi_dim, "X2c", X2c, "r^2*cos(2*theta) term in X, the component of the position vector in the direction of the normal vector", "1/meter");
-    nc.put(nphi_dim, "Y20", Y20, "r^2*cos(0*theta) term in Y, the component of the position vector in the direction of the binormal vector", "1/meter");
-    nc.put(nphi_dim, "Y2s", Y2s, "r^2*sin(2*theta) term in Y, the component of the position vector in the direction of the binormal vector", "1/meter");
-    nc.put(nphi_dim, "Y2c", Y2c, "r^2*cos(2*theta) term in Y, the component of the position vector in the direction of the binormal vector", "1/meter");
-    nc.put(nphi_dim, "Z20", Z20, "r^2*cos(0*theta) term in Z, the component of the position vector in the direction of the tangent vector", "1/meter");
-    nc.put(nphi_dim, "Z2s", Z2s, "r^2*sin(2*theta) term in Z, the component of the position vector in the direction of the tangent vector", "1/meter");
-    nc.put(nphi_dim, "Z2c", Z2c, "r^2*cos(2*theta) term in Z, the component of the position vector in the direction of the tangent vector", "1/meter");
 
-    nc.put(nphi_dim, "B20", B20, "r^2*cos(0*theta) term in the magnetic field magnitude B", "Telsa/(meter^2)");
-    nc.put(nphi_dim, "B20_anomaly", B20_anomaly, "B20 - B20_mean, i.e. the toroidal variation of B that breaks O(r^2) quasisymmetry", "Telsa/(meter^2)");
-	   
-    nc.put(nphi_dim, "d_X20_d_varphi", d_X20_d_varphi, "Derivative of X20 with respect to the Boozer toroidal angle varphi", "1/meter");
-    nc.put(nphi_dim, "d_X2s_d_varphi", d_X2s_d_varphi, "Derivative of X2s with respect to the Boozer toroidal angle varphi", "1/meter");
-    nc.put(nphi_dim, "d_X2c_d_varphi", d_X2c_d_varphi, "Derivative of X2c with respect to the Boozer toroidal angle varphi", "1/meter");
-    nc.put(nphi_dim, "d_Y20_d_varphi", d_Y20_d_varphi, "Derivative of Y20 with respect to the Boozer toroidal angle varphi", "1/meter");
-    nc.put(nphi_dim, "d_Y2s_d_varphi", d_Y2s_d_varphi, "Derivative of Y2s with respect to the Boozer toroidal angle varphi", "1/meter");
-    nc.put(nphi_dim, "d_Y2c_d_varphi", d_Y2c_d_varphi, "Derivative of Y2c with respect to the Boozer toroidal angle varphi", "1/meter");
-    nc.put(nphi_dim, "d_Z20_d_varphi", d_Z20_d_varphi, "Derivative of Z20 with respect to the Boozer toroidal angle varphi", "1/meter");
-    nc.put(nphi_dim, "d_Z2s_d_varphi", d_Z2s_d_varphi, "Derivative of Z2s with respect to the Boozer toroidal angle varphi", "1/meter");
-    nc.put(nphi_dim, "d_Z2c_d_varphi", d_Z2c_d_varphi, "Derivative of Z2c with respect to the Boozer toroidal angle varphi", "1/meter");
-    
-    nc.put(nphi_dim, "L_grad_grad_B", L_grad_grad_B, "Scale length associated with second derivatives of the magnetic field, eq (3.2) in Landreman J Plasma Physics (2021)", "meter");
-    nc.put(nphi_dim, "L_grad_grad_B_inverse", L_grad_grad_B_inverse, "1 / L_grad_grad_B", "1/meter");
-    nc.put(nphi_dim, "r_hat_singularity_robust", r_hat_singularity_robust, "Robust estimate of the minor radius at which the flux surface shapes become singular, hat{r}_c(varphi), as detailed in section 4.2 of Landreman, J Plasma Physics (2021)", "meter");
-  }
-  */
-  /*
-  nc.put(nphi_dim, "", , "", "");
-  */  
-  
+  // ND arrays for N > 1:
+  std::vector<dim_id_type> axis_nmax_plus_1_n_scan_dim {axis_nmax_plus_1_dim, n_scan_dim};
+  nc.put(axis_nmax_plus_1_n_scan_dim, "scan_R0c", &scan_R0c(0, 0), "For each configuration kept from the scan, the amplitudes of the cos(n*phi) components of the major radius of the magnetic axis", "meter");
+  nc.put(axis_nmax_plus_1_n_scan_dim, "scan_R0s", &scan_R0s(0, 0), "For each configuration kept from the scan, the amplitudes of the sin(n*phi) components of the major radius of the magnetic axis", "meter");
+  nc.put(axis_nmax_plus_1_n_scan_dim, "scan_Z0c", &scan_Z0c(0, 0), "For each configuration kept from the scan, the amplitudes of the cos(n*phi) components of the Cartesian Z coordinate of the magnetic axis", "meter");
+  nc.put(axis_nmax_plus_1_n_scan_dim, "scan_Z0s", &scan_Z0s(0, 0), "For each configuration kept from the scan, the amplitudes of the sin(n*phi) components of the Cartesian Z coordinate of the magnetic axis", "meter");
+ 
   // Done defining the NetCDF data.
   nc.write_and_close();
   

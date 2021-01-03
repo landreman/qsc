@@ -24,8 +24,12 @@ void Qsc::write_netcdf(std::string filename) {
   nbt_dim = nc.dim("normal_binormal_tangent", 3);
   
   // Scalars
+  std::string general_option = "single";
+  nc.put("general_option", general_option, "Whether this job was a single configuration vs a scan");
+  
   int at_least_order_r2_int = (int) at_least_order_r2;
   nc.put("at_least_order_r2", at_least_order_r2_int, "1 if the O(r^2) equations were solved, 0 if not", "dimensionless");
+  nc.put("order_r_option", order_r_option, "Whether the Garren-Boozer equations were solved to 1st or 2nd order in the effective minor radius r");
   nc.put("nfp", nfp, "Number of field periods", "dimensionless");
   nc.put("nphi", nphi, "Number of grid points in the toroidal angle phi", "dimensionless");
   //nc.put("axis_nmax_plus_1", R0c.size(), "Length of the arrays R0c, Z0s, etc", "dimensionless");

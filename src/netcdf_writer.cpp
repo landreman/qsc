@@ -2,6 +2,8 @@
 #include <valarray>
 #include <algorithm>
 #include <stdexcept>
+#include <iomanip>
+#include <sstream>
 #include <netcdf.h>
 #include "qsc.hpp"
 #include "netcdf_writer.hpp"
@@ -68,7 +70,7 @@ void qsc::NetCDFWriter::put(std::string varname, qscfloat& val, std::string att,
 
 void qsc::NetCDFWriter::put(std::string varname, big& val, std::string att, std::string units) {
   // Variant for "bigs".
-  // Convert results to qscfloat, since long ints require netcdf4, which scipy.io.netcdf cannot read
+  // Convert results to qscfloat, since long long ints require netcdf4, which scipy.io.netcdf cannot read
   qscfloat* floatval = new qscfloat;
   *floatval = (qscfloat) val;
   int var_id, retval;
@@ -78,6 +80,35 @@ void qsc::NetCDFWriter::put(std::string varname, big& val, std::string att, std:
   var_ids.push_back(var_id);
   types.push_back(QSC_NC_FLOAT);
   pointers.push_back((void*) floatval);
+  add_attribute(var_id, att, units);
+}
+
+void qsc::NetCDFWriter::put(std::string varname, std::string& val, std::string att) {
+  // Variant for strings. Note that unlike numerical quantities, strings have no units.
+  int var_id, retval;
+
+  // Make a name for the dimensions corresponding to the 
+  int len = val.size();
+  std::ostringstream converter;
+  converter << "dim_" << std::setfill('0') << std::setw(5) << len;
+  std::string dim_str = converter.str();
+
+  // See if this dimension already exists:
+  int dim_id;
+  retval = nc_inq_dimid(ncid, dim_str.c_str(), &dim_id);
+  if (retval != NC_NOERR) {
+    // The dimension does not yet exist, so create it.
+    if ((retval = nc_def_dim(ncid, dim_str.c_str(), len, &dim_id)))
+      ERR(retval);
+  }
+
+  // Now that we have a dimension, define the string variable
+  if ((retval = nc_def_var(ncid, varname.c_str(), NC_CHAR, 1, &dim_id, &var_id)))
+    ERR(retval);
+  var_ids.push_back(var_id);
+  types.push_back(QSC_NC_STRING);
+  pointers.push_back((void*) &val[0]);
+  std::string units = "";
   add_attribute(var_id, att, units);
 }
 
@@ -136,6 +167,10 @@ void qsc::NetCDFWriter::write_and_close() {
       // bigs
       std::cout << "About to nc_put a big" << std::endl;
       if ((retval = nc_put_var_ulonglong(ncid, var_ids[j], (big*) pointers[j])))
+	ERR(retval);
+    } else if (types[j] == QSC_NC_STRING) {
+      // strings
+      if ((retval = nc_put_var_text(ncid, var_ids[j], (char*) pointers[j])))
 	ERR(retval);
     } else {
       // floats
