@@ -41,14 +41,25 @@ void Scan::write_netcdf() {
   nc.put("nphi", q.nphi, "Number of grid points in the toroidal angle phi", "dimensionless");
   // In the next line, we cast n_scan to an int because long long ints require netcdf-4, which cannot be read by scipy.io.netcdf.
 
-  nc.put("eta_bar_scan_option", eta_bar_scan_option, "Whether a linear vs logarithmic distribution was used for choosing eta_bar");
-  nc.put("sigma0_scan_option", sigma0_scan_option, "Whether a linear vs logarithmic distribution was used for choosing sigma0");
-  nc.put("fourier_scan_option", fourier_scan_option, "Whether a linear vs logarithmic distribution was used for choosing the Fourier amplitudes of the magnetic axis");
+  nc.put("eta_bar_scan_option", eta_bar_scan_option, "Whether a linear vs logarithmic distribution was used for choosing eta_bar in the scan");
+  nc.put("sigma0_scan_option", sigma0_scan_option, "Whether a linear vs logarithmic distribution was used for choosing sigma0 in the scan");
+  nc.put("fourier_scan_option", fourier_scan_option, "Whether a linear vs logarithmic distribution was used for choosing the Fourier amplitudes of the magnetic axis in the scan");
   if (q.at_least_order_r2) {
-    nc.put("B2c_scan_option", B2c_scan_option, "Whether a linear vs logarithmic distribution was used for choosing B2c");
-    nc.put("B2s_scan_option", B2s_scan_option, "Whether a linear vs logarithmic distribution was used for choosing B2s");
+    nc.put("B2c_scan_option", B2c_scan_option, "Whether a linear vs logarithmic distribution was used for choosing B2c in the scan");
+    nc.put("B2s_scan_option", B2s_scan_option, "Whether a linear vs logarithmic distribution was used for choosing B2s in the scan");
   }
-    
+
+  nc.put("eta_bar_min", eta_bar_min, "Minimum value for eta_bar in the scan", "1/meter");
+  nc.put("eta_bar_max", eta_bar_max, "Maximum value for eta_bar in the scan", "1/meter");
+  nc.put("sigma0_min", sigma0_min, "Minimum value for sigma0 in the scan", "1/meter");
+  nc.put("sigma0_max", sigma0_max, "Maximum value for sigma0 in the scan", "1/meter");
+  if (q.at_least_order_r2) {
+    nc.put("B2c_min", B2c_min, "Minimum value for B2c in the scan", "1/meter");
+    nc.put("B2c_max", B2c_max, "Maximum value for B2c in the scan", "1/meter");
+    nc.put("B2s_min", B2s_min, "Minimum value for B2s in the scan", "1/meter");
+    nc.put("B2s_max", B2s_max, "Maximum value for B2s in the scan", "1/meter");
+  }
+  
   int n_scan_int = (int)n_scan;
   nc.put("n_scan", n_scan_int, "Number of configurations kept from the scan and saved in this file", "dimensionless");
   nc.put("attempts", filters[ATTEMPTS], "Number of configurations examined in the scan", "dimensionless");
@@ -96,6 +107,15 @@ void Scan::write_netcdf() {
   }
 
   // 1D arrays
+  nc.put(axis_nmax_plus_1_dim, "R0c_min", R0c_min, "Minimum values in the scan for each cos(n*phi) Fourier amplitude of the major radius R of the magnetic axis", "meter");
+  nc.put(axis_nmax_plus_1_dim, "R0c_max", R0c_max, "Maximum values in the scan for each cos(n*phi) Fourier amplitude of the major radius R of the magnetic axis", "meter");
+  nc.put(axis_nmax_plus_1_dim, "R0s_min", R0s_min, "Minimum values in the scan for each sin(n*phi) Fourier amplitude of the major radius R of the magnetic axis", "meter");
+  nc.put(axis_nmax_plus_1_dim, "R0s_max", R0s_max, "Maximum values in the scan for each sin(n*phi) Fourier amplitude of the major radius R of the magnetic axis", "meter");
+  nc.put(axis_nmax_plus_1_dim, "Z0c_min", Z0c_min, "Minimum values in the scan for each cos(n*phi) Fourier amplitude of the Cartesian Z component of the magnetic axis", "meter");
+  nc.put(axis_nmax_plus_1_dim, "Z0c_max", Z0c_max, "Maximum values in the scan for each cos(n*phi) Fourier amplitude of the Cartesian Z component of the magnetic axis", "meter");
+  nc.put(axis_nmax_plus_1_dim, "Z0s_min", Z0s_min, "Minimum values in the scan for each sin(n*phi) Fourier amplitude of the Cartesian Z component of the magnetic axis", "meter");
+  nc.put(axis_nmax_plus_1_dim, "Z0s_max", Z0s_max, "Maximum values in the scan for each sin(n*phi) Fourier amplitude of the Cartesian Z component of the magnetic axis", "meter");
+  
   nc.put(nphi_dim, "phi", q.phi, "The grid in the standard toroidal angle phi", "dimensionless");
   nc.put(n_scan_dim, "scan_eta_bar", scan_eta_bar, "For each configuration kept from the scan, the constant equal to B1c / B0", "1/meter");
   nc.put(n_scan_dim, "scan_sigma0", scan_sigma0, "For each configuration kept from the scan, the value of sigma at phi=0", "dimensionless");

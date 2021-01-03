@@ -24,6 +24,7 @@ namespace qsc {
     std::uniform_real_distribution<qscfloat> uniform_distrib;
     const qscfloat gamma = (1.0 + sqrt(5.0)) / 2.0;
     qscfloat last;
+    int sign;
     
   public:    
     Random(bool, std::string, qscfloat, qscfloat);

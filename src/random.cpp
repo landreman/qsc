@@ -16,9 +16,12 @@ Random::Random(bool deterministic_in,
   deterministic = deterministic_in;
   min = min_in;
   max = max_in;
-  logmin = log(min);
-  logmax = log(max);
+  logmin = log(std::abs(min));
+  logmax = log(std::abs(max));
   last = 0.0;
+
+  sign = 1;
+  if (max < 0) sign = -1;
 
   unsigned my_seed = std::chrono::steady_clock::now().time_since_epoch().count();
   generator.seed(my_seed);
@@ -28,14 +31,19 @@ Random::Random(bool deterministic_in,
     distrib = RANDOM_INT_OPTION_LINEAR;
   } else if (distrib_in.compare(RANDOM_OPTION_LOG) == 0) {
     distrib = RANDOM_INT_OPTION_LOG;
+    if (max * min < 0) throw std::runtime_error("Error initializing Random with log distribution: max and min must have the same sign");
   } else if (distrib_in.compare(RANDOM_OPTION_2_SIDED_LOG) == 0) {
     distrib = RANDOM_INT_OPTION_2_SIDED_LOG;
+    if (max * min < 0) throw std::runtime_error("Error initializing Random with 2-sided log distribution: max and min must have the same sign");
   } else {
     throw std::runtime_error("Unrecognized random distribution type");
   }
 }
 
 qscfloat Random::get() {
+  // Explicitly handle the case of min==max, to avoid evaluating log(0).
+  if (std::abs(max - min) < 1.0e-30) return max;
+  
   // First, get a random float in [0, 1]:
   qscfloat rand01, temp;
   if (deterministic) {
@@ -53,7 +61,7 @@ qscfloat Random::get() {
     break;
 
   case RANDOM_INT_OPTION_LOG:
-    val = exp(logmin + (logmax - logmin) * rand01);
+    val = sign * exp(logmin + (logmax - logmin) * rand01);
     break;
 
   case RANDOM_INT_OPTION_2_SIDED_LOG:

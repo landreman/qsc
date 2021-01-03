@@ -42,7 +42,12 @@ void Scan::random() {
   Random* random_Z0c[axis_nmax_plus_1];
   Random* random_Z0s[axis_nmax_plus_1];
   for (j = 0; j < axis_nmax_plus_1; j++) {
-    random_R0c[j] = new Random(deterministic, fourier_scan_option, R0c_min[j], R0c_max[j]);
+    // For fourier_scan_option = "2 sided log", handle R0c[0] separately so it is not negative
+    if (j == 0 && fourier_scan_option.compare(RANDOM_OPTION_2_SIDED_LOG) == 0) {
+      random_R0c[j] = new Random(deterministic, RANDOM_OPTION_LOG, R0c_min[j], R0c_max[j]);
+    } else {
+      random_R0c[j] = new Random(deterministic, fourier_scan_option, R0c_min[j], R0c_max[j]);
+    }
     random_R0s[j] = new Random(deterministic, fourier_scan_option, R0s_min[j], R0s_max[j]);
     random_Z0c[j] = new Random(deterministic, fourier_scan_option, Z0c_min[j], Z0c_max[j]);
     random_Z0s[j] = new Random(deterministic, fourier_scan_option, Z0s_min[j], Z0s_max[j]);

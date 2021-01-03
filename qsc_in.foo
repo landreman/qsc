@@ -1,7 +1,7 @@
 # This is a sample input file
 
-general_option = 'single'
-# general_option = 'random'
+# general_option = 'single'
+general_option = 'random'
 
 [qsc]
 nfp = 4
