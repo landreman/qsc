@@ -41,6 +41,7 @@ void Scan::input(std::string filename) {
   toml_read(varlist, indata, "Z0s_max", Z0s_max);
 
   toml_read(varlist, indata, "deterministic", deterministic);
+  toml_read(varlist, indata, "save_period", save_period);
   toml_read(varlist, indata, "max_seconds", max_seconds);
   toml_read(varlist, indata, "max_keep_per_proc", max_keep_per_proc);
   toml_read(varlist, indata, "max_attempts_per_proc", max_attempts_per_proc);
@@ -98,6 +99,7 @@ void Scan::input(std::string filename) {
   std::cout << "B2s_scan_option: " << B2s_scan_option << std::endl;
   std::cout << "fourier_scan_option: " << fourier_scan_option << std::endl;
 
+  std::cout << "save_period: " << save_period << std::endl;
   std::cout << "max_seconds: " << max_seconds << std::endl;
   std::cout << "max_keep_per_proc: " << max_keep_per_proc << std::endl;
   std::cout << "deterministic: " << deterministic << std::endl;

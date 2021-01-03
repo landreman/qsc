@@ -287,18 +287,10 @@ TEST_CASE("Verify results of a deterministic scan are independent of number of m
       
       if (proc0) {
 	CHECK(scan1.n_scan == scan2.n_scan);
-	CHECK(scan1.attempts == scan2.attempts);
-	CHECK(scan1.rejected_due_to_R0_crude == scan2.rejected_due_to_R0_crude);
-	CHECK(scan1.rejected_due_to_R0 == scan2.rejected_due_to_R0);
-	CHECK(scan1.rejected_due_to_curvature == scan2.rejected_due_to_curvature);
-	CHECK(scan1.rejected_due_to_iota == scan2.rejected_due_to_iota);
-	CHECK(scan1.rejected_due_to_elongation == scan2.rejected_due_to_elongation);
-	CHECK(scan1.rejected_due_to_L_grad_B == scan2.rejected_due_to_L_grad_B);
-	CHECK(scan1.rejected_due_to_L_grad_grad_B == scan2.rejected_due_to_L_grad_grad_B);
-	CHECK(scan1.rejected_due_to_B20_variation == scan2.rejected_due_to_B20_variation);
-	CHECK(scan1.rejected_due_to_r_singularity == scan2.rejected_due_to_r_singularity);
-	CHECK(scan1.rejected_due_to_d2_volume_d_psi2 == scan2.rejected_due_to_d2_volume_d_psi2);
-	CHECK(scan1.rejected_due_to_DMerc == scan2.rejected_due_to_DMerc);
+	for (j = 0; j < qsc::N_FILTERS; j++) {
+	  CAPTURE(j);
+	  CHECK(scan1.filters[j] == scan2.filters[j]);
+	}
 	
 	for (j = 0; j < scan1.n_scan; j++) {
 	  CAPTURE(j);

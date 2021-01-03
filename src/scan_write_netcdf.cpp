@@ -8,7 +8,7 @@
 
 using namespace qsc;
 
-void Scan::write_netcdf(std::string filename) {
+void Scan::write_netcdf() {
   // Only proc 0 should run this subroutine:
   int mpi_rank;
   MPI_Comm_rank(mpi_comm, &mpi_rank);
@@ -21,8 +21,8 @@ void Scan::write_netcdf(std::string filename) {
     start = std::chrono::steady_clock::now();
   }
 
-  if (verbose > 0) std::cout << "Writing output to " << filename << std::endl;
-  qsc::NetCDFWriter nc(filename);
+  if (verbose > 0) std::cout << "Writing output to " << outfilename << std::endl;
+  qsc::NetCDFWriter nc(outfilename);
 
   // Define dimensions
   dim_id_type nphi_dim, axis_nmax_plus_1_dim, n_scan_dim;
