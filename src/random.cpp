@@ -6,6 +6,15 @@
 
 using namespace qsc;
 
+/**
+ * Policy on signs:
+ * - Swapping min and max never has any effect.
+ * - For "linear", either sign is allowed for min and max.
+ * - For "log", min and max must have the same sign, either + or -. 
+ *   If min and max are negative, values returned by get() will be negative.
+ *   It is also valid to have min=max=0, in which case get() always returns 0.
+ * - For "2 sided log", min and max must both be positive, to avoid confusion.
+ */
 Random::Random(bool deterministic_in,
 	       std::string distrib_in,
 	       qscfloat min_in,
@@ -29,12 +38,21 @@ Random::Random(bool deterministic_in,
   // Convert string to int for speed later.
   if (distrib_in.compare(RANDOM_OPTION_LINEAR) == 0) {
     distrib = RANDOM_INT_OPTION_LINEAR;
+    
   } else if (distrib_in.compare(RANDOM_OPTION_LOG) == 0) {
     distrib = RANDOM_INT_OPTION_LOG;
     if (max * min < 0) throw std::runtime_error("Error initializing Random with log distribution: max and min must have the same sign");
+    if ((max != min) && (max == 0 || min == 0))
+      throw std::runtime_error("Error initializing Random with log distribution: max and min must both be nonzero, unless they are both 0");
+    
   } else if (distrib_in.compare(RANDOM_OPTION_2_SIDED_LOG) == 0) {
     distrib = RANDOM_INT_OPTION_2_SIDED_LOG;
-    if (max * min < 0) throw std::runtime_error("Error initializing Random with 2-sided log distribution: max and min must have the same sign");
+    if (min == 0 && max == 0) {
+      // Ok, get() will return 0
+    } else if (min <= 0 || max <= 0) {
+      throw std::runtime_error("Error initializing Random with 2-sided log distribution: max and min must both be positive, or both 0");
+    }
+    
   } else {
     throw std::runtime_error("Unrecognized random distribution type");
   }
@@ -42,7 +60,8 @@ Random::Random(bool deterministic_in,
 
 qscfloat Random::get() {
   // Explicitly handle the case of min==max, to avoid evaluating log(0).
-  if (std::abs(max - min) < 1.0e-30) return max;
+  if (max == min) return max;
+  //if (std::abs(max - min) < 1.0e-30) return max;
   
   // First, get a random float in [0, 1]:
   qscfloat rand01, temp;
