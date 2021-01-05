@@ -23,6 +23,16 @@ elseif("$ENV{CLUSTER}" STREQUAL "DRACO")
   set(CMAKE_CXX_COMPILER "mpiicpc")
   #set(BLA_VENDOR Intel10_64ilp_seq)
 
+elseif("$ENV{CLUSTER}" STREQUAL "COBRA")
+  message("Detected host is IPP Cobra")
+  # CMake detects gnu compiler unless you specify Intel:
+  set(CMAKE_CXX_COMPILER "mpiicpc")
+
+elseif("$ENV{CLUSTER}" STREQUAL "RAVEN")
+  message("Detected host is IPP Raven")
+  # CMake detects gnu compiler unless you specify Intel:
+  set(CMAKE_CXX_COMPILER "mpiicpc")
+
 else()
   message("This host is not one with specific rules for qsc.")
 

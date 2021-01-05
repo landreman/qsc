@@ -1,4 +1,3 @@
-#include <ctime>
 #include <chrono>
 #include "qsc.hpp"
 #include "toml.hpp"
@@ -9,12 +8,8 @@ using namespace qsc;
 /** Read in a configuration input file
  */
 void qsc::Qsc::input(std::string filename) {
-  std::time_t start_time, end_time;
   std::chrono::time_point<std::chrono::steady_clock> start;
-  if (verbose > 0) {
-    start_time = std::clock();
-    start = std::chrono::steady_clock::now();
-  }
+  if (verbose > 0) start = std::chrono::steady_clock::now();
   
   auto toml_file = toml::parse(filename);
   auto indata = toml::find(toml_file, "qsc");
@@ -56,22 +51,17 @@ void qsc::Qsc::input(std::string filename) {
   pad_vector(Z0c, newsize);
   pad_vector(Z0s, newsize);
 
-  std::cout << "Arrays after reading input file:" << std::endl;
+  std::cout << "Fourier amplitudes for the magnetic axis shape:" << std::endl;
   std::cout << "R0c: " << R0c << std::endl;
   std::cout << "R0s: " << R0s << std::endl;
   std::cout << "Z0c: " << Z0c << std::endl;
   std::cout << "Z0s: " << Z0s << std::endl;
 
   if (verbose > 0) {
-    end_time = std::clock();
     auto end = std::chrono::steady_clock::now();
-
     std::chrono::duration<double> elapsed = end - start;
-    std::cout << "Time for reading input from chrono:           "
+    std::cout << "Time for reading input: "
 	      << elapsed.count() << " seconds" << std::endl;
-    std::cout << "Time for reading input from ctime (CPU time): "
-	      << double(end_time - start_time) / CLOCKS_PER_SEC
-	      << " seconds" << std::endl;
   }
   
 }

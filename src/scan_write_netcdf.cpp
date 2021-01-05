@@ -1,4 +1,3 @@
-#include <ctime>
 #include <chrono>
 #include <vector>
 #include <mpi.h>
@@ -14,12 +13,8 @@ void Scan::write_netcdf() {
   MPI_Comm_rank(mpi_comm, &mpi_rank);
   if (mpi_rank != 0) return;
   
-  std::time_t start_time, end_time;
   std::chrono::time_point<std::chrono::steady_clock> start;
-  if (verbose > 0) {
-    start_time = std::clock();
-    start = std::chrono::steady_clock::now();
-  }
+  if (verbose > 0) start = std::chrono::steady_clock::now();
 
   if (verbose > 0) std::cout << "Writing output to " << outfilename << std::endl;
   qsc::NetCDFWriter nc(outfilename);
@@ -76,6 +71,21 @@ void Scan::write_netcdf() {
   nc.put("rejected_due_to_d2_volume_d_psi2", filters[REJECTED_DUE_TO_D2_VOLUME_D_PSI2], "Number of configurations in the scan that were rejected due to the max_d2_volume_d_psi2_to_keep filter", "dimensionless");
   nc.put("rejected_due_to_DMerc", filters[REJECTED_DUE_TO_DMERC], "Number of configurations in the scan that were rejected due to the min_DMerc_to_keep filter", "dimensionless");
   nc.put("rejected_due_to_r_singularity", filters[REJECTED_DUE_TO_R_SINGULARITY], "Number of configurations in the scan that were rejected due to the min_r_singularity_to_keep filter", "dimensionless");
+
+  nc.put("fraction_kept", filter_fractions[KEPT], "Fraction of the attempted configurations from the scan that were kept and saved in this file", "dimensionless");
+  nc.put("fraction_sigma_eq_solves", filter_fractions[N_SIGMA_EQ_SOLVES], "Fraction of the attempted configurations for which the sigma equation was solved during the scan", "dimensionless");
+  nc.put("fraction_r2_solves", filter_fractions[N_R2_SOLVES], "Fraction of the attempted configurations for which the O(r^2) equations were solved during the scan", "dimensionless");
+  nc.put("fraction_rejected_due_to_R0_crude", filter_fractions[REJECTED_DUE_TO_R0_CRUDE], "Fraction of configurations in the scan that were rejected due to R0 becoming <= 0 at toroidal angle 0 or half field period", "dimensionless");
+  nc.put("fraction_rejected_due_to_R0", filter_fractions[REJECTED_DUE_TO_R0], "Fraction of configurations in the scan that were rejected due to R0 becoming <= 0", "dimensionless");
+  nc.put("fraction_rejected_due_to_curvature", filter_fractions[REJECTED_DUE_TO_CURVATURE], "Fraction of configurations in the scan that were rejected due to the curvature of the magnetic axis exceeding 1 / min_L_grad_B_to_keep", "dimensionless");
+  nc.put("fraction_rejected_due_to_iota", filter_fractions[REJECTED_DUE_TO_IOTA], "Fraction of configurations in the scan that were rejected due to the min_iota_to_keep filter", "dimensionless");
+  nc.put("fraction_rejected_due_to_elongation", filter_fractions[REJECTED_DUE_TO_ELONGATION], "Fraction of configurations in the scan that were rejected due to the max_elongation_to_keep filter", "dimensionless");
+  nc.put("fraction_rejected_due_to_L_grad_B", filter_fractions[REJECTED_DUE_TO_L_GRAD_B], "Fraction of configurations in the scan that were rejected due to the min_L_grad_B_to_keep filter", "dimensionless");
+  nc.put("fraction_rejected_due_to_B20_variation", filter_fractions[REJECTED_DUE_TO_B20_VARIATION], "Fraction of configurations in the scan that were rejected due to the max_B20_variation_to_keep filter", "dimensionless");
+  nc.put("fraction_rejected_due_to_L_grad_grad_B", filter_fractions[REJECTED_DUE_TO_L_GRAD_GRAD_B], "Fraction of configurations in the scan that were rejected due to the min_L_grad_grad_B_to_keep filter", "dimensionless");
+  nc.put("fraction_rejected_due_to_d2_volume_d_psi2", filter_fractions[REJECTED_DUE_TO_D2_VOLUME_D_PSI2], "Fraction of configurations in the scan that were rejected due to the max_d2_volume_d_psi2_to_keep filter", "dimensionless");
+  nc.put("fraction_rejected_due_to_DMerc", filter_fractions[REJECTED_DUE_TO_DMERC], "Fraction of configurations in the scan that were rejected due to the min_DMerc_to_keep filter", "dimensionless");
+  nc.put("fraction_rejected_due_to_r_singularity", filter_fractions[REJECTED_DUE_TO_R_SINGULARITY], "Fraction of configurations in the scan that were rejected due to the min_r_singularity_to_keep filter", "dimensionless");
 
   int keep_all_int = (int) keep_all;
   nc.put("keep_all", keep_all_int, "1 if all configurations from the scan were saved, 0 if some configurations were filtered out", "dimensionless");
@@ -152,14 +162,9 @@ void Scan::write_netcdf() {
   nc.write_and_close();
   
   if (verbose > 0) {
-    end_time = std::clock();
-    auto end = std::chrono::steady_clock::now();
-    
+    auto end = std::chrono::steady_clock::now();    
     std::chrono::duration<double> elapsed = end - start;
-    std::cout << "Time for write_netcdf from chrono:           "
+    std::cout << "Time for write_netcdf: "
               << elapsed.count() << " seconds" << std::endl;
-    std::cout << "Time for write_netcdf from ctime (CPU time): "
-              << double(end_time - start_time) / CLOCKS_PER_SEC
-              << " seconds" << std::endl;
   }
 }

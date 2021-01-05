@@ -1,6 +1,5 @@
 #include <stdexcept>
 #include <iostream>
-#include <ctime>
 #include <chrono>
 #include <mpi.h>
 #include "toml.hpp"
@@ -38,8 +37,6 @@ int qsc::driver(int argc, char* argv[]) {
     std::cerr.precision(15);
   }
 
-  std::time_t start_time, end_time;
-  start_time = std::clock();
   auto start = std::chrono::steady_clock::now();
 
   // Read general_option
@@ -65,15 +62,10 @@ int qsc::driver(int argc, char* argv[]) {
     throw std::runtime_error("Unrecognized setting for general_option");
   }
   
-  end_time = std::clock();
   auto end = std::chrono::steady_clock::now();
-
   std::chrono::duration<double> elapsed = end - start;
-  std::cout << "Total time from chrono:           "
+  std::cout << "Total time: "
             << elapsed.count() << " seconds" << std::endl;
-  std::cout << "Total time from ctime (CPU time): "
-            << double(end_time - start_time) / CLOCKS_PER_SEC
-	    << " seconds" << std::endl;
   
   std::cout << "Good bye." << std::endl;
   

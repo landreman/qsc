@@ -1,0 +1,52 @@
+# This is a sample input file
+
+general_option = 'random'
+
+[qsc]
+nfp = 4
+# I can put comments here
+nphi = 51
+eta_bar = -1.1
+#R0c = [1.0, 0.3, 0.09]
+
+verbose = 0
+
+order_r_option = "r2"
+
+#R0c = [1.0]
+#Z0s = [0.0]
+ R0c = [1.0, 0.04, 0.002]
+ Z0s = [0.0, 0.03]
+
+[scan]
+
+eta_bar_max = -3
+eta_bar_min = -0.3333
+eta_bar_scan_option = "log"
+
+R0c_min = [1.0, 0.17, 0.001,  0.0003]
+R0c_max = [1.0, 0.17,   0.1,  0.03]
+
+Z0s_min = [0.0, 0.30, 0.001,  0.0003]
+Z0s_max = [0.0, 0.05,   0.1,  0.03]
+
+fourier_scan_option = "2 sided log"
+
+B2c_min = 0.01
+B2c_max = 3
+B2c_scan_option = "2 sided log"
+
+
+keep_all = false
+
+max_seconds = 3600
+save_period = 3
+# max_attempts_per_proc = 100000
+max_keep_per_proc = 10000
+
+min_R0_to_keep = 0.3
+max_elongation_to_keep = 10
+min_L_grad_B_to_keep = 0.1
+min_L_grad_grad_B_to_keep = 0.1
+max_B20_variation_to_keep = 5.0
+min_r_singularity_to_keep = 0.05

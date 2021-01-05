@@ -2,6 +2,7 @@
 #define QSC_SCAN_H
 
 #include <valarray>
+#include <chrono>
 #include <mpi.h>
 #include "qsc.hpp"
 
@@ -38,6 +39,7 @@ namespace qsc {
   class Scan {
   private:
     big filters_local[N_FILTERS];
+    std::chrono::time_point<std::chrono::steady_clock> start_time;
     void defaults();
     void collect_results(int, Matrix&, Matrix&, int, std::valarray<int>&, big);
     
@@ -51,6 +53,7 @@ namespace qsc {
     Vector R0c_min, R0c_max, R0s_min, R0s_max, Z0c_min, Z0c_max, Z0s_min, Z0s_max;
     qscfloat max_seconds, save_period;
     big n_scan, filters[N_FILTERS];
+    qscfloat filter_fractions[N_FILTERS];
     int max_keep_per_proc, max_attempts_per_proc; // Can I read in a "big" from toml?
     qscfloat min_R0_to_keep, min_iota_to_keep, max_elongation_to_keep;
     qscfloat min_L_grad_B_to_keep, min_L_grad_grad_B_to_keep;

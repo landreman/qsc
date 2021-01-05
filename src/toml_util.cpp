@@ -82,16 +82,18 @@ void qsc::pad_vector(Vector& v, std::size_t newsize) {
 /** Check to see if there are any unused keys in the input file.
  */
 void qsc::toml_unused(std::vector<std::string> varlist, toml::value indata) {
-  std::cout << "varlist:";
   int j;
+  /*
+  std::cout << "varlist:";
   for (j = 0; j < varlist.size(); j++) std::cout << " " << varlist[j];
   std::cout << std::endl;
-
+  */
+  
   int found_match;
   for (auto item : indata.as_table()) {
     // I believe "item" has type std::pair, representing a key-value pair.
     auto key = item.first;
-    std::cout << "Found key: " << key << std::endl;
+    //std::cout << "Found key: " << key << std::endl;
     found_match = 0;
     for (j = 0; j < varlist.size(); j++) {
       if (key.compare(varlist[j]) == 0) {

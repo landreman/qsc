@@ -1,5 +1,4 @@
 #include <cmath>
-#include <ctime>
 #include <chrono>
 #include "qsc.hpp"
 
@@ -8,12 +7,8 @@ using namespace qsc;
 /** Solve the O(r^2) equations for X2, Y2, Z2, and B20.
  */
 void Qsc::calculate_r2() {
-  std::time_t start_time, end_time;
   std::chrono::time_point<std::chrono::steady_clock> start;
-  if (verbose > 0) {
-    start_time = std::clock();
-    start = std::chrono::steady_clock::now();
-  }
+  if (verbose > 0) start = std::chrono::steady_clock::now();
   
   if (std::abs(iota_N) < 1.0e-8)
     std::cerr <<
@@ -170,18 +165,11 @@ void Qsc::calculate_r2() {
     r2_rhs[j + nphi] = work2[j];
   }
 
-  std::time_t solve_start_time, solve_end_time;
   std::chrono::time_point<std::chrono::steady_clock> solve_start, solve_end;
-  if (verbose > 0) {
-    solve_start_time = std::clock();
-    solve_start = std::chrono::steady_clock::now();
-  }
+  if (verbose > 0) solve_start = std::chrono::steady_clock::now();
   // Here is the main solve:
   linear_solve(r2_matrix, r2_rhs, r2_ipiv);
-  if (verbose > 0) {
-    solve_end_time = std::clock();
-    solve_end = std::chrono::steady_clock::now();
-  }
+  if (verbose > 0) solve_end = std::chrono::steady_clock::now();
 
   // Extract X20 and Y20 from the solution:
   for (j = 0; j < nphi; j++) {
@@ -219,17 +207,12 @@ void Qsc::calculate_r2() {
   ////////////////////////////////////////////////////////////
   
   if (verbose > 0) {
-    end_time = std::clock();
     auto end = std::chrono::steady_clock::now();
     
     std::chrono::duration<double> elapsed = end - start;
     std::chrono::duration<double> solve_elapsed = solve_end - solve_start;
-    std::cout << "Time for calculate_r2 from chrono:           "
+    std::cout << "Time for calculate_r2: "
               << elapsed.count() << " seconds, " << solve_elapsed.count()
-	      << " for solve" << std::endl;
-    std::cout << "Time for calculate_r2 from ctime (CPU time): "
-              << double(end_time - start_time) / CLOCKS_PER_SEC
-              << " seconds, " << double(solve_end_time - solve_start_time) / CLOCKS_PER_SEC
 	      << " for solve" << std::endl;
   }
 }
@@ -237,26 +220,18 @@ void Qsc::calculate_r2() {
 /////////////////////////////////////////
 
 void Qsc::r2_diagnostics() {
-  std::time_t diag_start_time, diag_end_time;
   std::chrono::time_point<std::chrono::steady_clock> diag_start, diag_end;
-  if (verbose > 0) {
-    diag_start_time = std::clock();
-    diag_start = std::chrono::steady_clock::now();
-  }
+  if (verbose > 0) diag_start = std::chrono::steady_clock::now();
 
   mercier();
   calculate_grad_grad_B_tensor();
   calculate_r_singularity();
   
   if (verbose > 0) {
-    diag_end_time = std::clock();
     diag_end = std::chrono::steady_clock::now();
     std::chrono::duration<double> diag_elapsed = diag_end - diag_start;
-    std::cout << "Time for r2_diagnostics from chrono:           "
+    std::cout << "Time for r2_diagnostics: "
               << diag_elapsed.count() << std::endl;
-    std::cout << "Time for calculate_r2 from ctime (CPU time): "
-              << double(diag_end_time - diag_start_time) / CLOCKS_PER_SEC
-	      << std::endl;
   }
 
 }

@@ -1,6 +1,5 @@
 #include <iostream>
 #include <valarray>
-#include <ctime>
 #include <chrono>
 #include "qsc.hpp"
 
@@ -52,12 +51,8 @@ void Qsc::sigma_eq_jacobian(Vector& state, Matrix& jac, void* user_data) {
 }
 
 void Qsc::solve_sigma_equation() {
-  std::time_t start_time, end_time;
   std::chrono::time_point<std::chrono::steady_clock> start;
-  if (verbose > 0) {
-    start_time = std::clock();
-    start = std::chrono::steady_clock::now();
-  }
+  if (verbose > 0) start = std::chrono::steady_clock::now();
   
   etabar_squared_over_curvature_squared = (eta_bar * eta_bar) / (curvature * curvature);
   X1s = 0;
@@ -72,26 +67,17 @@ void Qsc::solve_sigma_equation() {
 	       newton_tolerance, verbose, this);
 
   if (verbose > 0) {
-    end_time = std::clock();
-    auto end = std::chrono::steady_clock::now();
-    
+    auto end = std::chrono::steady_clock::now();    
     std::chrono::duration<double> elapsed = end - start;
-    std::cout << "Time for sigma equation from chrono:           "
+    std::cout << "Time for sigma equation: "
               << elapsed.count() << " seconds" << std::endl;
-    std::cout << "Time for sigma equation from ctime (CPU time): "
-              << double(end_time - start_time) / CLOCKS_PER_SEC
-              << " seconds" << std::endl;
   }
 
 }
 
 void Qsc::r1_diagnostics() {
-  std::time_t start_time, end_time;
   std::chrono::time_point<std::chrono::steady_clock> start;
-  if (verbose > 0) {
-    start_time = std::clock();
-    start = std::chrono::steady_clock::now();
-  }
+  if (verbose > 0) start = std::chrono::steady_clock::now();
 
   iota_N = iota + helicity * nfp;
   I2_over_B0 = I2 / B0;
@@ -120,14 +106,9 @@ void Qsc::r1_diagnostics() {
   calculate_grad_B_tensor();
 
   if (verbose > 0) {
-    end_time = std::clock();
     auto end = std::chrono::steady_clock::now();
-    
     std::chrono::duration<double> elapsed = end - start;
-    std::cout << "Time for r1_diagnostics from chrono:           "
+    std::cout << "Time for r1_diagnostics: "
               << elapsed.count() << " seconds" << std::endl;
-    std::cout << "Time for r1_diagnostics from ctime (CPU time): "
-              << double(end_time - start_time) / CLOCKS_PER_SEC
-              << " seconds" << std::endl;
   }
 }

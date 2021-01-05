@@ -68,7 +68,7 @@ void Scan::random() {
   q.Z0c.resize(axis_nmax_plus_1, 0.0);
   q.Z0s.resize(axis_nmax_plus_1, 0.0);
 
-  std::chrono::time_point<std::chrono::steady_clock> start_time, end_time, checkpoint_time;
+  std::chrono::time_point<std::chrono::steady_clock> end_time, checkpoint_time;
   start_time = std::chrono::steady_clock::now();
   checkpoint_time = start_time;
   std::chrono::duration<double> elapsed;

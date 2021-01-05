@@ -1,4 +1,3 @@
-#include <ctime>
 #include <chrono>
 #include <cmath>
 #include "qsc.hpp"
@@ -23,12 +22,8 @@ void Qsc::calculate_r_singularity() {
   qscfloat sin2_cos2_1_tol, acceptable_residual, imag_tol;
   bool get_cos_from_cos2;
 
-  std::time_t start_time, end_time;
   std::chrono::time_point<std::chrono::steady_clock> start;
-  if (verbose > 0) {
-    start_time = std::clock();
-    start = std::chrono::steady_clock::now();
-  }
+  if (verbose > 0) start = std::chrono::steady_clock::now();
 
   if (single) {
     sin2_cos2_1_tol = 1.0e-6;
@@ -390,14 +385,10 @@ void Qsc::calculate_r_singularity() {
   r_singularity_robust = r_hat_singularity_robust.min();
   
   if (verbose > 0) {
-    end_time = std::clock();
-    auto end = std::chrono::steady_clock::now();
-    
+    auto end = std::chrono::steady_clock::now();    
     std::chrono::duration<double> elapsed = end - start;
-    std::cout << "Time for r_singularity from chrono:           "
+    std::cout << "Time for r_singularity: "
               << elapsed.count() << std::endl;
-    std::cout << "Time for r_singularity from ctime (CPU time): "
-              << double(end_time - start_time) / CLOCKS_PER_SEC << std::endl;
   }
 }
 

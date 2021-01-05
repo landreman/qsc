@@ -23,6 +23,8 @@ void Scan::collect_results(int n_parameters,
   int mpi_rank, n_procs;
   MPI_Status mpi_status;
   
+  auto start = std::chrono::steady_clock::now();
+
   // Get MPI info
   MPI_Comm_rank(mpi_comm, &mpi_rank);
   MPI_Comm_size(mpi_comm, &n_procs);
@@ -45,7 +47,9 @@ void Scan::collect_results(int n_parameters,
     // Proc 0 does this following block.
     
     std::cout << "##################################################################################" << std::endl;
-    std::cout << "Transferring results to proc 0" << std::endl;
+    auto end_time = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsed = end_time - start_time;
+    std::cout << "Transferring results to proc 0 at time " << elapsed.count() << std::endl;
 
     std::valarray<big> filters_combined(N_FILTERS * n_procs);
     std::valarray<big> n_solves_kept(n_procs);
@@ -75,8 +79,6 @@ void Scan::collect_results(int n_parameters,
     std::cout << "# solves kept on each proc:";
     for (j = 0; j < n_procs; j++) std::cout << " " << n_solves_kept[j];
     std::cout << std::endl;
-    std::cout << "Total # of attempts: " << filters[ATTEMPTS] << std::endl;
-    std::cout << "Total # of solves kept: " << n_scan << std::endl;
 
     // Now that we know the total # of runs that succeeded, we can
     // allocate big arrays to store the combined results from all
@@ -165,26 +167,45 @@ void Scan::collect_results(int n_parameters,
     }
 
     big total_rejected = 0;
-    for (j = KEPT + 1; j < N_FILTERS; j++) total_rejected += filters[j];
+    for (j = REJECTED_DUE_TO_R0_CRUDE; j < N_SIGMA_EQ_SOLVES; j++) total_rejected += filters[j];
+    for (j = 0; j < N_FILTERS; j++) filter_fractions[j] = ((qscfloat)filters[j]) / filters[0];
 
-    std::cout << "Summary of scan results:" << std::endl;
-    std::cout << "  Configurations attempted:          " << filters[ATTEMPTS] << std::endl;
-    std::cout << "  # solves of the sigma equation:    " << filters[N_SIGMA_EQ_SOLVES] << std::endl;
-    std::cout << "  # solves of the O(r^2) equations:  " << filters[N_R2_SOLVES] << std::endl;
-    std::cout << "  Rejected due to crude R0 check:    " << filters[REJECTED_DUE_TO_R0_CRUDE] << std::endl;
-    std::cout << "  Rejected due to min_R0:            " << filters[REJECTED_DUE_TO_R0] << std::endl;
-    std::cout << "  Rejected due to max curvature:     " << filters[REJECTED_DUE_TO_CURVATURE] << std::endl;
-    std::cout << "  Rejected due to min iota:          " << filters[REJECTED_DUE_TO_IOTA] << std::endl;
-    std::cout << "  Rejected due to max elongation:    " << filters[REJECTED_DUE_TO_ELONGATION] << std::endl;
-    std::cout << "  Rejected due to min L_grad_B:      " << filters[REJECTED_DUE_TO_L_GRAD_B] << std::endl;
-    std::cout << "  Rejected due to B20 variation:     " << filters[REJECTED_DUE_TO_B20_VARIATION] << std::endl;
-    std::cout << "  Rejected due to min L_grad_grad_B: " << filters[REJECTED_DUE_TO_L_GRAD_GRAD_B] << std::endl;
-    std::cout << "  Rejected due to d2_volume_d_psi2:  " << filters[REJECTED_DUE_TO_D2_VOLUME_D_PSI2] << std::endl;
-    std::cout << "  Rejected due to DMerc:             " << filters[REJECTED_DUE_TO_DMERC] << std::endl;
-    std::cout << "  Rejected due to r_singularity:     " << filters[REJECTED_DUE_TO_R_SINGULARITY] << std::endl;
-    std::cout << "  Total rejected:                    " << total_rejected << std::endl;
-    std::cout << "  Kept:                              " << n_scan << std::endl;
-    std::cout << "  Kept + rejected:                   " << n_scan + total_rejected << std::endl;
+    int width = 13;
+    std::cout << std::setprecision(4) << std::endl;
+    std::cout << "Summary of scan results:                           (fractions in parentheses)" << std::endl;
+    std::cout << "  Configurations attempted:          " << std::setw(width) << filters[ATTEMPTS] << std::endl;
+    std::cout << "  # solves of the sigma equation:    " << std::setw(width) << filters[N_SIGMA_EQ_SOLVES]
+	      << " (" << filter_fractions[N_SIGMA_EQ_SOLVES] << ")" << std::endl;
+    std::cout << "  # solves of the O(r^2) equations:  " << std::setw(width) << filters[N_R2_SOLVES]
+	      << " (" << filter_fractions[N_R2_SOLVES] << ")" << std::endl;
+    std::cout << "  Rejected due to crude R0 check:    " << std::setw(width) << filters[REJECTED_DUE_TO_R0_CRUDE]
+	      << " (" << filter_fractions[REJECTED_DUE_TO_R0_CRUDE] << ")" << std::endl;
+    std::cout << "  Rejected due to min_R0:            " << std::setw(width) << filters[REJECTED_DUE_TO_R0]
+	      << " (" << filter_fractions[REJECTED_DUE_TO_R0] << ")" << std::endl;
+    std::cout << "  Rejected due to max curvature:     " << std::setw(width) << filters[REJECTED_DUE_TO_CURVATURE]
+	      << " (" << filter_fractions[REJECTED_DUE_TO_CURVATURE] << ")" << std::endl;
+    std::cout << "  Rejected due to min iota:          " << std::setw(width) << filters[REJECTED_DUE_TO_IOTA]
+	      << " (" << filter_fractions[REJECTED_DUE_TO_IOTA] << ")" << std::endl;
+    std::cout << "  Rejected due to max elongation:    " << std::setw(width) << filters[REJECTED_DUE_TO_ELONGATION]
+	      << " (" << filter_fractions[REJECTED_DUE_TO_ELONGATION] << ")" << std::endl;
+    std::cout << "  Rejected due to min L_grad_B:      " << std::setw(width) << filters[REJECTED_DUE_TO_L_GRAD_B]
+	      << " (" << filter_fractions[REJECTED_DUE_TO_L_GRAD_B] << ")" << std::endl;
+    std::cout << "  Rejected due to B20 variation:     " << std::setw(width) << filters[REJECTED_DUE_TO_B20_VARIATION]
+	      << " (" << filter_fractions[REJECTED_DUE_TO_B20_VARIATION] << ")" << std::endl;
+    std::cout << "  Rejected due to min L_grad_grad_B: " << std::setw(width) << filters[REJECTED_DUE_TO_L_GRAD_GRAD_B]
+	      << " (" << filter_fractions[REJECTED_DUE_TO_L_GRAD_GRAD_B] << ")" << std::endl;
+    std::cout << "  Rejected due to d2_volume_d_psi2:  " << std::setw(width) << filters[REJECTED_DUE_TO_D2_VOLUME_D_PSI2]
+	      << " (" << filter_fractions[REJECTED_DUE_TO_D2_VOLUME_D_PSI2] << ")" << std::endl;
+    std::cout << "  Rejected due to DMerc:             " << std::setw(width) << filters[REJECTED_DUE_TO_DMERC]
+	      << " (" << filter_fractions[REJECTED_DUE_TO_DMERC] << ")" << std::endl;
+    std::cout << "  Rejected due to r_singularity:     " << std::setw(width) << filters[REJECTED_DUE_TO_R_SINGULARITY]
+	      << " (" << filter_fractions[REJECTED_DUE_TO_R_SINGULARITY] << ")" << std::endl;
+    std::cout << "  Total rejected:                    " << std::setw(width) << total_rejected
+	      << " (" << ((qscfloat)total_rejected) / filters[ATTEMPTS] << ")" << std::endl;
+    std::cout << "  Kept:                              " << std::setw(width) << n_scan
+	      << " (" << filter_fractions[KEPT] << ")" << std::endl;
+    std::cout << "  Kept + rejected:                   " << std::setw(width) << n_scan + total_rejected
+	      << std::endl;
     if (n_scan < 1000) {
       std::cout << std::setprecision(2) << std::endl;
       std::cout << "min_R0: " << scan_min_R0 << std::endl;
@@ -197,8 +218,19 @@ void Scan::collect_results(int n_parameters,
       for (j = 0; j < n_scan; j++) std::cout << " " << scan_helicity[j];
       std::cout << std::endl;
       std::cout << std::endl;
-      std::cout << "r_singularity: " << scan_r_singularity << std::endl;
-
+      std::cout << "min_L_grad_B: " << scan_min_L_grad_B << std::endl;
+      if (q.at_least_order_r2) {
+	std::cout << std::endl;
+	std::cout << "min_L_grad_grad_B: " << scan_min_L_grad_grad_B << std::endl;
+	std::cout << std::endl;
+	std::cout << "d2_volume_d_psi2: " << scan_d2_volume_d_psi2 << std::endl;
+	std::cout << std::endl;
+	std::cout << "r_singularity: " << scan_r_singularity << std::endl;
+	std::cout << std::endl;
+	std::cout << "B20_variation: " << scan_B20_variation << std::endl;
+      }
+      std::cout << std::endl;
+      
       // Restore precision for printing
       if (single) {
 	std::cout.precision(8);
@@ -211,4 +243,10 @@ void Scan::collect_results(int n_parameters,
   } // if proc0
 
   MPI_Barrier(mpi_comm);
+  if (proc0 && verbose) {
+    auto end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+    std::cout << "Time for collect_results: "
+	      << elapsed.count() << " seconds" << std::endl;
+  }
 }
