@@ -126,6 +126,7 @@ TEST_CASE("Compare published configurations to fortran version of QSC") {
     Qsc c(cconfigs[jconfig]);
     c.verbose = ((jconfig == 5 || jconfig == 7) ? 2 : 0);
     c.nphi = f.nphi;
+    c.max_linesearch_iterations = 20; // It helps to have this larger value for single precision
     c.calculate();
     
     // Scalars

@@ -13,7 +13,10 @@ TEST_CASE("grad B tensor for an axisymmetric vacuum field") {
   qscfloat val;
   q.I2 = 0.0;
   q.sigma0 = 0.0;
-  q.verbose = 1;
+  q.verbose = 0;
+  
+  qscfloat tol = 1.0e-12;
+  if (single) tol = 2.0e-5;
 
   q.R0c.resize(1, 1.0);
   q.R0s.resize(1, 0.0);
@@ -66,7 +69,7 @@ TEST_CASE("grad B tensor for an axisymmetric vacuum field") {
 		    // bn
 		    CHECK(Approx(q.grad_B_tensor(j, 1, 0)) == 0.0);
 		    // nb
-		    CHECK(Approx(q.grad_B_tensor(j, 0, 1)) == 0.0);
+		    CHECK(Approx(q.grad_B_tensor(j, 0, 1)).epsilon(tol) == 0.0); // For some reason, the error in this term in single precision is a bit larger, so we need a wider tolerance than the default.
 		    // tt
 		    CHECK(Approx(q.grad_B_tensor(j, 2, 2)) == 0.0);
 		    // tb
@@ -105,7 +108,7 @@ TEST_CASE("grad grad B tensor for an axisymmetric vacuum field") {
   q.sigma0 = 0.0;
   q.verbose = 0;
   q.order_r_option = ORDER_R_OPTION_R2;
-
+  
   q.R0c.resize(1, 1.0);
   q.R0s.resize(1, 0.0);
   q.Z0c.resize(1, 0.0);
@@ -207,6 +210,7 @@ TEST_CASE("grad grad B tensor alternative derivation and symmetry") {
     
     Qsc q(configs[jconfig]);
     q.nphi = 65;
+    q.max_linesearch_iterations = 20; // It helps to have this larger value in single precision
   
     for (int sG = -1; sG <= 1; sG += 2) {
       for (int spsi = -1; spsi <= 1; spsi += 2) {

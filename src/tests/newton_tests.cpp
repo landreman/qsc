@@ -24,7 +24,8 @@ TEST_CASE("Newton solve") {
 
   int max_newton_iterations = 10;
   int max_linesearch_iterations = 5;
-  qscfloat tolerance = 1e-12;
+  qscfloat tolerance = 1.0e-12;
+  if (single) tolerance = 1.0e-7;
   int verbose = 1;
   int result;
 
