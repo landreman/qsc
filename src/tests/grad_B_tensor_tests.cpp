@@ -13,7 +13,7 @@ TEST_CASE("grad B tensor for an axisymmetric vacuum field") {
   qscfloat val;
   q.I2 = 0.0;
   q.sigma0 = 0.0;
-  q.verbose = 0;
+  q.verbose = 1;
 
   q.R0c.resize(1, 1.0);
   q.R0s.resize(1, 0.0);
@@ -46,6 +46,7 @@ TEST_CASE("grad B tensor for an axisymmetric vacuum field") {
 		  q.R0c[0] = R0;
 		  q.B0 = B0;
 		  q.sigma0 = sigma0;
+		  q.max_linesearch_iterations = 20; // It helps to use this increased value in single precision
 		
 		  q.calculate();
 		  

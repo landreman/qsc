@@ -28,7 +28,7 @@ using namespace qsc;
  * @param user_data This pointer allows you to pass any data you like to the
  *        residual and jacobian functions.
  */
-void qsc::newton_solve(residual_function_type residual_function,
+int qsc::newton_solve(residual_function_type residual_function,
 		       jacobian_function_type jacobian_function,
 		       Vector& state,
 		       Vector& residual,
@@ -56,7 +56,7 @@ void qsc::newton_solve(residual_function_type residual_function,
   int j_newton, j_linesearch;
   for (j_newton = 0; j_newton < max_newton_iterations; j_newton++) {
     last_residual_norm_sq = residual_norm_sq;
-    if (residual_norm_sq < tolerance_sq) break;
+    if (residual_norm_sq < tolerance_sq) return NEWTON_CONVERGED;
 
     jacobian_function(state, m, user_data);
 
@@ -83,8 +83,16 @@ void qsc::newton_solve(residual_function_type residual_function,
     if (residual_norm_sq > last_residual_norm_sq) {
       if (verbose > 0) std::cout << "Line search failed to reduce residual." << std::endl;
       // If the line search fails, stop the Newton iteration:
-      //state = state0;
+      state = state0;
+      return NEWTON_LINESEARCH_FAILED;
       //break;
     }
   }
+  
+  if (residual_norm_sq < tolerance_sq) {
+    return NEWTON_CONVERGED;
+  } else {
+    return NEWTON_MAX_ITERATIONS;
+  }
+
 }

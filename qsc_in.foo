@@ -1,7 +1,7 @@
 # This is a sample input file
 
-# general_option = 'single'
-general_option = 'random'
+ general_option = 'single'
+#general_option = 'random'
 
 [qsc]
 nfp = 4
@@ -10,14 +10,14 @@ nphi = 51
 eta_bar = -1.1
 #R0c = [1.0, 0.3, 0.09]
 
-verbose = 0
+verbose = 1
 sG=-1
 
  order_r_option = "r2"
 
 #R0c = [1.0]
 #Z0s = [0.0]
- R0c = [1.0, 0.04, 0.002]
+ R0c = [1.0, 1.04, 1.002]
  Z0s = [0.0, 0.03]
 
 [scan]

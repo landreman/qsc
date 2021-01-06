@@ -26,12 +26,14 @@ TEST_CASE("Newton solve") {
   int max_linesearch_iterations = 5;
   qscfloat tolerance = 1e-12;
   int verbose = 1;
+  int result;
 
-  newton_solve(residual_function1, jacobian_function1,
-	       state, residual, work1, work2, ipiv, m,
-	       max_newton_iterations, max_linesearch_iterations,
-	       tolerance, verbose, NULL);
+  result = newton_solve(residual_function1, jacobian_function1,
+			state, residual, work1, work2, ipiv, m,
+			max_newton_iterations, max_linesearch_iterations,
+			tolerance, verbose, NULL);
   CHECK(Approx(state[0]) == -0.5671432904097838);
   CHECK(Approx(state[1]) == 0.5671432904097838);
+  CHECK(result == NEWTON_CONVERGED);
 }
 

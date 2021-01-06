@@ -1,6 +1,7 @@
 #include <iostream>
 #include <valarray>
 #include <chrono>
+#include <stdexcept>
 #include "qsc.hpp"
 
 using namespace qsc;
@@ -61,12 +62,26 @@ void Qsc::solve_sigma_equation() {
   state = sigma0; // Initial guess for sigma
   state[0] = 0.0; // Initial guess for iota
     
-  newton_solve(sigma_eq_residual, sigma_eq_jacobian,
-	       state, residual, work1, work2, ipiv, work_matrix,
-	       max_newton_iterations, max_linesearch_iterations,
-	       newton_tolerance, verbose, this);
+  newton_result = newton_solve(sigma_eq_residual, sigma_eq_jacobian,
+			       state, residual, work1, work2, ipiv, work_matrix,
+			       max_newton_iterations, max_linesearch_iterations,
+			       newton_tolerance, verbose, this);
 
   if (verbose > 0) {
+    switch (newton_result) {
+    case NEWTON_CONVERGED:
+      std::cout << "Newton's method converged." << std::endl;
+      break;
+    case NEWTON_MAX_ITERATIONS:
+      std::cout << "Newton's method did not converge after the maximum number of iterations allowed." << std::endl;
+      break;
+    case NEWTON_LINESEARCH_FAILED:
+      std::cout << "Line search in Newton's method failed." << std::endl;
+      break;
+    default:
+      throw std::runtime_error("Should not get here.");
+    }
+    
     auto end = std::chrono::steady_clock::now();    
     std::chrono::duration<double> elapsed = end - start;
     std::cout << "Time for sigma equation: "

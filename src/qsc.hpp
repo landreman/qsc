@@ -15,7 +15,7 @@ namespace qsc {
 
   typedef void (*residual_function_type)(Vector&, Vector&, void*);
   typedef void (*jacobian_function_type)(Vector&, Matrix&, void*);
-  void newton_solve(residual_function_type, jacobian_function_type,
+  int newton_solve(residual_function_type, jacobian_function_type,
 		    Vector&, Vector&, Vector&, Vector&, std::valarray<int>&,
 		    Matrix&, int, int, qscfloat, int, void*);
 
@@ -23,6 +23,11 @@ namespace qsc {
   const std::string ORDER_R_OPTION_R2 = "r2";
 
   int driver(int, char**);
+
+  enum {
+    NEWTON_CONVERGED,
+    NEWTON_MAX_ITERATIONS,
+    NEWTON_LINESEARCH_FAILED};
   
   class Qsc {
   private:
@@ -84,6 +89,7 @@ namespace qsc {
     qscfloat d2_volume_d_psi2, DGeod_times_r2, DWell_times_r2, DMerc_times_r2;
     qscfloat r_singularity_robust;
     Vector r_hat_singularity_robust;
+    int newton_result;
     
     Qsc();
     Qsc(std::string);
