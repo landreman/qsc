@@ -575,3 +575,134 @@ TEST_CASE("Verify scan results with and without filters are related as expected.
     }
   }
 }
+
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+
+TEST_CASE("Verify the number of configurations attempted or kept in a scan matches the request. [mpi]") {
+  int j, k;
+  qsc::qscfloat amplitude;
+  int mpi_rank, n_procs;
+  MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
+  bool proc0 = (mpi_rank == 0);
+
+  qsc::Scan scan;
+
+  scan.deterministic = true;
+    
+  scan.max_seconds = 30;
+  
+  scan.q.nfp = 3;  
+  scan.q.nphi = 31;
+  scan.q.verbose = 0;  
+  scan.q.p2 = -1.0e+4; // Include nonzero pressure so DMerc is nonzero.
+  
+  int nf = 2;
+  scan.R0c_min.resize(nf, 0.0);
+  scan.R0c_max.resize(nf, 0.0);
+  scan.R0s_min.resize(nf, 0.0);
+  scan.R0s_max.resize(nf, 0.0);
+  scan.Z0c_min.resize(nf, 0.0);
+  scan.Z0c_max.resize(nf, 0.0);
+  scan.Z0s_min.resize(nf, 0.0);
+  scan.Z0s_max.resize(nf, 0.0);
+  
+  // Try both O(r^1) and O(r^2):
+  for (int order = 1; order < 3; order++) {
+    CAPTURE(order);
+    // Try both keep_all = true and false:
+    for (int j_keep_all = 0; j_keep_all < 2; j_keep_all++) {
+      CAPTURE(j_keep_all);
+      if (order == 1) {
+	scan.q.order_r_option = "r1";
+      } else if (order == 2) {
+	scan.q.order_r_option = "r2";
+      } else {
+	throw std::runtime_error("Should not get here");
+      }
+      scan.q.order_r_option = scan.q.order_r_option;
+      
+      amplitude = 0.02;
+      
+      scan.R0c_min[0] = 0.8;
+      scan.R0c_max[0] = 1.2;
+      
+      scan.R0c_min[1] = -amplitude;
+      scan.R0c_max[1] =  amplitude;
+      
+      scan.R0s_min[1] = -amplitude;
+      scan.R0s_max[1] =  amplitude;
+      
+      scan.Z0c_min[1] = -amplitude;
+      scan.Z0c_max[1] =  amplitude;
+      
+      scan.Z0s_min[1] = -amplitude;
+      scan.Z0s_max[1] =  amplitude;
+      
+      scan.eta_bar_min = 0.7;
+      scan.eta_bar_max = 1.4;
+      
+      scan.sigma0_min = -0.3;
+      scan.sigma0_max = 0.6;
+      
+      scan.B2c_min = -0.3;
+      scan.B2c_max = 0.3;
+      
+      scan.B2s_min = -0.3;
+      scan.B2s_max = 0.3;
+            
+      scan.keep_all = (bool) j_keep_all;
+
+      for (int j_constraint = 0; j_constraint < 2; j_constraint++) {
+	CAPTURE(j_constraint);
+	if (j_constraint == 0) {
+	  // Constraints are so lax that they should not be active
+	  scan.max_elongation_to_keep = 1.0e+30;
+	  scan.min_R0_to_keep = 0.01;
+	  scan.max_d2_volume_d_psi2_to_keep = 1.0e+30;
+	  scan.min_DMerc_to_keep = -1.0e+30;
+	  scan.min_L_grad_grad_B_to_keep = -1.0;
+	} else {
+	  // Constraints should be active
+	  scan.max_elongation_to_keep = 2.8;
+	  scan.min_R0_to_keep = 0.81;
+	  scan.max_d2_volume_d_psi2_to_keep = 0;
+	  scan.min_DMerc_to_keep = 0;  
+	  scan.min_L_grad_grad_B_to_keep = 0.03;
+	}
+	for (int j_limit = 0; j_limit < 2; j_limit++) {
+	  CAPTURE(j_limit);
+	  if (j_limit == 0) {
+	    // Limited by max_attempts_per_proc
+	    scan.max_attempts_per_proc = 30;  
+	    scan.max_keep_per_proc = 1000;
+	  } else {
+	    // Limited by max_keep_per_proc
+	    scan.max_attempts_per_proc = 10000;
+	    scan.max_keep_per_proc = 4;
+	  }
+
+	  for (int j_deterministic = 0; j_deterministic < 2; j_deterministic++) {
+	    CAPTURE(j_deterministic);
+	    scan.deterministic = (bool) j_deterministic;
+	    
+	    // Run the scans (without reading an input file):
+	    scan.random();
+	  
+	    if (proc0) {
+	      if (j_limit == 0) {
+		// Limited by max_attempts_per_proc
+		CHECK(scan.filters[qsc::ATTEMPTS] == scan.max_attempts_per_proc * n_procs);
+		if (scan.keep_all) CHECK(scan.n_scan == scan.max_attempts_per_proc * n_procs);
+	      } else {
+		// Limited by max_keep_per_proc
+		CHECK(scan.n_scan == scan.max_keep_per_proc * n_procs);
+	      }
+	    }
+	  }
+	}
+      }
+    }
+  }
+}
