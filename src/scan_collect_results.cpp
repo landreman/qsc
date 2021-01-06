@@ -39,6 +39,7 @@ void Scan::collect_results(int n_parameters,
 
     // Note mpi_rank is used as the tag
     MPI_Send(           &filters_local[0],                     N_FILTERS, MPI_UNSIGNED_LONG_LONG, 0, mpi_rank, mpi_comm);
+    MPI_Send(            &timing_local[0],                       N_TIMES,           MPI_QSCFLOAT, 0, mpi_rank, mpi_comm);
     MPI_Send(        &parameters_local[0],         n_parameters * j_scan,           MPI_QSCFLOAT, 0, mpi_rank, mpi_comm);
     MPI_Send(&fourier_parameters_local[0], n_fourier_parameters * j_scan,           MPI_QSCFLOAT, 0, mpi_rank, mpi_comm);
     MPI_Send(    &int_parameters_local[0],     n_int_parameters * j_scan,                MPI_INT, 0, mpi_rank, mpi_comm);
@@ -52,14 +53,18 @@ void Scan::collect_results(int n_parameters,
     std::cout << "Transferring results to proc 0 at time " << elapsed.count() << std::endl;
 
     std::valarray<big> filters_combined(N_FILTERS * n_procs);
+    Vector timing_combined(N_TIMES * n_procs);
     std::valarray<big> n_solves_kept(n_procs);
     std::valarray<big> attempts_per_proc(n_procs);
     for (j = 0; j < N_FILTERS; j++) filters_combined[j] = filters_local[j];
+    for (j = 0; j < N_TIMES; j++) timing_combined[j] = timing_local[j];
     // Receive results from all procs about how many runs were kept, etc
     for (j = 1; j < n_procs; j++) {
       // Use mpi_rank as the tag
       MPI_Recv(&filters_combined[N_FILTERS * j], N_FILTERS,
 	       MPI_UNSIGNED_LONG_LONG, j, j, mpi_comm, &mpi_status);
+      MPI_Recv(&timing_combined[N_TIMES * j], N_TIMES,
+	       MPI_QSCFLOAT, j, j, mpi_comm, &mpi_status);
     }
     // Add up numbers from all procs:
     for (j = 0; j < N_FILTERS; j++) filters[j] = 0;
@@ -70,6 +75,13 @@ void Scan::collect_results(int n_parameters,
       attempts_per_proc[k] = filters_combined[ATTEMPTS + k * N_FILTERS];
       n_solves_kept[k]     = filters_combined[KEPT + k * N_FILTERS];
     }
+    for (j = 0; j < N_TIMES; j++) timing[j] = 0;
+    for (k = 0; k < n_procs; k++) {
+      for (j = 0; j < N_TIMES; j++) {
+	timing[j] += timing_combined[j + k * N_TIMES];
+      }
+    }
+    qscfloat timing_total = timing_combined.sum();
 
     n_scan = filters[KEPT];
 
@@ -159,7 +171,7 @@ void Scan::collect_results(int n_parameters,
       scan_helicity[j] = int_parameters[0 + j * n_int_parameters];
       
       for (k = 0; k < axis_nmax_plus_1; k++) {
-	scan_R0c(k, j) = fourier_parameters(k + 0 * axis_nmax_plus_1, j);
+ 	scan_R0c(k, j) = fourier_parameters(k + 0 * axis_nmax_plus_1, j);
 	scan_R0s(k, j) = fourier_parameters(k + 1 * axis_nmax_plus_1, j);
 	scan_Z0c(k, j) = fourier_parameters(k + 2 * axis_nmax_plus_1, j);
 	scan_Z0s(k, j) = fourier_parameters(k + 3 * axis_nmax_plus_1, j);
@@ -206,6 +218,36 @@ void Scan::collect_results(int n_parameters,
 	      << " (" << filter_fractions[KEPT] << ")" << std::endl;
     std::cout << "  Kept + rejected:                   " << std::setw(width) << n_scan + total_rejected
 	      << std::endl;
+    
+    std::cout << std::setprecision(4) << "Time elapsed, summed over processors:" << std::endl;
+    width = 10;
+    
+    std::cout << "  Time for random number generation: " << std::setw(width) << timing[TIME_RANDOM]
+	      << " (" << timing[TIME_RANDOM] / timing_total << ")" << std::endl;
+    
+    std::cout << "  Time for init_axis:                " << std::setw(width) << timing[TIME_INIT_AXIS]
+	      << " (" << timing[TIME_INIT_AXIS] / timing_total << ")" << std::endl;
+    
+    std::cout << "  Time for solving sigma equation:   " << std::setw(width) << timing[TIME_SIGMA_EQUATION]
+	      << " (" << timing[TIME_SIGMA_EQUATION] / timing_total << ")" << std::endl;
+    
+    std::cout << "  Time for O(r^1) diagnostics:       " << std::setw(width) << timing[TIME_R1_DIAGNOSTICS]
+	      << " (" << timing[TIME_R1_DIAGNOSTICS] / timing_total << ")" << std::endl;
+
+    if (q.at_least_order_r2) {
+      std::cout << "  Time for calculate_r2:             " << std::setw(width) << timing[TIME_CALCULATE_R2]
+		<< " (" << timing[TIME_CALCULATE_R2] / timing_total << ")" << std::endl;
+    
+      std::cout << "  Time for mercier:                  " << std::setw(width) << timing[TIME_MERCIER]
+		<< " (" << timing[TIME_MERCIER] / timing_total << ")" << std::endl;
+    
+      std::cout << "  Time for grad grad B tensor:       " << std::setw(width) << timing[TIME_GRAD_GRAD_B_TENSOR]
+		<< " (" << timing[TIME_GRAD_GRAD_B_TENSOR] / timing_total << ")" << std::endl;
+    
+      std::cout << "  Time for r_singularity:            " << std::setw(width) << timing[TIME_R_SINGULARITY]
+		<< " (" << timing[TIME_R_SINGULARITY] / timing_total << ")" << std::endl;
+    }
+    
     if (n_scan < 1000) {
       std::cout << std::setprecision(2) << std::endl;
       std::cout << "min_R0: " << scan_min_R0 << std::endl;

@@ -69,9 +69,11 @@ void Scan::random() {
   q.Z0s.resize(axis_nmax_plus_1, 0.0);
 
   std::chrono::time_point<std::chrono::steady_clock> end_time, checkpoint_time;
+  std::chrono::time_point<std::chrono::steady_clock> section_start_time, section_end_time;
   start_time = std::chrono::steady_clock::now();
   checkpoint_time = start_time;
   std::chrono::duration<double> elapsed;
+  for (j = 0; j < N_TIMES; j++) timing_local[j] = 0.0;
 
   // Initialize the Qsc object:
   q.validate();
@@ -105,6 +107,7 @@ void Scan::random() {
     // the random number generation is likely to take much of the
     // overall time for a scan, so let's just get the random values
     // here.
+    section_start_time = std::chrono::steady_clock::now();
     q.eta_bar = random_eta_bar.get();
     q.sigma0 = random_sigma0.get();
     if (q.at_least_order_r2) {
@@ -127,12 +130,19 @@ void Scan::random() {
       }
     }
     R0_at_0 = q.R0c.sum();
+    section_end_time = std::chrono::steady_clock::now();
+    elapsed = section_end_time - section_start_time;
+    timing_local[TIME_RANDOM] += elapsed.count();
     if (R0_at_0 <= 0 || R0_at_half_period <= 0) {
       filters_local[REJECTED_DUE_TO_R0_CRUDE]++;
       continue;
     }
 
+    section_start_time = std::chrono::steady_clock::now();
     q.init_axis();
+    section_end_time = std::chrono::steady_clock::now();
+    elapsed = section_end_time - section_start_time;
+    timing_local[TIME_INIT_AXIS] += elapsed.count();
     if (!keep_all && q.grid_min_R0 < min_R0_to_keep) {
       filters_local[REJECTED_DUE_TO_R0]++;
       continue;
@@ -143,10 +153,18 @@ void Scan::random() {
     }
 
     // Here is the main O(r^1) solve:
+    section_start_time = std::chrono::steady_clock::now();
     q.solve_sigma_equation();
+    section_end_time = std::chrono::steady_clock::now();
+    elapsed = section_end_time - section_start_time;
+    timing_local[TIME_SIGMA_EQUATION] += elapsed.count();
     filters_local[N_SIGMA_EQ_SOLVES]++;
     
+    section_start_time = std::chrono::steady_clock::now();
     q.r1_diagnostics();
+    section_end_time = std::chrono::steady_clock::now();
+    elapsed = section_end_time - section_start_time;
+    timing_local[TIME_R1_DIAGNOSTICS] += elapsed.count();
     if (!keep_all && std::abs(q.iota) < min_iota_to_keep) {
       filters_local[REJECTED_DUE_TO_IOTA]++;
       continue;
@@ -162,8 +180,12 @@ void Scan::random() {
 
     if (q.at_least_order_r2) {
       // Here is the main O(r^2) solve:
+      section_start_time = std::chrono::steady_clock::now();
       q.calculate_r2();
       filters_local[N_R2_SOLVES]++;
+      section_end_time = std::chrono::steady_clock::now();
+      elapsed = section_end_time - section_start_time;
+      timing_local[TIME_CALCULATE_R2] += elapsed.count();
 
       // Filter results:
       if (!keep_all && q.B20_grid_variation > max_B20_variation_to_keep) {
@@ -171,7 +193,11 @@ void Scan::random() {
 	continue;
       }
 
+      section_start_time = std::chrono::steady_clock::now();
       q.mercier();
+      section_end_time = std::chrono::steady_clock::now();
+      elapsed = section_end_time - section_start_time;
+      timing_local[TIME_MERCIER] += elapsed.count();
       if (!keep_all && q.d2_volume_d_psi2 > max_d2_volume_d_psi2_to_keep) {
 	filters_local[REJECTED_DUE_TO_D2_VOLUME_D_PSI2]++;
 	continue;
@@ -181,13 +207,21 @@ void Scan::random() {
 	continue;
       }
 
+      section_start_time = std::chrono::steady_clock::now();
       q.calculate_grad_grad_B_tensor();
+      section_end_time = std::chrono::steady_clock::now();
+      elapsed = section_end_time - section_start_time;
+      timing_local[TIME_GRAD_GRAD_B_TENSOR] += elapsed.count();
       if (!keep_all && q.grid_min_L_grad_grad_B < min_L_grad_grad_B_to_keep) {
 	filters_local[REJECTED_DUE_TO_L_GRAD_GRAD_B]++;
 	continue;
       }
 
+      section_start_time = std::chrono::steady_clock::now();
       q.calculate_r_singularity();
+      section_end_time = std::chrono::steady_clock::now();
+      elapsed = section_end_time - section_start_time;
+      timing_local[TIME_R_SINGULARITY] += elapsed.count();
       if (!keep_all && q.r_singularity_robust < min_r_singularity_to_keep) {
 	filters_local[REJECTED_DUE_TO_R_SINGULARITY]++;
 	continue;

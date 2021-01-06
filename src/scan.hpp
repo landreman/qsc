@@ -35,11 +35,23 @@ namespace qsc {
     N_SIGMA_EQ_SOLVES,
     N_R2_SOLVES,
     N_FILTERS};
+
+  enum {
+    TIME_RANDOM,
+    TIME_INIT_AXIS,
+    TIME_SIGMA_EQUATION,
+    TIME_R1_DIAGNOSTICS,
+    TIME_CALCULATE_R2,
+    TIME_MERCIER,
+    TIME_GRAD_GRAD_B_TENSOR,
+    TIME_R_SINGULARITY,
+    N_TIMES};
     
   class Scan {
   private:
     big filters_local[N_FILTERS];
     std::chrono::time_point<std::chrono::steady_clock> start_time;
+    qscfloat timing_local[N_TIMES];
     void defaults();
     void collect_results(int, Matrix&, Matrix&, int, std::valarray<int>&, big);
     
@@ -53,7 +65,7 @@ namespace qsc {
     Vector R0c_min, R0c_max, R0s_min, R0s_max, Z0c_min, Z0c_max, Z0s_min, Z0s_max;
     qscfloat max_seconds, save_period;
     big n_scan, filters[N_FILTERS];
-    qscfloat filter_fractions[N_FILTERS];
+    qscfloat filter_fractions[N_FILTERS], timing[N_TIMES];
     int max_keep_per_proc, max_attempts_per_proc; // Can I read in a "big" from toml?
     qscfloat min_R0_to_keep, min_iota_to_keep, max_elongation_to_keep;
     qscfloat min_L_grad_B_to_keep, min_L_grad_grad_B_to_keep;
