@@ -54,6 +54,7 @@ message("BLA_VENDOR: ${BLA_VENDOR}")
 find_package(MPI REQUIRED)
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
+find_package(GSL REQUIRED)
 
 # Tell "make" to print out the commands used for compiling and linking:
 set(CMAKE_VERBOSE_MAKEFILE on)
@@ -98,7 +99,7 @@ endif()
 
 add_library(${QSC_LIB} ${SOURCES})
 # Below, PUBLIC means that anything that links to qsc must also link to MPI, BLAS, & LAPACK.
-target_link_libraries(${QSC_LIB} PUBLIC MPI::MPI_CXX ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${NETCDF_LIBRARIES})
+target_link_libraries(${QSC_LIB} PUBLIC MPI::MPI_CXX ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${NETCDF_LIBRARIES} ${GSL_LIBRARIES})
 
 # toml11 requires c++11
 set_property(TARGET ${QSC_LIB} PROPERTY CXX_STANDARD 11)
@@ -155,10 +156,9 @@ else()
 endif()
 
 
-find_package(GSL)
-message("GSL_FOUND = ${GSL_FOUND}")
-if(GSL_FOUND)
-  message("Found GSL")
-else()
-  message("Could not find GSL")
-endif()
+#message("GSL_FOUND = ${GSL_FOUND}")
+#if(GSL_FOUND)
+#  message("Found GSL")
+#else()
+#  message("Could not find GSL")
+#endif()

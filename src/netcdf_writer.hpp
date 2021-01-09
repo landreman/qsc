@@ -1,3 +1,4 @@
+#include <vector>
 #include <netcdf.h>
 #include "qsc.hpp"
 

@@ -1,7 +1,8 @@
 # This is a sample input file
 
- general_option = 'single'
+# general_option = 'single'
 #general_option = 'random'
+ general_option = 'opt'
 
 [qsc]
 nfp = 4
@@ -38,3 +39,9 @@ max_seconds = 0.1
 save_period = 2
 max_attempts_per_proc = 100000
 max_keep_per_proc = 100000
+
+[opt]
+
+vary_sigma0 = true
+vary_B2s = 1
+# vary_R0c = [0, 0, 1]

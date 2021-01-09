@@ -22,11 +22,17 @@ void qsc::toml_read(std::vector<std::string>& varlist, toml::value indata, std::
   */
 }
 
-/** Handle bools
+/** Handle bools.
+ * User should be able to enter true, false, 1, or 0.
  */
 void qsc::toml_read(std::vector<std::string>& varlist, toml::value indata, std::string varname, bool& var) {
   if (indata.contains(varname)) {
-    var = toml::find<bool>(indata, varname);
+    auto vx = toml::find(indata, varname);
+    if (vx.is_boolean()) {
+      var = vx.as_boolean(std::nothrow);
+    } else {
+      var = static_cast<bool>(vx.as_integer());
+    }
   }
   varlist.push_back(varname);
 }
@@ -65,6 +71,18 @@ void qsc::toml_read(std::vector<std::string>& varlist, toml::value indata, std::
     // Convert the std::vector<double> to a Vector:
     var.resize(indata_vector.size(), 0.0);
     for (int j = 0; j < indata_vector.size(); j++) var[j] = (qscfloat)indata_vector[j];
+  }
+  varlist.push_back(varname);
+}
+
+/** Handle valarray<bool>
+ */
+void qsc::toml_read(std::vector<std::string>& varlist, toml::value indata, std::string varname, std::valarray<bool>& var) {
+  if (indata.contains(varname)) {
+    auto indata_vector = toml::find<std::vector<bool>>(indata, varname);
+    // Convert the std::vector<bool> to a Vector:
+    var.resize(indata_vector.size(), true);
+    for (int j = 0; j < indata_vector.size(); j++) var[j] = indata_vector[j];
   }
   varlist.push_back(varname);
 }

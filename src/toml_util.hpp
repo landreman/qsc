@@ -2,6 +2,7 @@
 #define QSC_TOML_UTIL_H
 
 #include <vector>
+#include <valarray>
 #include "qsc.hpp"
 
 namespace qsc {
@@ -23,6 +24,10 @@ namespace qsc {
   /** Handle Vectors
    */
   void toml_read(std::vector<std::string>& varlist, toml::value indata, std::string varname, Vector& var);
+  
+  /** Handle valarray<bool>
+   */
+  void toml_read(std::vector<std::string>& varlist, toml::value indata, std::string varname, std::valarray<bool>& var);
   
   /** Expand a Vector to a longer size, padding with zeros.
    */
