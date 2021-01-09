@@ -13,8 +13,9 @@ if len(sys.argv) != 2:
    raise RuntimeError("A qsc_out.*.nc file must be provided as an argument")
 
 filename = sys.argv[1]
+bare_filename = os.path.basename(filename)
 s = 'qsc_out.'
-if filename[:len(s)] != s or filename[-3:] != '.nc':
+if bare_filename[:len(s)] != s or filename[-3:] != '.nc':
    raise RuntimeError("A qsc_out.*.nc file must be provided as an argument")
    
 f = netcdf.netcdf_file(filename, 'r', mmap=False)

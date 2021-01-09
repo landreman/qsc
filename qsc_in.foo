@@ -5,21 +5,21 @@
  general_option = 'opt'
 
 [qsc]
-nfp = 4
+nfp = 2
 # I can put comments here
-nphi = 5
+nphi = 31
 eta_bar = -1.1
 #R0c = [1.0, 0.3, 0.09]
 
-verbose = 1
+verbose = 0
 sG=-1
 
  order_r_option = "r2"
 
 #R0c = [1.0]
 #Z0s = [0.0]
- R0c = [1.0, 0.04, 0.002]
- Z0s = [0.0, 0.03]
+ R0c = [1.0, 0.2, 0.001]
+ Z0s = [0.0, 0.2]
 
 [scan]
 
@@ -42,8 +42,8 @@ max_keep_per_proc = 100000
 
 [opt]
 
-verbose = 2
-max_iter = 10000
+verbose = 1
+max_iter = 50
 
 # vary_sigma0 = true
 # vary_B2s = 1

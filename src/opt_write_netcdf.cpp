@@ -29,8 +29,8 @@ void Opt::write_netcdf() {
   nc.put(n_iter_dim, "iter_grad_grad_B_term", iter_grad_grad_B_term, "grad grad B term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_eta_bar", iter_eta_bar, "eta_bar at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_sigma0", iter_sigma0, "sigma0 at each iteration", "dimensionless");
-  nc.put(n_iter_dim, "iter_B2s", iter_B2c, "B2s at each iteration", "dimensionless");
-  nc.put(n_iter_dim, "iter_B2c", iter_B2s, "B2c at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_B2c", iter_B2c, "B2c at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_B2s", iter_B2s, "B2s at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_min_R0", iter_min_R0, "Min_R0 at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_max_curvature", iter_max_curvature, "max_curvature at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_iota", iter_iota, "iota at each iteration", "dimensionless");

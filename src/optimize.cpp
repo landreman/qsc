@@ -10,7 +10,7 @@
 
 int gsl_residual_function(const gsl_vector*, void*, gsl_vector*);
 void gsl_callback(const size_t, void*, const gsl_multifit_nlinear_workspace*);
-		  
+
 using namespace qsc;
 
 void Opt::optimize() {
@@ -25,6 +25,11 @@ void Opt::optimize() {
   n_iter = 0;
   q.init();
   
+  if (!q.at_least_order_r2) {
+    std::cout << "Optimization presently only works with O(r^2)." << std::endl;
+    return;
+  }
+
   gsl_vector *gsl_residual = gsl_vector_alloc(n_terms);
   gsl_vector *gsl_state_vector = gsl_vector_alloc(n_parameters);
   gsl_multifit_nlinear_fdf gsl_optimizer;
@@ -43,9 +48,11 @@ void Opt::optimize() {
   gsl_optimizer_params.h_fvv = 1.0e-5;
   */
 
-  // Set initial condition
+  // Set initial condition. This would be an invalid cast if SINGLE.
+#ifndef SINGLE
   set_state_vector(gsl_state_vector->data);
-
+#endif
+  
   switch (algorithm) {
   case GSL_LM:
     gsl_optimizer_params.trs = gsl_multifit_nlinear_trs_lm;
@@ -77,10 +84,13 @@ void Opt::optimize() {
   gsl_vector * x = gsl_multifit_nlinear_position(work);
   int info;
 
+  // GSL runs 1 more iteration than I want it to:
+  int max_iter_for_gsl = max_iter - 1;
+  
   // Run the optimization
   gsl_multifit_nlinear_init(gsl_state_vector, &gsl_optimizer, work);
-  gsl_multifit_nlinear_driver(max_iter, xtol, gtol, ftol,
-			      gsl_callback, (void*)this, &info, work);
+  gsl_multifit_nlinear_driver(max_iter_for_gsl, xtol, gtol, ftol,
+				gsl_callback, (void*)this, &info, work);
 
   if (verbose > 0) {
     std::cout << "----- Results from the optimization -----" << std::endl;
@@ -108,12 +118,24 @@ int gsl_residual_function(const gsl_vector * x, void *params, gsl_vector * f) {
     std::cout << std::endl << std::flush;
   }
 
+  /*
+  if (n_iter >= max_iter - 1) {
+    // Trick GSL into stopping by just returning the same residual as last time,
+    // so it thinks the gradient is 0.
+    opt->set_residuals(f);
+    return GSL_SUCCESS;
+  }
+  */
+  
   // gsl vectors have a 'stride'. Only if the stride is 1 does the layout of a gsl vector correspond to a standard double array.
   // Curran pointed out that the stride for f may not be 1!
   // See https://github.com/PrincetonUniversity/STELLOPT/commit/5820c453283785ffd97e40aec261ca97f76e9071
   assert(x->stride == 1);
 
+  // This unpack_state_vector call would be an invalid cast if SINGLE.
+#ifndef SINGLE
   opt->unpack_state_vector(x->data);
+#endif
   opt->q.calculate();
   opt->set_residuals(f);
 
@@ -514,12 +536,31 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
 
 void gsl_callback(const size_t iter, void *params,
 		  const gsl_multifit_nlinear_workspace *w) {
+  int j;
+  
   Opt* opt = (Opt*) params;
   int n_iter = opt->n_iter; // Shorthand
-  
-  if (opt->verbose > 0) {
-    std::cout << "gsl_callback called." << std::endl;
+
+  gsl_vector *x = gsl_multifit_nlinear_position(w);
+  gsl_vector *f = gsl_multifit_nlinear_residual(w);
+
+  if (opt->verbose > 1) {
+    std::cout << "gsl_callback called. n_iter=" << opt->n_iter << "  GSL iter=" << iter << std::endl;
+    std::cout << "  State vector in callback:";
+    for (j = 0; j < opt->n_parameters; j++)
+      std::cout << " " << x->data[j];
+    std::cout << std::endl << std::flush;
   }
+
+  // A foolproof way to make sure the inputs and outputs are
+  // consistent is to just re-run Qsc. This is not as efficient as it
+  // could be.
+#ifndef SINGLE
+  // This next line does not compile if SINGLE.
+  opt->unpack_state_vector(x->data);
+#endif
+  opt->q.calculate();
+  opt->set_residuals(f);
   
   opt->iter_objective_function[n_iter] = opt->objective_function;
   opt->iter_B20_term[n_iter] = opt->B20_term;
@@ -533,6 +574,28 @@ void gsl_callback(const size_t iter, void *params,
   opt->iter_grad_grad_B_term[n_iter] = opt->grad_grad_B_term;
 
   opt->iter_eta_bar[n_iter] = opt->q.eta_bar;
+  opt->iter_sigma0[n_iter] = opt->q.sigma0;
+  opt->iter_B2c[n_iter] = opt->q.B2c;
+  opt->iter_B2s[n_iter] = opt->q.B2s;
+  opt->iter_min_R0[n_iter] = opt->q.grid_min_R0;
+  opt->iter_max_curvature[n_iter] = opt->q.grid_max_curvature;
+  opt->iter_iota[n_iter] = opt->q.iota;
+  opt->iter_max_elongation[n_iter] = opt->q.grid_max_elongation;
+  opt->iter_min_L_grad_B[n_iter] = opt->q.grid_min_L_grad_B;
+  opt->iter_min_L_grad_grad_B[n_iter] = opt->q.grid_min_L_grad_grad_B;
+  opt->iter_r_singularity[n_iter] = opt->q.r_singularity_robust;
+  opt->iter_B20_variation[n_iter] = opt->q.B20_grid_variation;
+  opt->iter_B20_residual[n_iter] = opt->q.B20_residual;
+  opt->iter_d2_volume_d_psi2[n_iter] = opt->q.d2_volume_d_psi2;
+  opt->iter_DMerc_times_r2[n_iter] = opt->q.DMerc_times_r2;
+  opt->iter_standard_deviation_of_R[n_iter] = opt->q.standard_deviation_of_R;
+  opt->iter_standard_deviation_of_Z[n_iter] = opt->q.standard_deviation_of_Z;
+  for (j = 0; j < opt->q.R0c.size(); j++) {
+    opt->iter_R0c(j, n_iter) = opt->q.R0c[j];
+    opt->iter_R0s(j, n_iter) = opt->q.R0s[j];
+    opt->iter_Z0c(j, n_iter) = opt->q.Z0c[j];
+    opt->iter_Z0s(j, n_iter) = opt->q.Z0s[j];
+  }
     
   opt->n_iter++;
 }
