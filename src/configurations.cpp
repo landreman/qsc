@@ -150,5 +150,6 @@ Qsc::Qsc(std::string config_name) {
     throw std::runtime_error("Configuration name not recognized");
   }
 
+  init();
   calculate();
 }

@@ -38,6 +38,7 @@ TEST_CASE("Compare Shafranov shift to VMEC and textbook expressions for a circul
     for (q.spsi = -1; q.spsi <= 1; q.spsi += 2) {
       CAPTURE(q.sG);
       CAPTURE(q.spsi);
+      q.init();
       q.calculate();
 
       CHECK(Approx(q.iota) == q.sG * q.I2 * R0 / q.B0);

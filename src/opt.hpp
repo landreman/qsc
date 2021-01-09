@@ -3,17 +3,22 @@
 
 #include <valarray>
 #include <vector>
+#include <gsl/gsl_vector.h>
 #include "qsc.hpp"
 
 namespace qsc {
 
+  typedef enum {
+    GSL_LM,
+    GSL_DOGLEG,
+    GSL_DDOGLEG,
+    GSL_SUBSPACE2D
+  } algorithm_type;
+  
   class Opt {
   private:
     void defaults();
     void init();
-    void set_state_vector(qscfloat*);
-    void unpack_state_vector(qscfloat*);
-    void set_residuals(qscfloat*);
     
   public:
     Qsc q;
@@ -24,6 +29,8 @@ namespace qsc {
     Vector arclength_factor;
     bool make_names;
     std::vector<std::string> state_vector_names, residual_names;
+    algorithm_type algorithm;
+    Vector residuals;
 
     bool vary_eta_bar, vary_sigma0;
     bool vary_B2c, vary_B2s;
@@ -35,6 +42,13 @@ namespace qsc {
     qscfloat weight_XY2, weight_XY2Prime;
     qscfloat weight_XY3, weight_XY3Prime;
     qscfloat weight_grad_grad_B;
+
+    qscfloat objective_function;
+    qscfloat B20_term, iota_term;
+    qscfloat R0_term, d2_volume_d_psi2_term;
+    qscfloat XY2_term, XY2Prime_term;
+    qscfloat XY3_term, XY3Prime_term;
+    qscfloat grad_grad_B_term;
 
     Vector iter_objective_function;
     Vector iter_B20_term, iter_iota_term;
@@ -58,6 +72,9 @@ namespace qsc {
     void input(std::string);
     void optimize();
     void write_netcdf();
+    void set_state_vector(qscfloat*);
+    void unpack_state_vector(qscfloat*);
+    void set_residuals(gsl_vector *);
   };
 }
 

@@ -5,16 +5,46 @@ using namespace qsc;
 
 void Opt::write_netcdf() {
   if (verbose > 0) std::cout << "Writing output to " << outfilename << std::endl;
-  /*
   qsc::NetCDFWriter nc(outfilename);
 
   // Define dimensions
-  dim_id_type nphi_dim, axis_nmax_plus_1_dim, n_scan_dim;
+  dim_id_type nphi_dim, axis_nmax_plus_1_dim, n_iter_dim;
   nphi_dim = nc.dim("nphi", q.nphi);
-  axis_nmax_plus_1_dim = nc.dim("axis_nmax_plus_1", R0c_max.size());
-  n_scan_dim = nc.dim("n_scan", n_scan);
+  axis_nmax_plus_1_dim = nc.dim("axis_nmax_plus_1", q.R0c.size());
+  n_iter_dim = nc.dim("n_iter", n_iter);
   
   // Scalars
+  nc.put("n_iter", n_iter, "Number of optimization iterations saved", "dimensionless");
+
+  // 1D Vectors
+  nc.put(n_iter_dim, "iter_objective_function", iter_objective_function, "Total objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_B20_term", iter_B20_term, "B20 term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_iota_term", iter_iota_term, "Iota term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_R0_term", iter_R0_term, "R0 term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_d2_volume_d_psi2_term", iter_d2_volume_d_psi2_term, "Magnetic well term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_XY2_term", iter_XY2_term, "(X2,Y2) term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_XY2Prime_term", iter_XY2Prime_term, "(d_X2_d_varphi, d_Y2_d_varphi) term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_XY3_term", iter_XY3_term, "(X3,Y3) term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_XY3Prime_term", iter_XY3Prime_term, "(d_X3_d_varphi, d_Y3_d_varphi) term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_grad_grad_B_term", iter_grad_grad_B_term, "grad grad B term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_eta_bar", iter_eta_bar, "eta_bar at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_sigma0", iter_sigma0, "sigma0 at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_B2s", iter_B2c, "B2s at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_B2c", iter_B2s, "B2c at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_min_R0", iter_min_R0, "Min_R0 at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_max_curvature", iter_max_curvature, "max_curvature at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_iota", iter_iota, "iota at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_max_elongation", iter_max_elongation, "max_elongation at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_min_L_grad_B", iter_min_L_grad_B, "min_L_grad_B at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_min_L_grad_grad_B", iter_min_L_grad_grad_B, "min_L_grad_grad_B at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_r_singularity", iter_r_singularity, "r_singularity at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_B20_variation", iter_B20_variation, "B20_variation at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_B20_residual", iter_B20_residual, "B20_residual at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_d2_volume_d_psi2", iter_d2_volume_d_psi2, "d2_volume_d_psi2 at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_DMerc_times_r2", iter_DMerc_times_r2, "DMerc_times_r2 at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_standard_deviation_of_R", iter_standard_deviation_of_R, "standard_deviation_of_R at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_standard_deviation_of_Z", iter_standard_deviation_of_Z, "standard_deviation_of_Z at each iteration", "dimensionless");
+  /*
   std::string general_option = "random";
   nc.put("general_option", general_option, "Whether this job was a single configuration vs a scan");
   
@@ -146,9 +176,9 @@ void Opt::write_netcdf() {
   nc.put(axis_nmax_plus_1_n_scan_dim, "scan_R0s", &scan_R0s(0, 0), "For each configuration kept from the scan, the amplitudes of the sin(n*phi) components of the major radius of the magnetic axis", "meter");
   nc.put(axis_nmax_plus_1_n_scan_dim, "scan_Z0c", &scan_Z0c(0, 0), "For each configuration kept from the scan, the amplitudes of the cos(n*phi) components of the Cartesian Z coordinate of the magnetic axis", "meter");
   nc.put(axis_nmax_plus_1_n_scan_dim, "scan_Z0s", &scan_Z0s(0, 0), "For each configuration kept from the scan, the amplitudes of the sin(n*phi) components of the Cartesian Z coordinate of the magnetic axis", "meter");
+  */
  
   // Done defining the NetCDF data.
   nc.write_and_close();
   
-  */
 }

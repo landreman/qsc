@@ -1,11 +1,16 @@
 #include <fstream>
 #include <string>
 #include <stdexcept>
+#include <cassert>
+#include <iomanip>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_multifit_nlinear.h>
 #include "opt.hpp"
 
+int gsl_residual_function(const gsl_vector*, void*, gsl_vector*);
+void gsl_callback(const size_t, void*, const gsl_multifit_nlinear_workspace*);
+		  
 using namespace qsc;
 
 void Opt::optimize() {
@@ -18,11 +23,105 @@ void Opt::optimize() {
 
   init();
   n_iter = 0;
+  q.init();
+  
   gsl_vector *gsl_residual = gsl_vector_alloc(n_terms);
   gsl_vector *gsl_state_vector = gsl_vector_alloc(n_parameters);
   gsl_multifit_nlinear_fdf gsl_optimizer;
   gsl_multifit_nlinear_parameters gsl_optimizer_params = gsl_multifit_nlinear_default_parameters();
+  gsl_optimizer.f = gsl_residual_function;
+  // gsl_optimizer.df = gsl_residual_function_and_Jacobian;
+  // gsl_optimizer.fvv = func_fvv;
+  gsl_optimizer.df = NULL;
+  gsl_optimizer.fvv = NULL;
+  gsl_optimizer.n = n_terms;
+  gsl_optimizer.p = n_parameters;
+  gsl_optimizer.params = (void*)this;
+  /*
+  // Set finite difference step sizes:
+  gsl_optimizer_params.h_df = 1.0e-5;
+  gsl_optimizer_params.h_fvv = 1.0e-5;
+  */
+
+  // Set initial condition
+  set_state_vector(gsl_state_vector->data);
+
+  switch (algorithm) {
+  case GSL_LM:
+    gsl_optimizer_params.trs = gsl_multifit_nlinear_trs_lm;
+    break;
+  case GSL_DOGLEG:
+    gsl_optimizer_params.trs = gsl_multifit_nlinear_trs_dogleg;
+    break;
+  case GSL_DDOGLEG:
+    gsl_optimizer_params.trs = gsl_multifit_nlinear_trs_ddogleg;
+    break;
+  case GSL_SUBSPACE2D:
+    gsl_optimizer_params.trs = gsl_multifit_nlinear_trs_subspace2D;
+    break;
+  default:
+    throw std::runtime_error("Error! in optimize_least_squares_gsl.cpp switch! Should not get here!");
+  }
+
+  // Set other optimizer parameters
+  gsl_optimizer_params.solver = gsl_multifit_nlinear_solver_cholesky;
+  // For the above option, there is a trade-off between speed vs
+  // robustness when the problem may be rank-deficient. Other options
+  // are described in the GSL documentation.
+  const gsl_multifit_nlinear_type *T = gsl_multifit_nlinear_trust;
+  const double xtol = 1.0e-8;
+  const double gtol = 1.0e-8;
+  const double ftol = 1.0e-8;
+  gsl_multifit_nlinear_workspace *work = gsl_multifit_nlinear_alloc(T, &gsl_optimizer_params, n_terms, n_parameters);
+  gsl_vector * f = gsl_multifit_nlinear_residual(work);
+  gsl_vector * x = gsl_multifit_nlinear_position(work);
+  int info;
+
+  // Run the optimization
+  gsl_multifit_nlinear_init(gsl_state_vector, &gsl_optimizer, work);
+  gsl_multifit_nlinear_driver(max_iter, xtol, gtol, ftol,
+			      gsl_callback, (void*)this, &info, work);
+
+  if (verbose > 0) {
+    std::cout << "----- Results from the optimization -----" << std::endl;
+    std::cout << "n_iter: " << n_iter << "  niter from GSL: "
+	      << gsl_multifit_nlinear_niter(work) << std::endl;
+    std::cout << "# of function evals: " << gsl_optimizer.nevalf << std::endl;
+  }
+
+  gsl_multifit_nlinear_free(work);
+  gsl_vector_free(gsl_residual);
+  gsl_vector_free(gsl_state_vector);
+  if (verbose > 0) std::cout << "Goodbye from optimize" << std::endl;
 }
+
+//////////////////////////////////////////////////////////////////////////////
+
+int gsl_residual_function(const gsl_vector * x, void *params, gsl_vector * f) {
+  Opt* opt = (Opt*) params;
+
+  if (opt->verbose > 1) {
+    std::cout << "Hello from gsl_residual_function. f stride = " << f->stride << std::endl;
+    std::cout << "State vector:";
+    for (int j = 0; j < opt->n_parameters; j++)
+      std::cout << " " << x->data[j];
+    std::cout << std::endl << std::flush;
+  }
+
+  // gsl vectors have a 'stride'. Only if the stride is 1 does the layout of a gsl vector correspond to a standard double array.
+  // Curran pointed out that the stride for f may not be 1!
+  // See https://github.com/PrincetonUniversity/STELLOPT/commit/5820c453283785ffd97e40aec261ca97f76e9071
+  assert(x->stride == 1);
+
+  opt->unpack_state_vector(x->data);
+  opt->q.calculate();
+  opt->set_residuals(f);
+
+  if (opt->verbose > 1) std::cout << "Goodbye from gsl_residual_function" << std::endl << std::flush;
+  return GSL_SUCCESS;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 
 void Opt::init() {
   int j;
@@ -147,6 +246,8 @@ void Opt::init() {
     throw std::runtime_error("There must be at least 1 parameter varied.");
   if (n_terms < 1)
     throw std::runtime_error("There must be at least 1 residual term.");
+  residuals.resize(n_terms, 0.0);
+
 }
 
 /** Set the optimization state vector from values from the Qsc object.
@@ -249,18 +350,22 @@ void Opt::unpack_state_vector(qscfloat *state_vector) {
 
 /** Set the vector of residuals using values from the Qsc object.
  */
-void Opt::set_residuals(qscfloat* residuals) {
+void Opt::set_residuals(gsl_vector* gsl_residual) {
   int j, k;
   j = 0;
   qscfloat term;
   arclength_factor = sqrt(q.d_l_d_phi) * (q.d_phi * q.nfp / q.axis_length);
 
-  qscfloat objective_function = 0.0;
-  qscfloat B20_term = 0.0, iota_term = 0.0;
-  qscfloat R0_term = 0.0, d2_volume_d_psi2_term = 0.0;
-  qscfloat XY2_term = 0.0, XY2Prime_term = 0.0;
-  qscfloat XY3_term = 0.0, XY3Prime_term = 0.0;
-  qscfloat grad_grad_B_term = 0.0;
+  objective_function = 0.0;
+  B20_term = 0.0;
+  iota_term = 0.0;
+  R0_term = 0.0;
+  d2_volume_d_psi2_term = 0.0;
+  XY2_term = 0.0;
+  XY2Prime_term = 0.0;
+  XY3_term = 0.0;
+  XY3Prime_term = 0.0;
+  grad_grad_B_term = 0.0;
 
   // The order of terms here must match the order in Opt::init().
   if (weight_B20 > 0) {
@@ -392,20 +497,42 @@ void Opt::set_residuals(qscfloat* residuals) {
   XY3_term *= 0.5;
   XY3Prime_term *= 0.5;
   grad_grad_B_term *= 0.5;
-  
+    
   objective_function = B20_term + iota_term + R0_term + d2_volume_d_psi2_term
     + XY2_term + XY2Prime_term + XY3_term + XY3Prime_term + grad_grad_B_term;
 
-  iter_objective_function[n_iter] = objective_function;
-  iter_B20_term[n_iter] = B20_term;
-  iter_iota_term[n_iter] = iota_term;
-  iter_R0_term[n_iter] = R0_term;
-  iter_d2_volume_d_psi2_term[n_iter] = d2_volume_d_psi2_term;
-  iter_XY2_term[n_iter] = XY2_term;
-  iter_XY2Prime_term[n_iter] = XY2Prime_term;
-  iter_XY3_term[n_iter] = XY3_term;
-  iter_XY3Prime_term[n_iter] = XY3Prime_term;
-  iter_grad_grad_B_term[n_iter] = grad_grad_B_term;
-  
   assert (j == n_terms);
+
+  // We need to use gsl_vector_set rather than accessing the data of
+  // gsl_residual directly because the stride is not 1 when computing
+  // finite difference derivatives.
+  for (j = 0; j < n_terms; j++)
+    gsl_vector_set(gsl_residual, j, residuals[j]);
+}
+
+////////////////////////////////////////////////////////////
+
+void gsl_callback(const size_t iter, void *params,
+		  const gsl_multifit_nlinear_workspace *w) {
+  Opt* opt = (Opt*) params;
+  int n_iter = opt->n_iter; // Shorthand
+  
+  if (opt->verbose > 0) {
+    std::cout << "gsl_callback called." << std::endl;
+  }
+  
+  opt->iter_objective_function[n_iter] = opt->objective_function;
+  opt->iter_B20_term[n_iter] = opt->B20_term;
+  opt->iter_iota_term[n_iter] = opt->iota_term;
+  opt->iter_R0_term[n_iter] = opt->R0_term;
+  opt->iter_d2_volume_d_psi2_term[n_iter] = opt->d2_volume_d_psi2_term;
+  opt->iter_XY2_term[n_iter] = opt->XY2_term;
+  opt->iter_XY2Prime_term[n_iter] = opt->XY2Prime_term;
+  opt->iter_XY3_term[n_iter] = opt->XY3_term;
+  opt->iter_XY3Prime_term[n_iter] = opt->XY3Prime_term;
+  opt->iter_grad_grad_B_term[n_iter] = opt->grad_grad_B_term;
+
+  opt->iter_eta_bar[n_iter] = opt->q.eta_bar;
+    
+  opt->n_iter++;
 }

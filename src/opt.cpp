@@ -8,6 +8,7 @@ void Opt::defaults() {
   verbose = 1;
   max_iter = 3000;
   make_names = true;
+  algorithm = GSL_LM;
 
   vary_eta_bar = true;
   vary_sigma0 = false;

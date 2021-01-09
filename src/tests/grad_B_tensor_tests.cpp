@@ -50,7 +50,8 @@ TEST_CASE("grad B tensor for an axisymmetric vacuum field") {
 		  q.B0 = B0;
 		  q.sigma0 = sigma0;
 		  q.max_linesearch_iterations = 20; // It helps to use this increased value in single precision
-		
+
+		  q.init();
 		  q.calculate();
 		  
 		  val = sG * B0 / R0;
@@ -144,7 +145,8 @@ TEST_CASE("grad grad B tensor for an axisymmetric vacuum field") {
 		      q.sigma0 = sigma0;
 		      q.B2c = B2c;
 		      q.B2s = B2s;
-		      
+
+		      q.init();
 		      q.calculate();
 		      
 		      // Prefactor in eq (3.15):
@@ -218,6 +220,7 @@ TEST_CASE("grad grad B tensor alternative derivation and symmetry") {
 	  q.sG = sG;
 	  q.spsi = spsi;
 	  q.B0 = B0;
+	  q.init();
 	  q.calculate();
 	  auto tensor = q.calculate_grad_grad_B_tensor_alt();
 	  

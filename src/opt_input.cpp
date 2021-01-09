@@ -55,12 +55,47 @@ void Opt::input(std::string filename) {
   toml_read(varlist, indata, "max_iter", max_iter);
   toml_read(varlist, indata, "verbose", verbose);
   toml_read(varlist, indata, "make_names", make_names);
+
+  std::string algorithm_str = "";
+  toml_read(varlist, indata, "algorithm", algorithm_str);
+  if (algorithm_str.compare("lm") == 0) {
+    algorithm = GSL_LM;
+  } else if (algorithm_str.compare("dogleg") == 0) {
+    algorithm = GSL_DOGLEG;
+  } else if (algorithm_str.compare("ddogleg") == 0) {
+    algorithm = GSL_DDOGLEG;
+  } else if (algorithm_str.compare("subspace2d") == 0) {
+    algorithm = GSL_SUBSPACE2D;
+  } else if (algorithm_str.compare("") == 0) {
+    // Stick with the default
+  } else {
+    throw std::runtime_error("Unrecognized algorithm");
+  }
   
   toml_unused(varlist, indata);
   
   if (verbose > 0) {
     std::cout << "----- Optimization parameters -----" << std::endl;
     std::cout << "max_iter: " << max_iter << std::endl;
+    std::cout << "algorithm: ";
+    switch (algorithm) {
+    case GSL_LM:
+      std::cout << "Levenberg-Marquardt";
+      break;
+    case GSL_DOGLEG:
+      std::cout << "Dogleg";
+      break;
+    case GSL_DDOGLEG:
+      std::cout << "Double dogleg";
+      break;
+    case GSL_SUBSPACE2D:
+      std::cout << "Subspace 2D";
+      break;
+    default:
+      throw std::runtime_error("Should not get here");
+    }
+    std::cout << std::endl;
+    
     std::cout << "vary_eta_bar: " << vary_eta_bar << std::endl;
     std::cout << "vary_sigma0: " << vary_sigma0 << std::endl;
     std::cout << "vary_B2c: " << vary_B2c << std::endl;

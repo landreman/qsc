@@ -113,6 +113,7 @@ TEST_CASE("Each scan result should match a standalone Qsc. [mpi]") {
 	  }
 	  
 	  // Run the standalone calculation
+	  q.init();
 	  q.calculate();
 	  
 	  CHECK(Approx(q.grid_min_R0) == scan.scan_min_R0[j]);

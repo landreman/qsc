@@ -63,12 +63,17 @@ Qsc::Qsc() {
 
 /** High-level routine to call the low-level routines.
  */
+void Qsc::init() {
+  validate();
+  allocate();
+}
+
+/** High-level routine to call the low-level routines.
+ */
 void Qsc::calculate() {
   std::chrono::time_point<std::chrono::steady_clock> start;
   if (verbose > 0) start = std::chrono::steady_clock::now();
 
-  validate();
-  allocate();
   init_axis();
   solve_sigma_equation();
   r1_diagnostics();
@@ -89,6 +94,7 @@ void Qsc::calculate() {
 void Qsc::run(std::string directory_and_infile) {
   std::string directory_and_outfile = qsc::outfile(directory_and_infile);
   input(directory_and_infile);
+  init();
   calculate();
   write_netcdf(directory_and_outfile);
 }
