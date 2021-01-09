@@ -54,6 +54,7 @@ void Opt::input(std::string filename) {
 
   toml_read(varlist, indata, "max_iter", max_iter);
   toml_read(varlist, indata, "verbose", verbose);
+  toml_read(varlist, indata, "make_names", make_names);
   
   toml_unused(varlist, indata);
   

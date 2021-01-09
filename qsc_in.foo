@@ -7,7 +7,7 @@
 [qsc]
 nfp = 4
 # I can put comments here
-nphi = 51
+nphi = 5
 eta_bar = -1.1
 #R0c = [1.0, 0.3, 0.09]
 
@@ -42,6 +42,11 @@ max_keep_per_proc = 100000
 
 [opt]
 
-vary_sigma0 = true
-vary_B2s = 1
+max_iter = 10000
+
+# vary_sigma0 = true
+# vary_B2s = 1
 # vary_R0c = [0, 0, 1]
+vary_R0c = [false, false, true]
+
+weight_B20 = 1

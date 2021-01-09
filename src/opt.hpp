@@ -2,6 +2,7 @@
 #define QSC_OPT_H
 
 #include <valarray>
+#include <vector>
 #include "qsc.hpp"
 
 namespace qsc {
@@ -9,6 +10,10 @@ namespace qsc {
   class Opt {
   private:
     void defaults();
+    void init();
+    void set_state_vector(qscfloat*);
+    void unpack_state_vector(qscfloat*);
+    void set_residuals(qscfloat*);
     
   public:
     Qsc q;
@@ -16,7 +21,9 @@ namespace qsc {
     int n_parameters, n_terms;
     int verbose;
     std::string outfilename;
-    Vector sqrt_d_l_d_phi;
+    Vector arclength_factor;
+    bool make_names;
+    std::vector<std::string> state_vector_names, residual_names;
 
     bool vary_eta_bar, vary_sigma0;
     bool vary_B2c, vary_B2s;
