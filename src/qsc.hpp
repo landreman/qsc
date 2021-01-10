@@ -21,6 +21,7 @@ namespace qsc {
 
   const std::string ORDER_R_OPTION_R1 = "r1";
   const std::string ORDER_R_OPTION_R2 = "r2";
+  const std::string ORDER_R_OPTION_R2p1 = "r2.1";
 
   int driver(int, char**);
 
@@ -75,7 +76,7 @@ namespace qsc {
     qscfloat newton_tolerance, grid_min_R0, G2, I2_over_B0;
     qscfloat iota, iota_N, grid_max_curvature, grid_max_elongation, mean_elongation;
     std::string order_r_option;
-    bool at_least_order_r2;
+    bool at_least_order_r2, order_r2p1, order_r3;
     Vector X20, X2s, X2c, Y20, Y2s, Y2c, Z20, Z2s, Z2c;
     Vector d_X1c_d_varphi, d_Y1s_d_varphi, d_Y1c_d_varphi, B20, B20_anomaly;
     Rank3Tensor grad_B_tensor;
@@ -90,6 +91,10 @@ namespace qsc {
     qscfloat r_singularity_robust;
     Vector r_hat_singularity_robust;
     int newton_result;
+    Vector X3c1, X3c3, X3s1, X3s3, Y3c1, Y3c3, Y3s1, Y3s3;
+    Vector Z3c1, Z3c3, Z3s1, Z3s3, lambda_for_XY3;
+    Vector d_X3c1_d_varphi, d_X3c3_d_varphi, d_X3s1_d_varphi, d_X3s3_d_varphi;
+    Vector d_Y3c1_d_varphi, d_Y3c3_d_varphi, d_Y3s1_d_varphi, d_Y3s3_d_varphi;
     
     Qsc();
     Qsc(std::string);
@@ -101,6 +106,7 @@ namespace qsc {
     void solve_sigma_equation();
     void r1_diagnostics();
     void calculate_r2();
+    void calculate_r2p1();
     void r2_diagnostics();
     void init();
     void calculate();

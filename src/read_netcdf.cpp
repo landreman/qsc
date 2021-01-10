@@ -119,6 +119,14 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
     std::cout << "order_r_option:" << order_r_option << std::endl;
     at_least_order_r2 = !(order_r_option.compare("r1") == 0);
     std::cout << "at_least_order_r2:" << at_least_order_r2 << std::endl;
+    if (order_r_option.compare("r3_flux_constraint") == 0) {
+      order_r2p1 = true;
+      order_r3 = true;
+    } else {
+      order_r2p1 = false;
+      order_r3 = false;
+    }
+    std::cout << "order_r2p1:" << order_r2p1 << std::endl;
     allocate();
 
     // Scalars
@@ -178,6 +186,17 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
       L_grad_grad_B = ((qscfloat)1.0) / L_grad_grad_B_inverse;
       nc.get("r_singularity_basic_vs_zeta", r_hat_singularity_robust);
     }
+    if (order_r3) {
+      nc.get("X3s1", X3s1);
+      nc.get("X3s3", X3s3);
+      nc.get("X3c1", X3c1);
+      nc.get("X3c3", X3c3);
+
+      nc.get("Y3s1", Y3s1);
+      nc.get("Y3s3", Y3s3);
+      nc.get("Y3c1", Y3c1);
+      nc.get("Y3c3", Y3c3);
+    }
     
   } else {
     // Data saved by the C++ version
@@ -186,6 +205,12 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
     int tempint;
     nc.get("at_least_order_r2", tempint);
     at_least_order_r2 = (bool) tempint;
+    nc.get("order_r2.1", tempint);
+    order_r2p1 = (bool) tempint;
+    nc.get("order_r3", tempint);
+    order_r3 = (bool) tempint;
+    if (verbose > 0) std::cout << "Read at_least_order_r2=" << at_least_order_r2
+			       << " order_r2p1=" << order_r2p1 << " order_r3=" << order_r3 << std::endl;
 
     allocate();
     
@@ -279,6 +304,17 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
       nc.get("L_grad_grad_B", L_grad_grad_B);
       nc.get("L_grad_grad_B_inverse", L_grad_grad_B_inverse);
       nc.get("r_hat_singularity_robust", r_hat_singularity_robust);
+    }
+    if (order_r3) {
+      nc.get("X3s1", X3s1);
+      nc.get("X3s3", X3s3);
+      nc.get("X3c1", X3c1);
+      nc.get("X3c3", X3c3);
+
+      nc.get("Y3s1", Y3s1);
+      nc.get("Y3s3", Y3s3);
+      nc.get("Y3c1", Y3c1);
+      nc.get("Y3c3", Y3c3);
     }
   }
   // nc.get("", );

@@ -206,6 +206,15 @@ TEST_CASE("Compare published configurations to fortran version of QSC") {
 	std::cout << "Diff in r_hat_singularity_robust: " <<
 	  c.r_hat_singularity_robust[j] - f.r_hat_singularity_robust[j] << std::endl;
       }
+      if (c.order_r2p1) {
+	if (jconfig == 6 && (j >= 45 || j <= 58)) {
+	  // In single precision, these points have very large errors.
+	} else {
+	  CHECK(Approx(c.X3c1[j]).epsilon(tol) == f.X3c1[j]);
+	  CHECK(Approx(c.Y3c1[j]).epsilon(tol) == f.Y3c1[j]);
+	  CHECK(Approx(c.Y3s1[j]).epsilon(tol) == f.Y3s1[j]);
+	}
+      }
     }
   }
 }

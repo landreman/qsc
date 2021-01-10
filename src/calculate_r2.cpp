@@ -203,6 +203,8 @@ void Qsc::calculate_r2() {
   
   work1 = B20_anomaly * B20_anomaly * d_l_d_phi;
   B20_residual = sqrt(work1.sum() * normalizer) / B0;
+
+  if (order_r2p1) calculate_r2p1();
   
   ////////////////////////////////////////////////////////////
   
@@ -234,4 +236,32 @@ void Qsc::r2_diagnostics() {
               << diag_elapsed.count() << std::endl;
   }
 
+}
+
+/////////////////////////////////////////
+
+/** In this subroutine, equations (3.12) and (3.14)-(3.15) of
+    Landreman & Sengupta (2019) are implemented. Just enough of the
+    O(r^3) terms in X and Y are computed in order to make the m=0 mode
+    of B accurate to O(r^2).
+ */
+void Qsc::calculate_r2p1() {
+  // Eq (3.15): lambda = - Q / (2 * sign_G * spsi)
+  lambda_for_XY3 = - 0.5 / (sG * spsi) * (-spsi * B0 * abs_G0_over_B0 / (2*G0*G0) * (iota_N * I2 + mu0 * p2 * G0 / (B0 * B0)) + 2 * (X2c * Y2s - X2s * Y2c) 
+					  + spsi * B0 / (2*G0) * (abs_G0_over_B0 * X20 * curvature - d_Z20_d_varphi) 
+					  + I2 / (4 * G0) * (-abs_G0_over_B0 * torsion * (X1c*X1c + Y1s*Y1s + Y1c*Y1c) + Y1c * d_X1c_d_varphi - X1c * d_Y1c_d_varphi));  
+  // The expression above is derived in
+  // "20190318-01 Wrick's streamlined Garren-Boozer method, MHD.nb" in
+  // the section "Not assuming quasisymmetry".  Note Q = (1/2) *
+  // (XYEquation0 without X3 and Y3 terms) where XYEquation0 is the
+  // quantity in the above notebook.
+  
+  // Eq (3.14):
+  X3c1 = X1c * lambda_for_XY3;
+  Y3c1 = Y1c * lambda_for_XY3;
+  Y3s1 = Y1s * lambda_for_XY3;
+
+  matrix_vector_product(d_d_varphi, X3c1, d_X3c1_d_varphi);  
+  matrix_vector_product(d_d_varphi, Y3c1, d_Y3c1_d_varphi);  
+  matrix_vector_product(d_d_varphi, Y3s1, d_Y3s1_d_varphi);  
 }

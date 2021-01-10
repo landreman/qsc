@@ -24,6 +24,11 @@ void Qsc::write_netcdf(std::string filename) {
   
   int at_least_order_r2_int = (int) at_least_order_r2;
   nc.put("at_least_order_r2", at_least_order_r2_int, "1 if the O(r^2) equations were solved, 0 if not", "dimensionless");
+  int order_r2p1_int = (int) order_r2p1;
+  nc.put("order_r2.1", order_r2p1_int, "1 if equations (3.12) and (3.14)-(3.15) in Landreman and Sengupta (2019) were used to compute X3c1, Y3c1, and Y3s1, 0 if not", "dimensionless");
+  int order_r3_int = (int) order_r3;
+  nc.put("order_r3", order_r3_int, "1 if the arrays X3 and Y3 are present in this file, 0 if not", "dimensionless");
+
   nc.put("order_r_option", order_r_option, "Whether the Garren-Boozer equations were solved to 1st or 2nd order in the effective minor radius r");
   nc.put("nfp", nfp, "Number of field periods", "dimensionless");
   nc.put("nphi", nphi, "Number of grid points in the toroidal angle phi", "dimensionless");
@@ -132,6 +137,38 @@ void Qsc::write_netcdf(std::string filename) {
     nc.put(nphi_dim, "L_grad_grad_B", L_grad_grad_B, "Scale length associated with second derivatives of the magnetic field, eq (3.2) in Landreman J Plasma Physics (2021)", "meter");
     nc.put(nphi_dim, "L_grad_grad_B_inverse", L_grad_grad_B_inverse, "1 / L_grad_grad_B", "1/meter");
     nc.put(nphi_dim, "r_hat_singularity_robust", r_hat_singularity_robust, "Robust estimate of the minor radius at which the flux surface shapes become singular, hat{r}_c(varphi), as detailed in section 4.2 of Landreman, J Plasma Physics (2021)", "meter");
+  }
+
+  if (order_r2p1) {
+    nc.put(nphi_dim, "lambda_for_XY3", lambda_for_XY3, "lambda in eq (3.15) and (3.12) of Landreman and Sengupta (2019), used to compute X3 and Y3", "1/meter^2");
+  }
+
+  if (order_r3) {
+    nc.put(nphi_dim, "X3s1", X3s1, "r^3*sin(1*theta) term in X, the component of the position vector in the direction of the normal vector", "1/meter^2");
+    nc.put(nphi_dim, "X3s3", X3s3, "r^3*sin(3*theta) term in X, the component of the position vector in the direction of the normal vector", "1/meter^2");
+    nc.put(nphi_dim, "X3c1", X3c1, "r^3*cos(1*theta) term in X, the component of the position vector in the direction of the normal vector", "1/meter^2");
+    nc.put(nphi_dim, "X3c3", X3c3, "r^3*cos(3*theta) term in X, the component of the position vector in the direction of the normal vector", "1/meter^2");
+
+    nc.put(nphi_dim, "Y3s1", Y3s1, "r^3*sin(1*theta) term in Y, the component of the position vector in the direction of the binormal vector", "1/meter^2");
+    nc.put(nphi_dim, "Y3s3", Y3s3, "r^3*sin(3*theta) term in Y, the component of the position vector in the direction of the binormal vector", "1/meter^2");
+    nc.put(nphi_dim, "Y3c1", Y3c1, "r^3*cos(1*theta) term in Y, the component of the position vector in the direction of the binormal vector", "1/meter^2");
+    nc.put(nphi_dim, "Y3c3", Y3c3, "r^3*cos(3*theta) term in Y, the component of the position vector in the direction of the binormal vector", "1/meter^2");
+
+    nc.put(nphi_dim, "Z3s1", Z3s1, "r^3*sin(1*theta) term in Z, the component of the position vector in the direction of the tangnt vector", "1/meter^2");
+    nc.put(nphi_dim, "Z3s3", Z3s3, "r^3*sin(3*theta) term in Z, the component of the position vector in the direction of the tangnt vector", "1/meter^2");
+    nc.put(nphi_dim, "Z3c1", Z3c1, "r^3*cos(1*theta) term in Z, the component of the position vector in the direction of the tangnt vector", "1/meter^2");
+    nc.put(nphi_dim, "Z3c3", Z3c3, "r^3*cos(3*theta) term in Z, the component of the position vector in the direction of the tangnt vector", "1/meter^2");
+
+    nc.put(nphi_dim, "d_X3s1_d_varphi", d_X3s1_d_varphi, "Derivative of X3s1 with respect to the toroidal Boozer angle varphi", "1/meter^2");
+    nc.put(nphi_dim, "d_X3s3_d_varphi", d_X3s3_d_varphi, "Derivative of X3s3 with respect to the toroidal Boozer angle varphi", "1/meter^2");
+    nc.put(nphi_dim, "d_X3c1_d_varphi", d_X3c1_d_varphi, "Derivative of X3c1 with respect to the toroidal Boozer angle varphi", "1/meter^2");
+    nc.put(nphi_dim, "d_X3c3_d_varphi", d_X3c3_d_varphi, "Derivative of X3c3 with respect to the toroidal Boozer angle varphi", "1/meter^2");
+
+    nc.put(nphi_dim, "d_Y3s1_d_varphi", d_Y3s1_d_varphi, "Derivative of Y3s1 with respect to the toroidal Boozer angle varphi", "1/meter^2");
+    nc.put(nphi_dim, "d_Y3s3_d_varphi", d_Y3s3_d_varphi, "Derivative of Y3s3 with respect to the toroidal Boozer angle varphi", "1/meter^2");
+    nc.put(nphi_dim, "d_Y3c1_d_varphi", d_Y3c1_d_varphi, "Derivative of Y3c1 with respect to the toroidal Boozer angle varphi", "1/meter^2");
+    nc.put(nphi_dim, "d_Y3c3_d_varphi", d_Y3c3_d_varphi, "Derivative of Y3c3 with respect to the toroidal Boozer angle varphi", "1/meter^2");
+
   }
   /*
   nc.put(nphi_dim, "", , "", "");

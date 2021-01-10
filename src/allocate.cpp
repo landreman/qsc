@@ -164,6 +164,37 @@ void Qsc::allocate() {
 
     r_hat_singularity_robust.resize(nphi, 0.0);
   }
+
+  if (order_r2p1) {
+    lambda_for_XY3.resize(nphi, 0.0);
+  }
+  
+  if (order_r3) {
+    X3c1.resize(nphi, 0.0);
+    X3c3.resize(nphi, 0.0);
+    X3s1.resize(nphi, 0.0);
+    X3s3.resize(nphi, 0.0);
+    
+    Y3c1.resize(nphi, 0.0);
+    Y3c3.resize(nphi, 0.0);
+    Y3s1.resize(nphi, 0.0);
+    Y3s3.resize(nphi, 0.0);
+
+    Z3c1.resize(nphi, 0.0);
+    Z3c3.resize(nphi, 0.0);
+    Z3s1.resize(nphi, 0.0);
+    Z3s3.resize(nphi, 0.0);
+
+    d_X3c1_d_varphi.resize(nphi, 0.0);
+    d_X3c3_d_varphi.resize(nphi, 0.0);
+    d_X3s1_d_varphi.resize(nphi, 0.0);
+    d_X3s3_d_varphi.resize(nphi, 0.0);
+
+    d_Y3c1_d_varphi.resize(nphi, 0.0);
+    d_Y3c3_d_varphi.resize(nphi, 0.0);
+    d_Y3s1_d_varphi.resize(nphi, 0.0);
+    d_Y3s3_d_varphi.resize(nphi, 0.0);
+}
   
   if (verbose > 0) {
     auto end = std::chrono::steady_clock::now();    

@@ -18,8 +18,8 @@ sG=-1
 
 #R0c = [1.0]
 #Z0s = [0.0]
- R0c = [1.0, 0.2, 0.001]
- Z0s = [0.0, 0.2]
+ R0c = [1.0, 0.1, 0.0001]
+ Z0s = [0.0, 0.1]
 
 [scan]
 
@@ -43,13 +43,16 @@ max_keep_per_proc = 100000
 [opt]
 
 verbose = 1
-max_iter = 50
+max_iter = 250
 
 # vary_sigma0 = true
 # vary_B2s = 1
 # vary_R0c = [0, 0, 1]
-#vary_R0c = [false, false, true]
+vary_R0c = [false, false, true]
 
-weight_B20 = 1
+weight_XY2 = 30
+weight_B20 = 1.0e+4
+weight_grad_grad_B = 1.0e+10
 
-#algorithm = 'dogleg'
+# algorithm = 'ddogleg'
+# algorithm = 'subspace2d'

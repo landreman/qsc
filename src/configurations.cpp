@@ -56,7 +56,7 @@ Qsc::Qsc(std::string config_name) {
     nfp = 2;
     eta_bar = 0.64;
     B2c = -0.00322;
-    order_r_option = ORDER_R_OPTION_R2;
+    order_r_option = ORDER_R_OPTION_R2p1;
 
     R0c.resize(3, 0.0);
     R0s.resize(3, 0.0);
@@ -73,7 +73,7 @@ Qsc::Qsc(std::string config_name) {
     nfp = 2;
     eta_bar = 0.632;
     B2c = -0.158;
-    order_r_option = ORDER_R_OPTION_R2;
+    order_r_option = ORDER_R_OPTION_R2p1;
 
     R0c.resize(4, 0.0);
     R0s.resize(4, 0.0);
@@ -95,7 +95,7 @@ Qsc::Qsc(std::string config_name) {
     B2c = -0.7;
     I2 = 0.9;
     p2 = -600000.0;
-    order_r_option = ORDER_R_OPTION_R2;
+    order_r_option = ORDER_R_OPTION_R2p1;
     
     R0c.resize(2, 0.0);
     R0s.resize(2, 0.0);
@@ -110,7 +110,7 @@ Qsc::Qsc(std::string config_name) {
     nfp = 4;
     eta_bar = 1.569;
     B2c = 0.1348;
-    order_r_option = ORDER_R_OPTION_R2;
+    order_r_option = ORDER_R_OPTION_R2p1;
 
     R0c.resize(5, 0.0);
     R0s.resize(5, 0.0);
@@ -136,7 +136,7 @@ Qsc::Qsc(std::string config_name) {
     B2s = 3.0;
     I2 = 1.6;
     p2 = -0.5e7;
-    order_r_option = ORDER_R_OPTION_R2;
+    order_r_option = ORDER_R_OPTION_R2p1;
 
     R0c.resize(2, 0.0);
     R0s.resize(2, 0.0);

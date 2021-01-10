@@ -177,6 +177,13 @@ void Opt::write_netcdf() {
   nc.put(axis_nmax_plus_1_n_scan_dim, "scan_Z0c", &scan_Z0c(0, 0), "For each configuration kept from the scan, the amplitudes of the cos(n*phi) components of the Cartesian Z coordinate of the magnetic axis", "meter");
   nc.put(axis_nmax_plus_1_n_scan_dim, "scan_Z0s", &scan_Z0s(0, 0), "For each configuration kept from the scan, the amplitudes of the sin(n*phi) components of the Cartesian Z coordinate of the magnetic axis", "meter");
   */
+  
+  // ND arrays for N > 1:
+  std::vector<dim_id_type> axis_nmax_plus_1_n_iter_dim {axis_nmax_plus_1_dim, n_iter_dim};
+  nc.put(axis_nmax_plus_1_n_iter_dim, "iter_R0c", &iter_R0c(0, 0), "The amplitudes of the cos(n*phi) components of the major radius of the magnetic axis", "meter");
+  nc.put(axis_nmax_plus_1_n_iter_dim, "iter_R0s", &iter_R0s(0, 0), "The amplitudes of the sin(n*phi) components of the major radius of the magnetic axis", "meter");
+  nc.put(axis_nmax_plus_1_n_iter_dim, "iter_Z0c", &iter_Z0c(0, 0), "The amplitudes of the cos(n*phi) components of the Cartesian Z coordinate of the magnetic axis", "meter");
+  nc.put(axis_nmax_plus_1_n_iter_dim, "iter_Z0s", &iter_Z0s(0, 0), "The amplitudes of the sin(n*phi) components of the Cartesian Z coordinate of the magnetic axis", "meter");
  
   // Done defining the NetCDF data.
   nc.write_and_close();
