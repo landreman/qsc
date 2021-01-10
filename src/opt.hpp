@@ -18,7 +18,6 @@ namespace qsc {
   class Opt {
   private:
     void defaults();
-    void init();
     
   public:
     Qsc q;
@@ -69,6 +68,7 @@ namespace qsc {
     Opt();
     void run(std::string);
     void allocate();
+    void init();
     void input(std::string);
     void optimize();
     void write_netcdf();

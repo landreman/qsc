@@ -236,14 +236,14 @@ void Opt::init() {
       for (j = 0; j < q.nphi * 6; j++) residual_names.push_back("XY2Prime[" + std::to_string(j) + "]");
   }
   if (weight_XY3 > 0) {
-    n_terms += q.nphi * 6;
+    n_terms += q.nphi * 8;
     if (make_names)
-      for (j = 0; j < q.nphi * 6; j++) residual_names.push_back("XY3[" + std::to_string(j) + "]");
+      for (j = 0; j < q.nphi * 8; j++) residual_names.push_back("XY3[" + std::to_string(j) + "]");
   }
   if (weight_XY3Prime > 0) {
-    n_terms += q.nphi * 6;
+    n_terms += q.nphi * 8;
     if (make_names)
-      for (j = 0; j < q.nphi * 6; j++) residual_names.push_back("XY3Prime[" + std::to_string(j) + "]");
+      for (j = 0; j < q.nphi * 8; j++) residual_names.push_back("XY3Prime[" + std::to_string(j) + "]");
   }
   if (weight_grad_grad_B > 0) {
     n_terms += q.nphi * 27;
@@ -256,6 +256,7 @@ void Opt::init() {
     if (!output_file.is_open()) {
       throw std::runtime_error("Error! Unable to open output file.");
     }
+    assert (n_terms == residual_names.size());
     for (j = 0; j < n_terms; j++)
       output_file << std::setw(4) << j << ", " << residual_names[j] << std::endl;
     output_file.close();
@@ -376,7 +377,7 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   int j, k;
   j = 0;
   qscfloat term;
-  arclength_factor = sqrt(q.d_l_d_phi) * (q.d_phi * q.nfp / q.axis_length);
+  arclength_factor = sqrt(q.d_l_d_phi * (q.d_phi * q.nfp / q.axis_length));
 
   objective_function = 0.0;
   B20_term = 0.0;
@@ -494,18 +495,27 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
       term = weight_XY2Prime * arclength_factor[k] * q.d_Y2c_d_varphi[k];
       residuals[j] = term;
       XY2Prime_term += term * term;
-      j++;      
+      j++;
     }
   }
 
   // XY3 and XY3Prime terms should go here.
-
+  if (weight_XY3 > 0) {
+    j += q.nphi * 8;
+  }
+  
+  if (weight_XY3Prime > 0) {
+    j += q.nphi * 8;
+  }
+  
   if (weight_grad_grad_B > 0) {
-    for (k = 0; k < q.nphi * 27; k++) {
-      term = weight_grad_grad_B * arclength_factor[k] * q.grad_grad_B_tensor[k];
-      residuals[j] = term;
-      grad_grad_B_term += term * term;
-      j++;
+    for (k = 0; k < q.nphi; k++) {
+      for (int j2 = 0; j2 < 27; j2++) {
+	term = weight_grad_grad_B * arclength_factor[k] * q.grad_grad_B_tensor[k + q.nphi * j2];
+	residuals[j] = term;
+	grad_grad_B_term += term * term;
+	j++;
+      }
     }
   }
 

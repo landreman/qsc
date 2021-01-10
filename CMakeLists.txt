@@ -6,6 +6,7 @@ cmake_minimum_required (VERSION 3.12)
 # Comment out the next line when speed is needed
 set(CMAKE_BUILD_TYPE Debug)
 #add_definitions(-O2)
+#add_definitions(-fsanitize=address -fno-omit-frame-pointer)
 
 # Figure out the command to submit mpi jobs. It should be either srun or mpiexec. Other batch systems besides Slurm are not supported.
 # First, see if the system uses slurm by checking for the "sinfo" command.
