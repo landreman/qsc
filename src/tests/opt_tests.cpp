@@ -344,6 +344,86 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
       }
     }
   }
+}
 
+TEST_CASE("Check Opt::unpack_state_vector() and Opt::set_state_vector()") {
+  if (single) return;
 
+  int j, index = 0;
+  int n_fourier = 3;
+  Vector state_vec1, state_vec2;
+  qscfloat arbitrary_val = 3.14;
+  Opt opt;
+  opt.verbose = 0;
+  opt.q.R0c.resize(n_fourier, 0.0);
+  opt.q.R0s.resize(n_fourier, 0.0);
+  opt.q.Z0c.resize(n_fourier, 0.0);
+  opt.q.Z0s.resize(n_fourier, 0.0);
+  opt.vary_R0c.resize(n_fourier, false);
+  opt.vary_R0s.resize(n_fourier, false);
+  opt.vary_Z0c.resize(n_fourier, false);
+  opt.vary_Z0s.resize(n_fourier, false);
+  // opt.q = Qsc(config);
+  std::cout << "max fourier_index:" << (1 << (4 * (n_fourier - 1))) << std::endl;
+
+  for (int vary_eta_bar = 0; vary_eta_bar < 2; vary_eta_bar++) {
+    CAPTURE(vary_eta_bar);
+    opt.vary_eta_bar = (bool) vary_eta_bar;
+    
+    for (int vary_sigma0 = 0; vary_sigma0 < 2; vary_sigma0++) {
+      CAPTURE(vary_sigma0);
+      opt.vary_sigma0 = (bool) vary_sigma0;
+
+      for (int vary_B2c = 0; vary_B2c < 2; vary_B2c++) {
+	CAPTURE(vary_B2c);
+	opt.vary_B2c = (bool) vary_B2c;
+
+	for (int vary_B2s = 0; vary_B2s < 2; vary_B2s++) {
+	  CAPTURE(vary_B2s);
+	  opt.vary_B2s = (bool) vary_B2s;
+
+	  for (int vary_R00 = 0; vary_R00 < 2; vary_R00++) {
+	    CAPTURE(vary_R00);
+	    opt.vary_R0c[0] = (bool) vary_R00;
+
+	    for (int fourier_index = 0; fourier_index < (1 << (4 * (n_fourier - 1))); fourier_index++) {
+	      CAPTURE(fourier_index);
+	      // std::cout << "fourier_index:" << fourier_index << std::endl;
+	      // std::cout << "fourier_index >> (j * 4 + 0):" << (fourier_index >> (j * 4 + 0)) << std::endl;
+	      for (j = 0; j < n_fourier - 1; j++) {
+		// Pick out the relevant bit of fourier_index:
+		opt.vary_R0c[j + 1] = (bool) ((fourier_index >> (j * 4 + 0)) & 1);
+		opt.vary_R0s[j + 1] = (bool) ((fourier_index >> (j * 4 + 1)) & 1);
+		opt.vary_Z0c[j + 1] = (bool) ((fourier_index >> (j * 4 + 2)) & 1);
+		opt.vary_Z0s[j + 1] = (bool) ((fourier_index >> (j * 4 + 3)) & 1);
+	      }
+
+	      /*
+	      std::cout << "vary_R0c:" << opt.vary_R0c << std::endl;
+	      std::cout << "vary_R0s:" << opt.vary_R0s << std::endl;
+	      std::cout << "vary_Z0c:" << opt.vary_Z0c << std::endl;
+	      std::cout << "vary_Z0s:" << opt.vary_Z0s << std::endl;
+	      */
+	      index++;
+	      if (index == 1) continue; // Need at least 1 parameter to vary
+	      opt.init();
+	      state_vec1.resize(opt.n_parameters, 0.0);
+	      state_vec2.resize(opt.n_parameters, 0.0);
+	      arbitrary_val++;
+	      
+	      for (j = 0; j < opt.n_parameters; j++) {
+		state_vec1[j] = arbitrary_val + 0.1 * j;
+	      }
+	      opt.unpack_state_vector(&state_vec1[0]);
+	      opt.set_state_vector(&state_vec2[0]);
+	      for (j = 0; j < opt.n_parameters; j++) {
+		CAPTURE(j);
+		CHECK(Approx(state_vec2[j]) == state_vec1[j]);
+	      }
+	    }
+	  }
+	}
+      }
+    }
+  }
 }

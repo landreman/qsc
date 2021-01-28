@@ -46,6 +46,7 @@ namespace qsc {
   // https://stackoverflow.com/questions/3623631/where-should-non-member-operator-overloads-be-placed
   std::ostream& operator<<(std::ostream&, Vector&);
   std::ostream& operator<<(std::ostream&, Matrix&);
+  std::ostream& operator<<(std::ostream&, std::valarray<bool>&);
   Vector operator*(Matrix&, Vector&);
 
   

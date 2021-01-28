@@ -80,6 +80,14 @@ std::ostream& qsc::operator<< (std::ostream& os, Matrix& m) {
   return os;
 }
 
+std::ostream& qsc::operator<< (std::ostream& os, std::valarray<bool>& v) {
+  for (index_type j = 0; j < v.size(); j++) {
+    if (j > 0) os << " ";
+    os << v[j];
+  }
+  return os;
+}
+
 qscfloat qsc::dot_product(Vector& u, Vector& v) {
   assert(u.size() == v.size());
   qscfloat sum = 0;
