@@ -63,6 +63,8 @@ void quartic_roots(qscfloat* coefficients, qscfloat* real_parts, qscfloat* imag_
   
   if (INFO != 0) {
     std::cerr << "Error in DGEEV: info=" << INFO << std::endl;
+    std::cerr << "coefficients:" << coefficients[0] << " " << coefficients[1] << " " << coefficients[2] << " " << coefficients[3] << " " << coefficients[4] << std::endl;
+    std::cerr << "Top row of companion matrix:" << matrix[0] << " " << matrix[4] << " " << matrix[8] << " " << matrix[12] << std::endl;
     throw std::runtime_error("LAPACK error in *geev");
   }
 }
