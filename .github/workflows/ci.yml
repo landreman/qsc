@@ -19,8 +19,8 @@ jobs:
         os: [ubuntu-latest, macos-latest]
         exclude:
           # macos with single has strange errors on github actions, even though it works on my laptop
-          precision: 'single'
-          os: macos-latest
+          - precision: 'single'
+            os: macos-latest
 
     runs-on: ${{ matrix.os }}
 
