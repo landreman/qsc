@@ -30,9 +30,11 @@ endif()
 # If on a Mac, use the Accelerate framework for BLAS/LAPACK.
 # Otherwise, CMake may use a random BLAS/LAPACK it finds that is not as optimized.
 # To check if we're on a Mac, evaluate 'uname -s'.
-execute_process(COMMAND uname -s OUTPUT_VARIABLE UNAME_S)
+execute_process(COMMAND uname -s
+                OUTPUT_VARIABLE UNAME_S
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
 message("Result of uname -s: ${UNAME_S}")
-if ("${UNAME_S}" STREQUAL "Darwin\n")
+if ("${UNAME_S}" STREQUAL "Darwin")
   message("Setting BLA_VENDOR to Apple")
   set(BLA_VENDOR Apple)
 endif()
@@ -42,7 +44,9 @@ include(cmake/knownHosts.cmake)
 
 project(qsc LANGUAGES CXX)
 
-set(CMAKE_MODULE_PATH cmake)
+#set(CMAKE_MODULE_PATH cmake)
+# Tell CMake where to find FindNetCDF.cmake:
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 #set (NETCDF_CXX "YES")
 find_package (NetCDF REQUIRED)
 message("NETCDF_INCLUDES=${NETCDF_INCLUDES}")

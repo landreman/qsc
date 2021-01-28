@@ -1,25 +1,29 @@
 # This is a sample input file
 
-# general_option = 'single'
+general_option = 'single'
 #general_option = 'random'
- general_option = 'opt'
+# general_option = 'opt'
 
 [qsc]
 nfp = 2
 # I can put comments here
 nphi = 31
-eta_bar = -1.1
 #R0c = [1.0, 0.3, 0.09]
 
-verbose = 0
-sG=-1
+verbose = 1
 
- order_r_option = "r2"
+ order_r_option = "r2.1"
 
 #R0c = [1.0]
 #Z0s = [0.0]
- R0c = [1.0, 0.1, 0.0001]
- Z0s = [0.0, 0.1]
+# R0c = [1.0, 0.1, 0.0001]
+# Z0s = [0.0, 0.1]
+
+# Section 5.2:
+R0c = [1.0, 0.173, 0.0168, 0.00101, 0.00001]
+Z0s = [0.0, 0.159, 0.0165, 0.000985]
+eta_bar = 0.632
+B2c = -0.158
 
 [scan]
 
@@ -48,11 +52,15 @@ max_iter = 250
 # vary_sigma0 = true
 # vary_B2s = 1
 # vary_R0c = [0, 0, 1]
-vary_R0c = [false, false, true]
+vary_R0c = [false, false, true, true, true]
 
-weight_XY2 = 30
-weight_B20 = 1.0e+4
-weight_grad_grad_B = 1.0e+10
+target_iota =-0.42
+weight_iota = 300.0
+weight_XY2 = 1.0
+weight_B20 = 1000.0
+weight_grad_grad_B = 0.1
+weight_XY3 = 1
+weight_XY3Prime = 1
 
 # algorithm = 'ddogleg'
 # algorithm = 'subspace2d'

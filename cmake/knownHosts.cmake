@@ -10,7 +10,8 @@ message("fully qualified domain name is ${FQDN}")
 if(DEFINED ENV{GITHUB_ACTIONS})
   message("Detected host is Github Actions CI")
   # Some flags are added to mpiexec to avoid some warning messages.
-  set(QSC_COMMAND_TO_SUBMIT_JOB "mpiexec -n NUM_PROCS --mca btl_base_warn_component_unused 0")
+  set(QSC_COMMAND_TO_SUBMIT_JOB "mpiexec -n NUM_PROCS --mca btl_base_warn_component_unused 0 --oversubscribe")
+  # "--oversubscribe" is helpful because the macos environment is limited to 3 procs.
   #set(QSC_COMMAND_TO_SUBMIT_JOB "mpiexec -n NUM_PROCS --mca btl_base_warn_component_unused 0 --mca orte_base_help_aggregate 0")
 
 elseif(DEFINED ENV{NERSC_HOST})

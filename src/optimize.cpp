@@ -25,8 +25,8 @@ void Opt::optimize() {
   n_iter = 0;
   q.init();
   
-  if (!q.at_least_order_r2) {
-    std::cout << "Optimization presently only works with O(r^2)." << std::endl;
+  if (!q.order_r2p1) {
+    std::cout << "Optimization presently only works with order_r_option = r2.1." << std::endl;
     return;
   }
 
@@ -243,14 +243,14 @@ void Opt::init() {
       for (j = 0; j < q.nphi * 6; j++) residual_names.push_back("XY2Prime[" + std::to_string(j) + "]");
   }
   if (weight_XY3 > 0) {
-    n_terms += q.nphi * 8;
+    n_terms += q.nphi * 3;
     if (make_names)
-      for (j = 0; j < q.nphi * 8; j++) residual_names.push_back("XY3[" + std::to_string(j) + "]");
+      for (j = 0; j < q.nphi * 3; j++) residual_names.push_back("XY3[" + std::to_string(j) + "]");
   }
   if (weight_XY3Prime > 0) {
-    n_terms += q.nphi * 8;
+    n_terms += q.nphi * 3;
     if (make_names)
-      for (j = 0; j < q.nphi * 8; j++) residual_names.push_back("XY3Prime[" + std::to_string(j) + "]");
+      for (j = 0; j < q.nphi * 3; j++) residual_names.push_back("XY3Prime[" + std::to_string(j) + "]");
   }
   if (weight_grad_grad_B > 0) {
     n_terms += q.nphi * 27;
@@ -408,7 +408,7 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   }
   
   if (weight_iota > 0) {
-    term = weight_iota - target_iota;
+    term = weight_iota * (q.iota - target_iota);
     residuals[j] = term;
     iota_term = term * term;
     j++;
@@ -506,13 +506,42 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
     }
   }
 
-  // XY3 and XY3Prime terms should go here.
   if (weight_XY3 > 0) {
-    j += q.nphi * 8;
+    for (k = 0; k < q.nphi; k++) {
+      term = weight_XY3 * arclength_factor[k] * q.X3c1[k];
+      residuals[j] = term;
+      XY3_term += term * term;
+      j++;
+      
+      term = weight_XY3 * arclength_factor[k] * q.Y3c1[k];
+      residuals[j] = term;
+      XY3_term += term * term;
+      j++;
+      
+      term = weight_XY3 * arclength_factor[k] * q.Y3s1[k];
+      residuals[j] = term;
+      XY3_term += term * term;
+      j++;
+    }
   }
   
   if (weight_XY3Prime > 0) {
-    j += q.nphi * 8;
+    for (k = 0; k < q.nphi; k++) {
+      term = weight_XY3Prime * arclength_factor[k] * q.d_X3c1_d_varphi[k];
+      residuals[j] = term;
+      XY3Prime_term += term * term;
+      j++;
+      
+      term = weight_XY3Prime * arclength_factor[k] * q.d_Y3c1_d_varphi[k];
+      residuals[j] = term;
+      XY3Prime_term += term * term;
+      j++;
+      
+      term = weight_XY3Prime * arclength_factor[k] * q.d_Y3s1_d_varphi[k];
+      residuals[j] = term;
+      XY3Prime_term += term * term;
+      j++;
+    }
   }
   
   if (weight_grad_grad_B > 0) {
