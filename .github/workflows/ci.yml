@@ -12,18 +12,19 @@ on: [push, pull_request]
 
 jobs:
   CI:
-    runs-on: ubuntu-latest
-
-    env:
-      OMPI_ALLOW_RUN_AS_ROOT: 1
-      OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
-
     strategy:
       fail-fast: false
       matrix:
         precision: ['single', 'double']
+        os: [ubuntu-latest, macos-latest]
 
-    name: ${{ matrix.precision }} precision
+    runs-on: ${{ matrix.os }}
+
+    name: ${{ matrix.os}}, ${{ matrix.precision }} precision
+
+    env:
+      OMPI_ALLOW_RUN_AS_ROOT: 1
+      OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
 
     steps:
     # First print out lots of information. We do this in separate 
@@ -46,10 +47,18 @@ jobs:
         ls -l
 
     - name: apt-get any needed packages
+      if: "contains(matrix.os, 'ubuntu')"
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential openmpi-bin libopenmpi-dev liblapack-dev git cmake libnetcdf-dev libgsl-dev
         # If at some point we need the C++ wrapper for netcdf, it is libnetcdf-c++4-dev
+
+    - name: Get any needed packages from homebrew
+      if: "contains(matrix.os, 'macos')"
+      run: |
+        brew install netcdf
+        brew install open-mpi
+        brew install gsl
 
     - name: Print versions
       run: |
