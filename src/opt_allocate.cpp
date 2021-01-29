@@ -18,6 +18,7 @@ void Opt::allocate() {
   iter_XY3_term.resize(max_iter, 0.0);
   iter_XY3Prime_term.resize(max_iter, 0.0);
   iter_grad_grad_B_term.resize(max_iter, 0.0);
+  iter_r_singularity_term.resize(max_iter, 0.0);
   
   iter_eta_bar.resize(max_iter, 0.0);
   iter_sigma0.resize(max_iter, 0.0);

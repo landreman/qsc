@@ -35,6 +35,7 @@ void Opt::defaults() {
   weight_XY3 = -1.0;
   weight_XY3Prime = -1.0;
   weight_grad_grad_B = -1.0;
+  weight_r_singularity = -1.0;
 }
 
 Opt::Opt() {

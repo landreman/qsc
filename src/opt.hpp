@@ -40,21 +40,21 @@ namespace qsc {
     qscfloat weight_d2_volume_d_psi2, max_d2_volume_d_psi2;
     qscfloat weight_XY2, weight_XY2Prime;
     qscfloat weight_XY3, weight_XY3Prime;
-    qscfloat weight_grad_grad_B;
+    qscfloat weight_grad_grad_B, weight_r_singularity;
 
     qscfloat objective_function;
     qscfloat B20_term, iota_term;
     qscfloat R0_term, d2_volume_d_psi2_term;
     qscfloat XY2_term, XY2Prime_term;
     qscfloat XY3_term, XY3Prime_term;
-    qscfloat grad_grad_B_term;
+    qscfloat grad_grad_B_term, r_singularity_term;
 
     Vector iter_objective_function;
     Vector iter_B20_term, iter_iota_term;
     Vector iter_R0_term, iter_d2_volume_d_psi2_term;
     Vector iter_XY2_term, iter_XY2Prime_term;
     Vector iter_XY3_term, iter_XY3Prime_term;
-    Vector iter_grad_grad_B_term;
+    Vector iter_grad_grad_B_term, iter_r_singularity_term;
     
     Vector iter_eta_bar, iter_sigma0, iter_B2s, iter_B2c;
     Matrix iter_R0c, iter_R0s, iter_Z0c, iter_Z0s;

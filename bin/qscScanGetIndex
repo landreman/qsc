@@ -1,0 +1,75 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import numpy as np
+from scipy.io import netcdf
+
+print()
+print("Usage: ", os.path.basename(__file__), ' qsc_out.<extension>.nc index')
+
+if len(sys.argv) != 3:
+   raise RuntimeError("A qsc_out.*.nc file must be provided as an argument")
+
+filename = sys.argv[1]
+bare_filename = os.path.basename(filename)
+s = 'qsc_out.'
+if bare_filename[:len(s)] != s or filename[-3:] != '.nc':
+   raise RuntimeError("A qsc_out.*.nc file must be provided as an argument")
+
+index = int(sys.argv[2])
+
+f = netcdf.netcdf_file(filename, 'r', mmap=False)
+iota = f.variables['scan_iota'][()]
+B20_variation = f.variables['scan_B20_variation'][()]
+r_singularity = f.variables['scan_r_singularity'][()]
+d2_volume_d_psi2 = f.variables['scan_d2_volume_d_psi2'][()]
+L_grad_B = f.variables['scan_min_L_grad_B'][()]
+L_grad_grad_B = f.variables['scan_min_L_grad_grad_B'][()]
+elongation = f.variables['scan_max_elongation'][()]
+eta_bar = f.variables['scan_eta_bar'][()]
+sigma0 = f.variables['scan_sigma0'][()]
+B2c = f.variables['scan_B2c'][()]
+B2s = f.variables['scan_B2s'][()]
+R0c = f.variables['scan_R0c'][()]
+R0s = f.variables['scan_R0s'][()]
+Z0c = f.variables['scan_Z0c'][()]
+Z0s = f.variables['scan_Z0s'][()]
+f.close()
+
+print('Scan index {}:'.format(index))
+print('  iota:', iota[index])
+print('  max elongation:', elongation[index])
+print('  r_singularity:', r_singularity[index])
+print('  d^2 volume /d psi^2:', d2_volume_d_psi2[index])
+print('  B20 variation:', B20_variation[index])
+print('  L grad B:', L_grad_B[index])
+print('  L grad grad B:', L_grad_grad_B[index])
+print()
+print('# ', os.path.abspath(filename), '  index =', index)
+print('eta_bar =', eta_bar[index])
+print('sigma0 =', sigma0[index])
+print('B2c =', B2c[index])
+print('B2s =', B2s[index])
+nfourier = R0c.shape[1]
+print('R0c = [', R0c[index, 0], end='')
+for j in range(1, nfourier):
+   print(', ', R0c[index, j], end='')
+print(']')
+
+print('R0s = [', R0s[index, 0], end='')
+for j in range(1, nfourier):
+   print(', ', R0s[index, j], end='')
+print(']')
+
+print('Z0c = [', Z0c[index, 0], end='')
+for j in range(1, nfourier):
+   print(', ', Z0c[index, j], end='')
+print(']')
+
+print('Z0s = [', Z0s[index, 0], end='')
+for j in range(1, nfourier):
+   print(', ', Z0s[index, j], end='')
+print(']')
+
+

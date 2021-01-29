@@ -109,6 +109,10 @@ void Opt::optimize() {
     std::cout << "  R0s: " << q.R0s << std::endl;
     std::cout << "  Z0c: " << q.Z0c << std::endl;
     std::cout << "  Z0s: " << q.Z0s << std::endl;
+    std::cout << "  iota: " << q.iota << "  r_singularity: " << q.r_singularity_robust << std::endl;
+    std::cout << "  L grad B: " << q.grid_min_L_grad_B << "  L grad grad B: " << q.grid_min_L_grad_grad_B << std::endl;
+    std::cout << "  B20 variation: " << q.B20_grid_variation << std::endl;
+    std::cout << "  d2 volume / d psi2: " << q.d2_volume_d_psi2 << std::endl;
   }
 
   gsl_multifit_nlinear_free(work);
@@ -262,6 +266,11 @@ void Opt::init() {
     if (make_names)
       for (j = 0; j < q.nphi * 27; j++) residual_names.push_back("grad_grad_B[" + std::to_string(j) + "]");
   }
+  if (weight_r_singularity > 0) {
+    n_terms += q.nphi;
+    if (make_names)
+      for (j = 0; j < q.nphi; j++) residual_names.push_back("r_singularity[" + std::to_string(j) + "]");
+  }
   
   if (make_names) {
     output_file.open("residual_vector");
@@ -401,6 +410,7 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   XY3_term = 0.0;
   XY3Prime_term = 0.0;
   grad_grad_B_term = 0.0;
+  r_singularity_term = 0.0;
 
   // The order of terms here must match the order in Opt::init().
   if (weight_B20 > 0) {
@@ -560,6 +570,15 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
     }
   }
 
+  if (weight_r_singularity > 0) {
+    for (k = 0; k < q.nphi; k++) {
+      term = weight_r_singularity * arclength_factor[k] / q.r_hat_singularity_robust[k];
+      residuals[j] = term;
+      r_singularity_term += term * term;
+      j++;
+    }
+  }
+
   // GSL defines the objective function with a factor of 1/2.
   B20_term *= 0.5;
   iota_term *= 0.5;
@@ -570,9 +589,11 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   XY3_term *= 0.5;
   XY3Prime_term *= 0.5;
   grad_grad_B_term *= 0.5;
+  r_singularity_term *= 0.5;
     
   objective_function = B20_term + iota_term + R0_term + d2_volume_d_psi2_term
-    + XY2_term + XY2Prime_term + XY3_term + XY3Prime_term + grad_grad_B_term;
+    + XY2_term + XY2Prime_term + XY3_term + XY3Prime_term + grad_grad_B_term
+    + r_singularity_term;
 
   assert (j == n_terms);
 
@@ -623,6 +644,7 @@ void gsl_callback(const size_t iter, void *params,
   opt->iter_XY3_term[n_iter] = opt->XY3_term;
   opt->iter_XY3Prime_term[n_iter] = opt->XY3Prime_term;
   opt->iter_grad_grad_B_term[n_iter] = opt->grad_grad_B_term;
+  opt->iter_r_singularity_term[n_iter] = opt->r_singularity_term;
 
   opt->iter_eta_bar[n_iter] = opt->q.eta_bar;
   opt->iter_sigma0[n_iter] = opt->q.sigma0;

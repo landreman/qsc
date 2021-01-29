@@ -51,6 +51,7 @@ void Opt::input(std::string filename) {
   toml_read(varlist, indata, "weight_XY3", weight_XY3);
   toml_read(varlist, indata, "weight_XY3Prime", weight_XY3Prime);
   toml_read(varlist, indata, "weight_grad_grad_B", weight_grad_grad_B);
+  toml_read(varlist, indata, "weight_r_singularity", weight_r_singularity);
 
   toml_read(varlist, indata, "max_iter", max_iter);
   toml_read(varlist, indata, "verbose", verbose);

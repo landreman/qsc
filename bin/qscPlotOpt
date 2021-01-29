@@ -42,6 +42,7 @@ XY2Prime_term = f.variables['iter_XY2Prime_term'][()]
 XY3_term = f.variables['iter_XY3_term'][()]
 XY3Prime_term = f.variables['iter_XY3Prime_term'][()]
 grad_grad_B_term = f.variables['iter_grad_grad_B_term'][()]
+r_singularity_term = f.variables['iter_r_singularity_term'][()]
 
 axis_nmax_plus_1 = R0c.shape[1]
 print("R0c.shape: ", R0c.shape)
@@ -124,6 +125,7 @@ plt.plot(iteration, XY2Prime_term, '.-', label='XY2Prime term')
 plt.plot(iteration, XY3_term, '.-', label='XY3 term')
 plt.plot(iteration, XY3Prime_term, '.-', label='XY3Prime term')
 plt.plot(iteration, grad_grad_B_term, '.-', label='grad_grad_B term')
+plt.plot(iteration, r_singularity_term, '.-', label='r_singularity term')
 plt.semilogy(iteration, objective_function, ':k', label='total')
 plt.xlabel('iteration', labelpad=labelpad)
 plt.legend(loc='upper left', fontsize=6, bbox_to_anchor=(1.01, 1))
