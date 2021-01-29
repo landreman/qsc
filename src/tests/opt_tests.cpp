@@ -429,6 +429,8 @@ TEST_CASE("Check Opt::unpack_state_vector() and Opt::set_state_vector()") {
 }
 
 TEST_CASE("1d optimization for iota") {
+  if (single) return;
+
   // Skip the subspace2D algorithm - I'm not sure why it gives an error.
   for (int j_algorithm = 0; j_algorithm < 3; j_algorithm++) {
     CAPTURE(j_algorithm);
