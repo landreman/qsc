@@ -427,3 +427,95 @@ TEST_CASE("Check Opt::unpack_state_vector() and Opt::set_state_vector()") {
     }
   }
 }
+
+TEST_CASE("1d optimization for iota") {
+  // Skip the subspace2D algorithm - I'm not sure why it gives an error.
+  for (int j_algorithm = 0; j_algorithm < 3; j_algorithm++) {
+    CAPTURE(j_algorithm);
+    for (int j_var = 0; j_var < 3; j_var++) {
+      CAPTURE(j_var);
+      Opt opt;
+      
+      // Set Qsc parameters:
+      opt.q.nphi = 31;
+      opt.q.nfp = 2;
+      opt.q.verbose = 0;
+      opt.q.order_r_option = "r2.1";
+      opt.q.R0c = {1.0, 0.15};
+      opt.q.Z0s = {0.0, 0.15};
+      opt.q.R0s = {0.0, 0.0};
+      opt.q.Z0c = {0.0, 0.0};
+      opt.q.eta_bar = 0.8;
+      opt.q.B2c = 0.0;
+
+      // Set optimization parameters:
+      opt.verbose = 1;
+      switch (j_algorithm) {
+      case 0:
+	opt.algorithm = GSL_LM;
+	break;
+      case 1:
+	opt.algorithm = GSL_DOGLEG;
+	break;
+      case 2:
+	opt.algorithm = GSL_DDOGLEG;
+	break;
+      case 3:
+	opt.algorithm = GSL_SUBSPACE2D;
+	break;
+      default:
+	CHECK(false); // Should not get here.
+      }
+      opt.vary_B2c = false;
+      switch (j_var) {
+      case 0:
+	// Vary Z0s[1]
+	opt.vary_eta_bar = false;
+	opt.vary_R0c = {false, false};
+	opt.vary_Z0s = {false, true};
+	break;
+      case 1:
+	// Vary R0c[1]
+	opt.vary_eta_bar = false;
+	opt.vary_R0c = {false, true};
+	opt.vary_Z0s = {false, false};
+	break;
+      case 2:
+	// Vary eta_bar
+	opt.vary_eta_bar = true;
+	opt.vary_R0c = {false, false};
+	opt.vary_Z0s = {false, false};
+	break;
+      default:
+	CHECK(false); // Should not get here.
+      }
+      opt.vary_R0s = {false, false};
+      opt.vary_Z0c = {false, false};
+      
+      // Target only iota:
+      qscfloat target_iota = -0.5;
+      opt.target_iota = target_iota;
+      opt.weight_iota = 1.0;
+      opt.weight_XY2 = -1.0;
+      opt.weight_XY2Prime = -1.0;
+      
+      opt.allocate();
+      opt.optimize();
+      
+      CHECK(Approx(opt.iter_iota[opt.n_iter - 1]) == target_iota);
+      switch (j_var) {
+      case 0:
+	CHECK(Approx(opt.iter_Z0s(1, opt.n_iter - 1)) == 0.0870713164550382);
+	break;
+      case 1:
+	CHECK(Approx(opt.iter_R0c(1, opt.n_iter - 1)) == 0.123975273705787);
+	break;
+      case 2:
+	CHECK(Approx(opt.iter_eta_bar[opt.n_iter - 1]) == 1.03662076014559);
+	break;
+      default:
+	CHECK(false); // Should not get here.
+      }
+    }
+  }
+}

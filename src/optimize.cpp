@@ -52,19 +52,24 @@ void Opt::optimize() {
 #ifndef SINGLE
   set_state_vector(gsl_state_vector->data);
 #endif
-  
+
+  if (verbose > 0) std::cout << "Algorithm: ";
   switch (algorithm) {
   case GSL_LM:
     gsl_optimizer_params.trs = gsl_multifit_nlinear_trs_lm;
+    if (verbose > 0) std::cout << "Levenberg-Marquardt" << std::endl;
     break;
   case GSL_DOGLEG:
     gsl_optimizer_params.trs = gsl_multifit_nlinear_trs_dogleg;
+    if (verbose > 0) std::cout << "Dogleg" << std::endl;
     break;
   case GSL_DDOGLEG:
     gsl_optimizer_params.trs = gsl_multifit_nlinear_trs_ddogleg;
+    if (verbose > 0) std::cout << "Double dogleg" << std::endl;
     break;
   case GSL_SUBSPACE2D:
     gsl_optimizer_params.trs = gsl_multifit_nlinear_trs_subspace2D;
+    if (verbose > 0) std::cout << "Subspace-2D" << std::endl;
     break;
   default:
     throw std::runtime_error("Error! in optimize_least_squares_gsl.cpp switch! Should not get here!");
