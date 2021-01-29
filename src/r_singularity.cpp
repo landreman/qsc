@@ -251,6 +251,26 @@ void Qsc::calculate_r_singularity() {
 
     coefficients[4] = (K0 + K4c)*(K0 + K4c) - K2c*K2c;
 
+    // Set a default value for rc that is huge to indicate a true solution has not yet been found.
+    rc = 1.0e+30;
+
+    // If we have overflowed already, which can happen in single precision, give up now
+    if (! (std::isfinite(coefficients[0]) &&
+	   std::isfinite(coefficients[1]) &&
+	   std::isfinite(coefficients[2]) &&
+	   std::isfinite(coefficients[3]) &&
+	   std::isfinite(coefficients[4]))) {
+      r_hat_singularity_robust[j] = rc;
+      std::cout << "non-finite coefficient for j=" << j << " coefficients: "
+		<< coefficients[0] << " "
+		<< coefficients[1] << " "
+		<< coefficients[2] << " "
+		<< coefficients[3] << " "
+		<< coefficients[4] << std::endl;
+      
+      continue;
+    }
+    
     quartic_roots(coefficients, real_parts, imag_parts);
 
     if (verbose > 1) {
@@ -276,9 +296,6 @@ void Qsc::calculate_r_singularity() {
 		<< imag_parts[3] << std::endl;
     }
     
-    // Set a default value for rc that is huge to indicate a true solution has not yet been found.
-    rc = 1.0e+30;
-
     for (jr = 0; jr < 4; jr++) { // Loop over the roots of the equation for w.
       // If root is not purely real, skip it.
       if (std::abs(imag_parts[jr]) > imag_tol) {
