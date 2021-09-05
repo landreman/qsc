@@ -4,10 +4,15 @@ function m20210129_01_interactiveQscOptimization()
 qsc_executable = '/Users/mattland/qsc/bin/xqsc';
 
 % Qsc input file to use as a template:
-qsc_template = '/Users/mattland/Box Sync/work21/20210129-01-qsc_optimize_QH4/qsc_in.20210129-01-QH4_006_fromScan';
+%qsc_template = '/Users/mattland/Box Sync/work21/20210129-01-qsc_optimize_QH4/qsc_in.20210129-01-QH4_006_fromScan';
+%qsc_template = '/Users/mattland/qsc/qsc_in.QH5';
+%qsc_template = '/Users/mattland/Box Sync/work21/20210209-01-qsc_fun/qsc_in.QH5';
+qsc_template = '/Users/mattland/Box Sync/work21/20210428-01-qsc_further_optimize_QH4/qsc_in.QH4';
 
 % Input file to write:
-qsc_input = '/Users/mattland/Box Sync/work21/20210129-01-qsc_optimize_QH4/qsc_in.interactive';
+%qsc_input = '/Users/mattland/Box Sync/work21/20210129-01-qsc_optimize_QH4/qsc_in.interactive';
+%qsc_input = '/Users/mattland/Box Sync/work21/20210209-01-qsc_fun/qsc_in.interactive';
+qsc_input = '/Users/mattland/Box Sync/work21/20210428-01-qsc_further_optimize_QH4/qsc_in.interactive';
 
 template = splitlines(fileread(qsc_template));
 
@@ -649,12 +654,12 @@ set(f,'Visible','on')
             ax = axes('Units','pixels','Position',[plot_left + plot_horiz_space * 2, plot_bottom + plot_vert_space * 2, plot_width, plot_height]);
             eta_bar_handle = plot(eta_bar, '.-');
             title('eta bar')
-            ylim([-2.5, 2.5])
+            ylim([-3.5, 3.5])
 
             ax = axes('Units','pixels','Position',[plot_left + plot_horiz_space * 3, plot_bottom + plot_vert_space * 2, plot_width, plot_height]);
             B2c_handle = plot(B2c, '.-');
             title('B2c')
-            ylim([-3, 3])
+            ylim([-5, 5])
 
             ax = axes('Units','pixels','Position',[plot_left + plot_horiz_space * 0, plot_bottom + plot_vert_space * 1, plot_width, plot_height]);
             R0c_handle = semilogy(abs(R0c'), '.-');
@@ -669,7 +674,7 @@ set(f,'Visible','on')
             ax = axes('Units','pixels','Position',[plot_left + plot_horiz_space * 2, plot_bottom + plot_vert_space * 1, plot_width, plot_height]);
             iota_handle = plot(iota, '.-');
             title('iota')
-            ylim([-2, 2])
+            ylim([-5, 5])
 
             ax = axes('Units','pixels','Position',[plot_left + plot_horiz_space * 3, plot_bottom + plot_vert_space * 1, plot_width, plot_height]);
             B20_handle = plot(B20_variation, '.-');
@@ -693,7 +698,7 @@ set(f,'Visible','on')
             ax = axes('Units','pixels','Position',[plot_left + plot_horiz_space * 2, plot_bottom + plot_vert_space * 0, plot_width, plot_height]);
             well_handle = plot(d2_volume_d_psi2, '.-');
             title('V"')
-            ylim([-300, 1500])
+            ylim([-300, 2500])
             xlabel('iteration')
 
         else

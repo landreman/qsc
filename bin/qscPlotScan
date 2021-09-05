@@ -36,11 +36,13 @@ nrows = 1
 ncols = 1
 
 ax = plt.subplot(nrows, ncols, 1)
-#plt.plot(B20_variation[hill], r_singularity[hill], '.c', label='hill')
-#plt.plot(B20_variation[well], r_singularity[well], '.b', label='well')
-scatterplot_handle = plt.scatter(B20_variation, r_singularity, c=well, s=4, cmap='bwr')
-plt.xlabel('B20 variation')
+#scatterplot_handle = plt.scatter(B20_variation, r_singularity, c=well, s=4, cmap='bwr')
+scatterplot_handle = plt.scatter(d2_volume_d_psi2, r_singularity, c=B20_variation, s=4)
+#plt.xlabel('B20 variation')
+plt.xlabel("V''")
 plt.ylabel('r singularity')
+plt.colorbar()
+plt.title('color = B20 variation')
 #plt.legend(loc=0, fontsize=6)
 
 plt.figtext(0.5, 0.99, 'Data: ' + os.path.abspath(filename), ha='center', va='top', fontsize=6)
@@ -68,13 +70,17 @@ def update_annot(ind):
     """
     text = 'index={} $\\iota$={:.2g}\n' \
     'elong={:.2g} V"={:.4g}\n' \
-    '$L\\nabla B$={:.2g} $L\\nabla \\nabla B$={:.2g}'.format(
+    '$L\\nabla B$={:.2g} $L\\nabla \\nabla B$={:.2g}\n' \
+    '$r_c$={:.2g} $\Delta B_2$={:.2g}'.format(
        index,
        iota[index],
        elongation[index],
        d2_volume_d_psi2[index],
        L_grad_B[index],
-       L_grad_grad_B[index])
+       L_grad_grad_B[index],
+       r_singularity[index],
+       B20_variation[index]
+    )
     
     #list(map(str,scan_R0c[:,index]))))
     #text = "{}".format(" ".join(list(map(str,ind["ind"]))))
