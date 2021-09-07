@@ -46,8 +46,10 @@ TEST_CASE("Each term in the objective function should be approximately independe
   o2.weight_XY3Prime = 9.0;
   o2.weight_grad_grad_B = 10.0;
 
-  o1.init();
-  o2.init();
+  o1.init_parameters();
+  o1.init_residuals();
+  o2.init_parameters();
+  o2.init_residuals();
   
   gsl_vector *res1 = gsl_vector_alloc(o1.n_terms);
   gsl_vector *res2 = gsl_vector_alloc(o2.n_terms);
@@ -406,7 +408,8 @@ TEST_CASE("Check Opt::unpack_state_vector() and Opt::set_state_vector()") {
 	      */
 	      index++;
 	      if (index == 1) continue; // Need at least 1 parameter to vary
-	      opt.init();
+	      opt.init_parameters();
+	      opt.init_residuals();
 	      state_vec1.resize(opt.n_parameters, 0.0);
 	      state_vec2.resize(opt.n_parameters, 0.0);
 	      arbitrary_val++;

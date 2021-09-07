@@ -17,6 +17,7 @@ void Opt::write_netcdf() {
   nc.put("n_iter", n_iter, "Number of optimization iterations saved", "dimensionless");
 
   // 1D Vectors
+  nc.put(n_iter_dim, "iter_fourier_refine_step", iter_fourier_refine_step, "Step number with respect to expanding the number of Fourier modes for the axis shape", "dimensionless");
   nc.put(n_iter_dim, "iter_objective_function", iter_objective_function, "Total objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_B20_term", iter_B20_term, "B20 term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_iota_term", iter_iota_term, "Iota term in the objective function at each iteration", "dimensionless");

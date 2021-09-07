@@ -19,105 +19,165 @@ void Opt::optimize() {
     std::cout << "Optimization presently only works with double precision." << std::endl;
     return;
   }
-  std::cout << "optimizing..." << std::endl;
 
-  init();
-  n_iter = 0;
-  q.init();
+  // Add fourier_refine modes to the end of input arrays:
+  Vector axis_arr;
+  std::valarray<bool> bool_arr;
+  int oldsize = q.R0c.size();
+  int newsize = oldsize + fourier_refine;
   
-  if (!q.order_r2p1) {
-    std::cout << "Optimization presently only works with order_r_option = r2.1." << std::endl;
-    return;
-  }
+  axis_arr = q.R0c;
+  q.R0c.resize(newsize, 0.0);
+  for (j = 0; j < oldsize; j++) q.R0c[j] = axis_arr[j];
+  axis_arr = q.R0s;
+  q.R0s.resize(newsize, 0.0);
+  for (j = 0; j < oldsize; j++) q.R0s[j] = axis_arr[j];
+  axis_arr = q.Z0c;
+  q.Z0c.resize(newsize, 0.0);
+  for (j = 0; j < oldsize; j++) q.Z0c[j] = axis_arr[j];
+  axis_arr = q.Z0s;
+  q.Z0s.resize(newsize, 0.0);
+  for (j = 0; j < oldsize; j++) q.Z0s[j] = axis_arr[j];
+  
+  bool_arr = vary_R0c;
+  vary_R0c.resize(newsize, false);
+  for (j = 0; j < oldsize; j++) vary_R0c[j] = bool_arr[j];
+  bool_arr = vary_R0s;
+  vary_R0s.resize(newsize, false);
+  for (j = 0; j < oldsize; j++) vary_R0s[j] = bool_arr[j];
+  bool_arr = vary_Z0c;
+  vary_Z0c.resize(newsize, false);
+  for (j = 0; j < oldsize; j++) vary_Z0c[j] = bool_arr[j];
+  bool_arr = vary_Z0s;
+  vary_Z0s.resize(newsize, false);
+  for (j = 0; j < oldsize; j++) vary_Z0s[j] = bool_arr[j];
 
-  gsl_vector *gsl_residual = gsl_vector_alloc(n_terms);
-  gsl_vector *gsl_state_vector = gsl_vector_alloc(n_parameters);
-  gsl_multifit_nlinear_fdf gsl_optimizer;
-  gsl_multifit_nlinear_parameters gsl_optimizer_params = gsl_multifit_nlinear_default_parameters();
-  gsl_optimizer.f = gsl_residual_function;
-  // gsl_optimizer.df = gsl_residual_function_and_Jacobian;
-  // gsl_optimizer.fvv = func_fvv;
-  gsl_optimizer.df = NULL;
-  gsl_optimizer.fvv = NULL;
-  gsl_optimizer.n = n_terms;
-  gsl_optimizer.p = n_parameters;
-  gsl_optimizer.params = (void*)this;
-  /*
-  // Set finite difference step sizes:
-  gsl_optimizer_params.h_df = 1.0e-5;
-  gsl_optimizer_params.h_fvv = 1.0e-5;
-  */
-
-  // Set initial condition. This would be an invalid cast if SINGLE.
-#ifndef SINGLE
-  set_state_vector(gsl_state_vector->data);
-#endif
-
+  const gsl_multifit_nlinear_trs * gsl_multifit_nlinear_trs_choice;
   if (verbose > 0) std::cout << "Algorithm: ";
   switch (algorithm) {
   case GSL_LM:
-    gsl_optimizer_params.trs = gsl_multifit_nlinear_trs_lm;
+    gsl_multifit_nlinear_trs_choice = gsl_multifit_nlinear_trs_lm;
     if (verbose > 0) std::cout << "Levenberg-Marquardt" << std::endl;
     break;
   case GSL_DOGLEG:
-    gsl_optimizer_params.trs = gsl_multifit_nlinear_trs_dogleg;
+    gsl_multifit_nlinear_trs_choice = gsl_multifit_nlinear_trs_dogleg;
     if (verbose > 0) std::cout << "Dogleg" << std::endl;
     break;
   case GSL_DDOGLEG:
-    gsl_optimizer_params.trs = gsl_multifit_nlinear_trs_ddogleg;
+    gsl_multifit_nlinear_trs_choice = gsl_multifit_nlinear_trs_ddogleg;
     if (verbose > 0) std::cout << "Double dogleg" << std::endl;
     break;
   case GSL_SUBSPACE2D:
-    gsl_optimizer_params.trs = gsl_multifit_nlinear_trs_subspace2D;
+    gsl_multifit_nlinear_trs_choice = gsl_multifit_nlinear_trs_subspace2D;
     if (verbose > 0) std::cout << "Subspace-2D" << std::endl;
     break;
   default:
     throw std::runtime_error("Error! in optimize_least_squares_gsl.cpp switch! Should not get here!");
   }
 
-  // Set other optimizer parameters
-  gsl_optimizer_params.solver = gsl_multifit_nlinear_solver_cholesky;
-  // For the above option, there is a trade-off between speed vs
-  // robustness when the problem may be rank-deficient. Other options
-  // are described in the GSL documentation.
-  const gsl_multifit_nlinear_type *T = gsl_multifit_nlinear_trust;
-  const double xtol = 1.0e-8;
-  const double gtol = 1.0e-8;
-  const double ftol = 1.0e-8;
-  gsl_multifit_nlinear_workspace *work = gsl_multifit_nlinear_alloc(T, &gsl_optimizer_params, n_terms, n_parameters);
-  gsl_vector * f = gsl_multifit_nlinear_residual(work);
-  gsl_vector * x = gsl_multifit_nlinear_position(work);
-  int info;
 
-  // GSL runs 1 more iteration than I want it to:
-  int max_iter_for_gsl = max_iter - 1;
+  std::cout << "optimizing..." << std::endl;
   
-  // Run the optimization
-  gsl_multifit_nlinear_init(gsl_state_vector, &gsl_optimizer, work);
-  gsl_multifit_nlinear_driver(max_iter_for_gsl, xtol, gtol, ftol,
+  init_residuals();
+  n_iter = 0;
+  for (j_fourier_refine = 0; j_fourier_refine <= fourier_refine; j_fourier_refine++) {
+    if (n_iter >= max_iter - 2) {
+      if (verbose > 0) std::cout << "Skipping j_fourier_refine = " << j_fourier_refine << " since n_iter is too large." << std::endl;
+      break;
+    }
+    if (j_fourier_refine > 0) {
+      vary_R0c[oldsize + j_fourier_refine - 1] = true;
+      vary_Z0s[oldsize + j_fourier_refine - 1] = true;
+      // For non-stellarator-symmetry, could also modify vary_R0s and vary_Z0c here.
+    }
+    if (verbose > 0) {
+      std::cout << "`````````````````````````````````````````````````" << std::endl;
+      std::cout << "Beginning optimization with j_fourier_refine = " << j_fourier_refine << std::endl;
+      std::cout << "vary_R0c: ";
+      std::cout << vary_R0c << std::endl;
+      std::cout << "vary_R0s: ";
+      std::cout << vary_R0s << std::endl;
+      std::cout << "vary_Z0c: ";
+      std::cout << vary_Z0c << std::endl;
+      std::cout << "vary_Z0s: ";
+      std::cout << vary_Z0s << std::endl;
+    }
+    init_parameters();
+    q.init();
+  
+    if (!q.order_r2p1) {
+      std::cout << "Optimization presently only works with order_r_option = r2.1." << std::endl;
+      return;
+    }
+
+    gsl_vector *gsl_residual = gsl_vector_alloc(n_terms);
+    gsl_vector *gsl_state_vector = gsl_vector_alloc(n_parameters);
+    gsl_multifit_nlinear_fdf gsl_optimizer;
+    gsl_multifit_nlinear_parameters gsl_optimizer_params = gsl_multifit_nlinear_default_parameters();
+    gsl_optimizer.f = gsl_residual_function;
+    // gsl_optimizer.df = gsl_residual_function_and_Jacobian;
+    // gsl_optimizer.fvv = func_fvv;
+    gsl_optimizer.df = NULL;
+    gsl_optimizer.fvv = NULL;
+    gsl_optimizer.n = n_terms;
+    gsl_optimizer.p = n_parameters;
+    gsl_optimizer.params = (void*)this;
+    /*
+    // Set finite difference step sizes:
+    gsl_optimizer_params.h_df = 1.0e-5;
+    gsl_optimizer_params.h_fvv = 1.0e-5;
+    */
+    
+    // Set initial condition. This would be an invalid cast if SINGLE.
+#ifndef SINGLE
+    set_state_vector(gsl_state_vector->data);
+#endif
+
+    // Set other optimizer parameters
+    gsl_optimizer_params.trs = gsl_multifit_nlinear_trs_choice;
+    gsl_optimizer_params.solver = gsl_multifit_nlinear_solver_cholesky;
+    // For the above option, there is a trade-off between speed vs
+    // robustness when the problem may be rank-deficient. Other options
+    // are described in the GSL documentation.
+    const gsl_multifit_nlinear_type *T = gsl_multifit_nlinear_trust;
+    const double xtol = 1.0e-8;
+    const double gtol = 1.0e-8;
+    const double ftol = 1.0e-8;
+    gsl_multifit_nlinear_workspace *work = gsl_multifit_nlinear_alloc(T, &gsl_optimizer_params, n_terms, n_parameters);
+    gsl_vector * f = gsl_multifit_nlinear_residual(work);
+    gsl_vector * x = gsl_multifit_nlinear_position(work);
+    int info;
+    
+    // GSL runs 1 more iteration than I want it to:
+    int max_iter_for_gsl = max_iter - 1 - n_iter;
+    
+    // Run the optimization
+    gsl_multifit_nlinear_init(gsl_state_vector, &gsl_optimizer, work);
+    gsl_multifit_nlinear_driver(max_iter_for_gsl, xtol, gtol, ftol,
 				gsl_callback, (void*)this, &info, work);
-
-  if (verbose > 0) {
-    std::cout << "----- Results from the optimization -----" << std::endl;
-    std::cout << "n_iter: " << n_iter << "  niter from GSL: "
-	      << gsl_multifit_nlinear_niter(work) << std::endl;
-    std::cout << "# of function evals: " << gsl_optimizer.nevalf << std::endl;
-    std::cout << "Final configuration:" << std::endl;
-    std::cout << "  eta_bar: " << q.eta_bar << "  sigma0: " << q.sigma0 << std::endl;
-    std::cout << "  B2c: " << q.B2c << "  B2s: " << q.B2s << std::endl;
-    std::cout << "  R0c: " << q.R0c << std::endl;
-    std::cout << "  R0s: " << q.R0s << std::endl;
-    std::cout << "  Z0c: " << q.Z0c << std::endl;
-    std::cout << "  Z0s: " << q.Z0s << std::endl;
-    std::cout << "  iota: " << q.iota << "  r_singularity: " << q.r_singularity_robust << std::endl;
-    std::cout << "  L grad B: " << q.grid_min_L_grad_B << "  L grad grad B: " << q.grid_min_L_grad_grad_B << std::endl;
-    std::cout << "  B20 variation: " << q.B20_grid_variation << std::endl;
-    std::cout << "  d2 volume / d psi2: " << q.d2_volume_d_psi2 << std::endl;
+    
+    if (verbose > 0) {
+      std::cout << "----- Results from the optimization -----" << std::endl;
+      std::cout << "n_iter: " << n_iter << "  niter from GSL: "
+		<< gsl_multifit_nlinear_niter(work) << std::endl;
+      std::cout << "# of function evals: " << gsl_optimizer.nevalf << std::endl;
+      std::cout << "Final configuration:" << std::endl;
+      std::cout << "  eta_bar: " << q.eta_bar << "  sigma0: " << q.sigma0 << std::endl;
+      std::cout << "  B2c: " << q.B2c << "  B2s: " << q.B2s << std::endl;
+      std::cout << "  R0c: " << q.R0c << std::endl;
+      std::cout << "  R0s: " << q.R0s << std::endl;
+      std::cout << "  Z0c: " << q.Z0c << std::endl;
+      std::cout << "  Z0s: " << q.Z0s << std::endl;
+      std::cout << "  iota: " << q.iota << "  r_singularity: " << q.r_singularity_robust << std::endl;
+      std::cout << "  L grad B: " << q.grid_min_L_grad_B << "  L grad grad B: " << q.grid_min_L_grad_grad_B << std::endl;
+      std::cout << "  B20 variation: " << q.B20_grid_variation << std::endl;
+      std::cout << "  d2 volume / d psi2: " << q.d2_volume_d_psi2 << std::endl;
+    }
+    
+    gsl_multifit_nlinear_free(work);
+    gsl_vector_free(gsl_residual);
+    gsl_vector_free(gsl_state_vector);
   }
-
-  gsl_multifit_nlinear_free(work);
-  gsl_vector_free(gsl_residual);
-  gsl_vector_free(gsl_state_vector);
   if (verbose > 0) std::cout << "Goodbye from optimize" << std::endl;
 }
 
@@ -161,10 +221,9 @@ int gsl_residual_function(const gsl_vector * x, void *params, gsl_vector * f) {
 
 //////////////////////////////////////////////////////////////////////////////
 
-void Opt::init() {
+void Opt::init_parameters() {
   int j;
-  std::ofstream output_file;
-
+ 
   // Initialize the parameters in the state vector.
   // The order of parameters here must match the order in
   // Opt::set_state_vector() and Opt::unpack_state_vector().
@@ -217,6 +276,19 @@ void Opt::init() {
     for (j = 0; j < n_parameters; j++)
       std::cout << "  " << j << ", " << state_vector_names[j] << std::endl;
   }
+  
+  if (verbose > 0)
+    std::cout << "n_parameters: " << n_parameters << std::endl;
+
+  if (n_parameters < 1)
+    throw std::runtime_error("There must be at least 1 parameter varied.");
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+void Opt::init_residuals() {
+  int j;
+  std::ofstream output_file;
 
   // Initialize the terms in the residual.
   // The order of terms here must match the order in
@@ -284,10 +356,8 @@ void Opt::init() {
   }
 
   if (verbose > 0)
-    std::cout << "n_parameters: " << n_parameters << "  n_terms: " << n_terms << std::endl;
+    std::cout << "n_terms: " << n_terms << std::endl;
 
-  if (n_parameters < 1)
-    throw std::runtime_error("There must be at least 1 parameter varied.");
   if (n_terms < 1)
     throw std::runtime_error("There must be at least 1 residual term.");
   residuals.resize(n_terms, 0.0);
@@ -669,6 +739,7 @@ void gsl_callback(const size_t iter, void *params,
     opt->iter_Z0c(j, n_iter) = opt->q.Z0c[j];
     opt->iter_Z0s(j, n_iter) = opt->q.Z0s[j];
   }
-    
+
+  opt->iter_fourier_refine_step[n_iter] = opt->j_fourier_refine;
   opt->n_iter++;
 }

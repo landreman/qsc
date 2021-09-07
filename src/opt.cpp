@@ -9,6 +9,7 @@ void Opt::defaults() {
   max_iter = 3000;
   make_names = true;
   algorithm = GSL_LM;
+  fourier_refine = 0;
 
   vary_eta_bar = true;
   vary_sigma0 = false;

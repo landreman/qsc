@@ -69,6 +69,7 @@ include_directories(src)
 include_directories(externalPackages/doctest)
 include_directories(externalPackages/toml11)
 include_directories("${NETCDF_INCLUDES}")
+include_directories("${GSL_INCLUDE_DIRS}")
 
 # Get a list of all source files except for the driver:
 file(GLOB SOURCES "src/*.cpp")

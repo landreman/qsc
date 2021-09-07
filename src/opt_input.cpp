@@ -56,6 +56,7 @@ void Opt::input(std::string filename) {
   toml_read(varlist, indata, "max_iter", max_iter);
   toml_read(varlist, indata, "verbose", verbose);
   toml_read(varlist, indata, "make_names", make_names);
+  toml_read(varlist, indata, "fourier_refine", fourier_refine);
 
   std::string algorithm_str = "";
   toml_read(varlist, indata, "algorithm", algorithm_str);
@@ -78,6 +79,7 @@ void Opt::input(std::string filename) {
   if (verbose > 0) {
     std::cout << "----- Optimization parameters -----" << std::endl;
     std::cout << "max_iter: " << max_iter << std::endl;
+    std::cout << "fourier_refine: " << fourier_refine << std::endl;
     std::cout << "algorithm: ";
     switch (algorithm) {
     case GSL_LM:

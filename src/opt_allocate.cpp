@@ -25,10 +25,10 @@ void Opt::allocate() {
   iter_B2s.resize(max_iter, 0.0);
   iter_B2c.resize(max_iter, 0.0);
   
-  iter_R0c.resize(q.R0c.size(), max_iter, 0.0);
-  iter_R0s.resize(q.R0c.size(), max_iter, 0.0);
-  iter_Z0c.resize(q.R0c.size(), max_iter, 0.0);
-  iter_Z0s.resize(q.R0c.size(), max_iter, 0.0);
+  iter_R0c.resize(q.R0c.size() + fourier_refine, max_iter, 0.0);
+  iter_R0s.resize(q.R0c.size() + fourier_refine, max_iter, 0.0);
+  iter_Z0c.resize(q.R0c.size() + fourier_refine, max_iter, 0.0);
+  iter_Z0s.resize(q.R0c.size() + fourier_refine, max_iter, 0.0);
   
   iter_min_R0.resize(max_iter, 0.0);
   iter_max_curvature.resize(max_iter, 0.0);
@@ -43,5 +43,6 @@ void Opt::allocate() {
   iter_DMerc_times_r2.resize(max_iter, 0.0);
   iter_standard_deviation_of_R.resize(max_iter, 0.0);
   iter_standard_deviation_of_Z.resize(max_iter, 0.0);
-  
+
+  iter_fourier_refine_step.resize(max_iter, 0);
 }

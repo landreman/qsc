@@ -16,12 +16,13 @@ namespace qsc {
   } algorithm_type;
   
   class Opt {
-  private:
+  private:    
     void defaults();
     
   public:
     Qsc q;
     int max_iter, n_iter;
+    int j_fourier_refine;
     int n_parameters, n_terms;
     int verbose;
     std::string outfilename;
@@ -30,6 +31,7 @@ namespace qsc {
     std::vector<std::string> state_vector_names, residual_names;
     algorithm_type algorithm;
     Vector residuals;
+    int fourier_refine;
 
     bool vary_eta_bar, vary_sigma0;
     bool vary_B2c, vary_B2s;
@@ -64,11 +66,13 @@ namespace qsc {
     Vector iter_r_singularity, iter_B20_variation, iter_B20_residual;
     Vector iter_d2_volume_d_psi2, iter_DMerc_times_r2;
     Vector iter_standard_deviation_of_R, iter_standard_deviation_of_Z;
+    std::valarray<int> iter_fourier_refine_step;
     
     Opt();
     void run(std::string);
     void allocate();
-    void init();
+    void init_parameters();
+    void init_residuals();
     void input(std::string);
     void optimize();
     void write_netcdf();
