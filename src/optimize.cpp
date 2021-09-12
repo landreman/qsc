@@ -81,7 +81,7 @@ void Opt::optimize() {
   init_residuals();
   n_iter = 0;
   for (j_fourier_refine = 0; j_fourier_refine <= fourier_refine; j_fourier_refine++) {
-    if (n_iter >= max_iter - 2) {
+    if (n_iter >= max_iter - 1) {
       if (verbose > 0) std::cout << "Skipping j_fourier_refine = " << j_fourier_refine << " since n_iter is too large." << std::endl;
       break;
     }
