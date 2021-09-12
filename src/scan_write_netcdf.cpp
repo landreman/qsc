@@ -17,7 +17,7 @@ void Scan::write_netcdf() {
   if (verbose > 0) start = std::chrono::steady_clock::now();
 
   if (verbose > 0) std::cout << "Writing output to " << outfilename << std::endl;
-  qsc::NetCDFWriter nc(outfilename);
+  qsc::NetCDFWriter nc(outfilename, false);
 
   // Define dimensions
   dim_id_type nphi_dim, axis_nmax_plus_1_dim, n_scan_dim;

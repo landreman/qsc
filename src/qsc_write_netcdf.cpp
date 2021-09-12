@@ -10,7 +10,7 @@ void Qsc::write_netcdf(std::string filename) {
   if (verbose > 0) start = std::chrono::steady_clock::now();
 
   if (verbose > 0) std::cout << "Writing output to " << filename << std::endl;
-  qsc::NetCDFWriter nc(filename);
+  qsc::NetCDFWriter nc(filename, false);
 
   // Define dimensions
   dim_id_type nphi_dim, axis_nmax_plus_1_dim, nbt_dim;

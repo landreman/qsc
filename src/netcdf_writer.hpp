@@ -38,8 +38,9 @@ namespace qsc {
     static void ERR(int);
     
   public:
-    NetCDFWriter(std::string);
+    NetCDFWriter(std::string, bool);
     dim_id_type dim(std::string, int);
+    dim_id_type get_dim(std::string);
     void add_attribute(int, std::string, std::string);
     
     // Scalars:

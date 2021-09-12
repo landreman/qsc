@@ -5,14 +5,16 @@ using namespace qsc;
 
 void Opt::write_netcdf() {
   if (verbose > 0) std::cout << "Writing output to " << outfilename << std::endl;
-  qsc::NetCDFWriter nc(outfilename);
+  // Write the final configuration:
+  q.write_netcdf(outfilename);
+  // Append extra info about the optimization:
+  qsc::NetCDFWriter nc(outfilename, true);
 
   // Define dimensions
-  dim_id_type nphi_dim, axis_nmax_plus_1_dim, n_iter_dim;
-  nphi_dim = nc.dim("nphi", q.nphi);
-  axis_nmax_plus_1_dim = nc.dim("axis_nmax_plus_1", q.R0c.size());
+  dim_id_type axis_nmax_plus_1_dim, n_iter_dim;
+  axis_nmax_plus_1_dim = nc.get_dim("axis_nmax_plus_1");
   n_iter_dim = nc.dim("n_iter", n_iter);
-  
+
   // Scalars
   nc.put("n_iter", n_iter, "Number of optimization iterations saved", "dimensionless");
 
@@ -190,8 +192,8 @@ void Opt::write_netcdf() {
   nc.put(axis_nmax_plus_1_n_iter_dim, "iter_R0s", &iter_R0s(0, 0), "The amplitudes of the sin(n*phi) components of the major radius of the magnetic axis", "meter");
   nc.put(axis_nmax_plus_1_n_iter_dim, "iter_Z0c", &iter_Z0c(0, 0), "The amplitudes of the cos(n*phi) components of the Cartesian Z coordinate of the magnetic axis", "meter");
   nc.put(axis_nmax_plus_1_n_iter_dim, "iter_Z0s", &iter_Z0s(0, 0), "The amplitudes of the sin(n*phi) components of the Cartesian Z coordinate of the magnetic axis", "meter");
- 
+
   // Done defining the NetCDF data.
   nc.write_and_close();
-  
+
 }

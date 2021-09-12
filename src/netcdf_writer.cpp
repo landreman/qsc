@@ -10,21 +10,45 @@
 
 using namespace qsc;
 
-qsc::NetCDFWriter::NetCDFWriter(std::string filename) {
+qsc::NetCDFWriter::NetCDFWriter(std::string filename, bool append) {
   int retval;
-  // If you want to store long longs, "|NC_NETCDF4" must be included
-  // in the file type, but such files cannot be read with
-  // scipy.io.netcdf.
-  if ((retval = nc_create(filename.c_str(), NC_CLOBBER, &ncid))) ERR(retval);
+  if (append) {
+    // Add to an existing netcdf file:
+    if ((retval = nc_open(filename.c_str(), NC_WRITE, &ncid)))
+      ERR(retval);
+    // Go from "data mode" back to "define mode":
+    if ((retval = nc_redef(ncid)))
+      ERR(retval);
+  } else {
+    // Create a new netcdf file, overwriting any existing one with the same name.
+    
+    // If you want to store long longs, "|NC_NETCDF4" must be included
+    // in the file type, but such files cannot be read with
+    // scipy.io.netcdf.
+    if ((retval = nc_create(filename.c_str(), NC_CLOBBER, &ncid))) ERR(retval);
+  }
 }
 
 void qsc::NetCDFWriter::ERR(int e) {
   throw std::runtime_error(nc_strerror(e));
 }
 
+/**
+ * Create a new dimension.
+ */
 int qsc::NetCDFWriter::dim(std::string dimname, int val) {
   int dim_id, retval;
   if ((retval = nc_def_dim(ncid, dimname.c_str(), val, &dim_id)))
+    ERR(retval);
+  return dim_id;
+}
+
+/**
+ * Get the id for an existing dimension.
+ */
+int qsc::NetCDFWriter::get_dim(std::string dimname) {
+  int dim_id, retval;
+  if ((retval = nc_inq_dimid(ncid, dimname.c_str(), &dim_id)))
     ERR(retval);
   return dim_id;
 }
