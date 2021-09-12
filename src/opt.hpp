@@ -37,7 +37,8 @@ namespace qsc {
     bool vary_B2c, vary_B2s;
     std::valarray<bool> vary_R0c, vary_R0s, vary_Z0c, vary_Z0s;
     
-    qscfloat weight_B20, weight_iota, target_iota, weight_elongation;
+    qscfloat weight_B20, weight_iota, target_iota;
+    qscfloat weight_elongation, weight_curvature;
     qscfloat weight_R0, min_R0;
     qscfloat weight_d2_volume_d_psi2, max_d2_volume_d_psi2;
     qscfloat weight_XY2, weight_XY2Prime;
@@ -46,7 +47,8 @@ namespace qsc {
     qscfloat weight_grad_B, weight_grad_grad_B, weight_r_singularity;
 
     qscfloat objective_function;
-    qscfloat B20_term, iota_term, elongation_term;
+    qscfloat B20_term, iota_term;
+    qscfloat elongation_term, curvature_term;
     qscfloat R0_term, d2_volume_d_psi2_term;
     qscfloat XY2_term, XY2Prime_term;
     qscfloat Z2_term, Z2Prime_term;
@@ -54,7 +56,8 @@ namespace qsc {
     qscfloat grad_B_term, grad_grad_B_term, r_singularity_term;
 
     Vector iter_objective_function;
-    Vector iter_B20_term, iter_iota_term, iter_elongation_term;
+    Vector iter_B20_term, iter_iota_term;
+    Vector iter_elongation_term, iter_curvature_term;
     Vector iter_R0_term, iter_d2_volume_d_psi2_term;
     Vector iter_XY2_term, iter_XY2Prime_term;
     Vector iter_Z2_term, iter_Z2Prime_term;

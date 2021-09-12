@@ -12,6 +12,7 @@ void Opt::allocate() {
   iter_B20_term.resize(max_iter, 0.0);
   iter_iota_term.resize(max_iter, 0.0);
   iter_elongation_term.resize(max_iter, 0.0);
+  iter_curvature_term.resize(max_iter, 0.0);
   iter_R0_term.resize(max_iter, 0.0);
   iter_d2_volume_d_psi2_term.resize(max_iter, 0.0);
   iter_XY2_term.resize(max_iter, 0.0);

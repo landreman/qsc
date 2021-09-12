@@ -309,6 +309,11 @@ void Opt::init_residuals() {
     if (make_names)
       for (j = 0; j < q.nphi; j++) residual_names.push_back("elongation[" + std::to_string(j) + "]");
   }
+  if (weight_curvature > 0) {
+    n_terms += q.nphi;
+    if (make_names)
+      for (j = 0; j < q.nphi; j++) residual_names.push_back("curvature[" + std::to_string(j) + "]");
+  }
   if (weight_R0 > 0) {
     n_terms += q.nphi;
     if (make_names)
@@ -494,6 +499,7 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   B20_term = 0.0;
   iota_term = 0.0;
   elongation_term = 0.0;
+  curvature_term = 0.0;
   R0_term = 0.0;
   d2_volume_d_psi2_term = 0.0;
   XY2_term = 0.0;
@@ -528,6 +534,15 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
       term = weight_elongation * arclength_factor[k] * q.elongation[k];
       residuals[j] = term;
       elongation_term += term * term;
+      j++;
+    }
+  }
+  
+  if (weight_curvature > 0) {
+    for (k = 0; k < q.nphi; k++) {
+      term = weight_curvature * arclength_factor[k] * q.curvature[k];
+      residuals[j] = term;
+      curvature_term += term * term;
       j++;
     }
   }
@@ -735,6 +750,7 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   B20_term *= 0.5;
   iota_term *= 0.5;
   elongation_term *= 0.5;
+  curvature_term *= 0.5;
   R0_term *= 0.5;
   d2_volume_d_psi2_term *= 0.5;
   XY2_term *= 0.5;
@@ -747,7 +763,8 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   grad_grad_B_term *= 0.5;
   r_singularity_term *= 0.5;
     
-  objective_function = B20_term + iota_term + elongation_term
+  objective_function = B20_term + iota_term
+    + elongation_term + curvature_term
     + R0_term + d2_volume_d_psi2_term
     + XY2_term + XY2Prime_term
     + Z2_term + Z2Prime_term
@@ -798,6 +815,7 @@ void gsl_callback(const size_t iter, void *params,
   opt->iter_B20_term[n_iter] = opt->B20_term;
   opt->iter_iota_term[n_iter] = opt->iota_term;
   opt->iter_elongation_term[n_iter] = opt->elongation_term;
+  opt->iter_curvature_term[n_iter] = opt->curvature_term;
   opt->iter_R0_term[n_iter] = opt->R0_term;
   opt->iter_d2_volume_d_psi2_term[n_iter] = opt->d2_volume_d_psi2_term;
   opt->iter_XY2_term[n_iter] = opt->XY2_term;

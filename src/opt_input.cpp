@@ -43,6 +43,7 @@ void Opt::input(std::string filename) {
   toml_read(varlist, indata, "weight_iota", weight_iota);
   toml_read(varlist, indata, "target_iota", target_iota);
   toml_read(varlist, indata, "weight_elongation", weight_elongation);
+  toml_read(varlist, indata, "weight_curvature", weight_curvature);
   toml_read(varlist, indata, "weight_R0", weight_R0);
   toml_read(varlist, indata, "min_R0", min_R0);
   toml_read(varlist, indata, "weight_d2_volume_d_psi2", weight_d2_volume_d_psi2);
@@ -128,6 +129,7 @@ void Opt::input(std::string filename) {
     std::cout << "weight_iota: " << weight_iota << std::endl;
     std::cout << "target_iota: " << target_iota << std::endl;
     std::cout << "weight_elongation: " << weight_elongation << std::endl;
+    std::cout << "weight_curvature: " << weight_curvature << std::endl;
     std::cout << "weight_R0: " << weight_R0 << std::endl;
     std::cout << "min_R0: " << min_R0 << std::endl;
     std::cout << "weight_d2_volume_d_psi2: " << weight_d2_volume_d_psi2 << std::endl;

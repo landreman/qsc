@@ -24,6 +24,7 @@ void Opt::write_netcdf() {
   nc.put(n_iter_dim, "iter_B20_term", iter_B20_term, "B20 term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_iota_term", iter_iota_term, "Iota term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_elongation_term", iter_elongation_term, "Elongation term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_curvature_term", iter_elongation_term, "Curvature term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_R0_term", iter_R0_term, "R0 term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_d2_volume_d_psi2_term", iter_d2_volume_d_psi2_term, "Magnetic well term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_XY2_term", iter_XY2_term, "(X2,Y2) term in the objective function at each iteration", "dimensionless");

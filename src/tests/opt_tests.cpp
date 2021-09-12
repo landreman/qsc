@@ -27,6 +27,7 @@ TEST_CASE("Each term in the objective function should be approximately independe
   o1.weight_B20 = 2.0;
   o1.weight_iota = 3.0;
   o1.weight_elongation = 3.5;
+  o1.weight_curvature = 3.7;
   o1.weight_R0 = 4.0;
   o1.min_R0 = 0.8;
   o1.weight_d2_volume_d_psi2 = 5.0;
@@ -43,6 +44,7 @@ TEST_CASE("Each term in the objective function should be approximately independe
   o2.weight_B20 = 2.0;
   o2.weight_iota = 3.0;
   o2.weight_elongation = 3.5;
+  o2.weight_curvature = 3.7;
   o2.weight_R0 = 4.0;
   o2.min_R0 = 0.8;
   o2.weight_d2_volume_d_psi2 = 5.0;
@@ -71,6 +73,7 @@ TEST_CASE("Each term in the objective function should be approximately independe
   CHECK(Approx(o1.B20_term).epsilon(tol) == o2.B20_term);
   CHECK(Approx(o1.iota_term).epsilon(tol) == o2.iota_term);
   CHECK(Approx(o1.elongation_term).epsilon(tol) == o2.elongation_term);
+  CHECK(Approx(o1.curvature_term).epsilon(tol) == o2.curvature_term);
   CHECK(Approx(o1.R0_term).epsilon(1.0e-4) == o2.R0_term); // This term needs a wider tolerance
   CHECK(Approx(o1.d2_volume_d_psi2_term).epsilon(tol) == o2.d2_volume_d_psi2_term);
   CHECK(Approx(o1.XY2_term).epsilon(tol) == o2.XY2_term);
@@ -112,6 +115,7 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
       opt.weight_B20 = 2.0;
       opt.weight_iota = 3.0;
       opt.weight_elongation = 3.5;
+      opt.weight_curvature = 3.7;
       opt.weight_R0 = 4.0;
       opt.min_R0 = 0.8;
       opt.weight_d2_volume_d_psi2 = 5.0;
