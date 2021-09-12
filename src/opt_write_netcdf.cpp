@@ -21,12 +21,16 @@ void Opt::write_netcdf() {
   nc.put(n_iter_dim, "iter_objective_function", iter_objective_function, "Total objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_B20_term", iter_B20_term, "B20 term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_iota_term", iter_iota_term, "Iota term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_elongation_term", iter_elongation_term, "Elongation term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_R0_term", iter_R0_term, "R0 term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_d2_volume_d_psi2_term", iter_d2_volume_d_psi2_term, "Magnetic well term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_XY2_term", iter_XY2_term, "(X2,Y2) term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_XY2Prime_term", iter_XY2Prime_term, "(d_X2_d_varphi, d_Y2_d_varphi) term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_Z2_term", iter_Z2_term, "Z2 term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_Z2Prime_term", iter_Z2Prime_term, "d_Z2_d_varphi term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_XY3_term", iter_XY3_term, "(X3,Y3) term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_XY3Prime_term", iter_XY3Prime_term, "(d_X3_d_varphi, d_Y3_d_varphi) term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_grad_B_term", iter_grad_B_term, "grad B term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_grad_grad_B_term", iter_grad_grad_B_term, "grad grad B term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_r_singularity_term", iter_r_singularity_term, "r_singularity term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_eta_bar", iter_eta_bar, "eta_bar at each iteration", "dimensionless");

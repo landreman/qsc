@@ -42,14 +42,18 @@ void Opt::input(std::string filename) {
   toml_read(varlist, indata, "weight_B20", weight_B20);
   toml_read(varlist, indata, "weight_iota", weight_iota);
   toml_read(varlist, indata, "target_iota", target_iota);
+  toml_read(varlist, indata, "weight_elongation", weight_elongation);
   toml_read(varlist, indata, "weight_R0", weight_R0);
   toml_read(varlist, indata, "min_R0", min_R0);
   toml_read(varlist, indata, "weight_d2_volume_d_psi2", weight_d2_volume_d_psi2);
   toml_read(varlist, indata, "max_d2_volume_d_psi2", max_d2_volume_d_psi2);
   toml_read(varlist, indata, "weight_XY2", weight_XY2);
   toml_read(varlist, indata, "weight_XY2Prime", weight_XY2Prime);
+  toml_read(varlist, indata, "weight_Z2", weight_Z2);
+  toml_read(varlist, indata, "weight_Z2Prime", weight_Z2Prime);
   toml_read(varlist, indata, "weight_XY3", weight_XY3);
   toml_read(varlist, indata, "weight_XY3Prime", weight_XY3Prime);
+  toml_read(varlist, indata, "weight_grad_B", weight_grad_B);
   toml_read(varlist, indata, "weight_grad_grad_B", weight_grad_grad_B);
   toml_read(varlist, indata, "weight_r_singularity", weight_r_singularity);
 
@@ -123,14 +127,19 @@ void Opt::input(std::string filename) {
     std::cout << "weight_B20: " << weight_B20 << std::endl;
     std::cout << "weight_iota: " << weight_iota << std::endl;
     std::cout << "target_iota: " << target_iota << std::endl;
+    std::cout << "weight_elongation: " << weight_elongation << std::endl;
     std::cout << "weight_R0: " << weight_R0 << std::endl;
     std::cout << "min_R0: " << min_R0 << std::endl;
     std::cout << "weight_d2_volume_d_psi2: " << weight_d2_volume_d_psi2 << std::endl;
     std::cout << "max_d2_volume_d_psi2: " << max_d2_volume_d_psi2 << std::endl;
     std::cout << "weight_XY2: " << weight_XY2 << std::endl;
     std::cout << "weight_XY2Prime: " << weight_XY2Prime << std::endl;
+    std::cout << "weight_Z2: " << weight_Z2 << std::endl;
+    std::cout << "weight_Z2Prime: " << weight_Z2Prime << std::endl;
     std::cout << "weight_XY3: " << weight_XY3 << std::endl;
     std::cout << "weight_XY3Prime: " << weight_XY3Prime << std::endl;
+    std::cout << "weight_grad_B: " << weight_grad_B << std::endl;
     std::cout << "weight_grad_grad_B: " << weight_grad_grad_B << std::endl;
+    std::cout << "weight_r_singularity: " << weight_r_singularity << std::endl;
   }
 }

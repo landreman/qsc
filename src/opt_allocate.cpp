@@ -11,12 +11,16 @@ void Opt::allocate() {
   iter_objective_function.resize(max_iter, 0.0);
   iter_B20_term.resize(max_iter, 0.0);
   iter_iota_term.resize(max_iter, 0.0);
+  iter_elongation_term.resize(max_iter, 0.0);
   iter_R0_term.resize(max_iter, 0.0);
   iter_d2_volume_d_psi2_term.resize(max_iter, 0.0);
   iter_XY2_term.resize(max_iter, 0.0);
   iter_XY2Prime_term.resize(max_iter, 0.0);
+  iter_Z2_term.resize(max_iter, 0.0);
+  iter_Z2Prime_term.resize(max_iter, 0.0);
   iter_XY3_term.resize(max_iter, 0.0);
   iter_XY3Prime_term.resize(max_iter, 0.0);
+  iter_grad_B_term.resize(max_iter, 0.0);
   iter_grad_grad_B_term.resize(max_iter, 0.0);
   iter_r_singularity_term.resize(max_iter, 0.0);
   

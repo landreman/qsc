@@ -7,7 +7,7 @@
 using namespace qsc;
 using doctest::Approx;
 
-TEST_CASE("Each term in the objective function should be approximately independent of nphi") {
+TEST_CASE("Each term in the objective function should be approximately independent of nphi [opt]") {
   if (single) return;
   
   Opt o1, o2;
@@ -26,25 +26,35 @@ TEST_CASE("Each term in the objective function should be approximately independe
   // Turn on all residual terms:
   o1.weight_B20 = 2.0;
   o1.weight_iota = 3.0;
+  o1.weight_elongation = 3.5;
   o1.weight_R0 = 4.0;
   o1.min_R0 = 0.8;
   o1.weight_d2_volume_d_psi2 = 5.0;
   o1.weight_XY2 = 6.0;
   o1.weight_XY2Prime = 7.0;
+  o1.weight_Z2 = 6.5;
+  o1.weight_Z2Prime = 7.5;
   o1.weight_XY3 = 8.0;
   o1.weight_XY3Prime = 9.0;
-  o1.weight_grad_grad_B = 10.0;
+  o1.weight_grad_B = 10.0;
+  o1.weight_grad_grad_B = 11.0;
+  o1.weight_r_singularity = 12.0;
   
   o2.weight_B20 = 2.0;
   o2.weight_iota = 3.0;
+  o2.weight_elongation = 3.5;
   o2.weight_R0 = 4.0;
   o2.min_R0 = 0.8;
   o2.weight_d2_volume_d_psi2 = 5.0;
   o2.weight_XY2 = 6.0;
   o2.weight_XY2Prime = 7.0;
+  o2.weight_Z2 = 6.5;
+  o2.weight_Z2Prime = 7.5;
   o2.weight_XY3 = 8.0;
   o2.weight_XY3Prime = 9.0;
-  o2.weight_grad_grad_B = 10.0;
+  o2.weight_grad_B = 10.0;
+  o2.weight_grad_grad_B = 11.0;
+  o2.weight_r_singularity = 12.0;
 
   o1.init_parameters();
   o1.init_residuals();
@@ -60,17 +70,22 @@ TEST_CASE("Each term in the objective function should be approximately independe
   CHECK(Approx(o1.objective_function).epsilon(tol) == o2.objective_function);
   CHECK(Approx(o1.B20_term).epsilon(tol) == o2.B20_term);
   CHECK(Approx(o1.iota_term).epsilon(tol) == o2.iota_term);
+  CHECK(Approx(o1.elongation_term).epsilon(tol) == o2.elongation_term);
   CHECK(Approx(o1.R0_term).epsilon(1.0e-4) == o2.R0_term); // This term needs a wider tolerance
   CHECK(Approx(o1.d2_volume_d_psi2_term).epsilon(tol) == o2.d2_volume_d_psi2_term);
   CHECK(Approx(o1.XY2_term).epsilon(tol) == o2.XY2_term);
   CHECK(Approx(o1.XY2Prime_term).epsilon(tol) == o2.XY2Prime_term);
+  CHECK(Approx(o1.Z2_term).epsilon(tol) == o2.Z2_term);
+  CHECK(Approx(o1.Z2Prime_term).epsilon(tol) == o2.Z2Prime_term);
   CHECK(Approx(o1.XY3_term).epsilon(tol) == o2.XY3_term);
   CHECK(Approx(o1.XY3Prime_term).epsilon(tol) == o2.XY3Prime_term);
+  CHECK(Approx(o1.grad_B_term).epsilon(tol) == o2.grad_B_term);
   CHECK(Approx(o1.grad_grad_B_term).epsilon(tol) == o2.grad_grad_B_term);
+  CHECK(Approx(o1.r_singularity_term).epsilon(tol) == o2.r_singularity_term);
 
 }
 
-TEST_CASE("Running standalone QSC on each configuration in the optimization history should give the corresponding iter_ values. Also confirm that inputs were fixed or varied as requested.") {
+TEST_CASE("Running standalone QSC on each configuration in the optimization history should give the corresponding iter_ values. Also confirm that inputs were fixed or varied as requested. [opt]") {
   if (single) return;
   int j, k;
 
@@ -96,14 +111,19 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
       // Turn on all residual terms:
       opt.weight_B20 = 2.0;
       opt.weight_iota = 3.0;
+      opt.weight_elongation = 3.5;
       opt.weight_R0 = 4.0;
       opt.min_R0 = 0.8;
       opt.weight_d2_volume_d_psi2 = 5.0;
       opt.weight_XY2 = 6.0;
       opt.weight_XY2Prime = 7.0;
+      opt.weight_Z2 = 6.5;
+      opt.weight_Z2Prime = 7.5;
       opt.weight_XY3 = 8.0;
       opt.weight_XY3Prime = 9.0;
-      opt.weight_grad_grad_B = 10.0;
+      opt.weight_grad_B = 10.0;
+      opt.weight_grad_grad_B = 11.0;
+      opt.weight_r_singularity = 12.0;
       
       switch (vary_axis_option) {
       case 0:
@@ -348,7 +368,7 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
   }
 }
 
-TEST_CASE("Check Opt::unpack_state_vector() and Opt::set_state_vector()") {
+TEST_CASE("Check Opt::unpack_state_vector() and Opt::set_state_vector() [opt]") {
   if (single) return;
 
   int j, index = 0;
@@ -431,7 +451,7 @@ TEST_CASE("Check Opt::unpack_state_vector() and Opt::set_state_vector()") {
   }
 }
 
-TEST_CASE("1d optimization for iota") {
+TEST_CASE("1d optimization for iota [opt]") {
   if (single) return;
 
   // Skip the subspace2D algorithm - I'm not sure why it gives an error.
@@ -525,7 +545,7 @@ TEST_CASE("1d optimization for iota") {
   }
 }
 
-TEST_CASE("Try Fourier refinement. Make sure the vary_R0c etc arrays are extended properly.") {
+TEST_CASE("Try Fourier refinement. Make sure the vary_R0c etc arrays are extended properly. [opt]") {
   if (single) return;
 
   for (int fourier_refine = 0; fourier_refine < 5; fourier_refine++) {
@@ -578,7 +598,7 @@ TEST_CASE("Try Fourier refinement. Make sure the vary_R0c etc arrays are extende
   }
 }
 
-TEST_CASE("Verify that Fourier refinement works gracefully if the max_iter limit is reached") {
+TEST_CASE("Verify that Fourier refinement works gracefully if the max_iter limit is reached [opt]") {
   if (single) return;
 
   for (int fourier_refine = 0; fourier_refine < 5; fourier_refine++) {

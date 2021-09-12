@@ -304,6 +304,11 @@ void Opt::init_residuals() {
     n_terms++;
     if (make_names) residual_names.push_back("iota");
   }
+  if (weight_elongation > 0) {
+    n_terms += q.nphi;
+    if (make_names)
+      for (j = 0; j < q.nphi; j++) residual_names.push_back("elongation[" + std::to_string(j) + "]");
+  }
   if (weight_R0 > 0) {
     n_terms += q.nphi;
     if (make_names)
@@ -323,6 +328,16 @@ void Opt::init_residuals() {
     if (make_names)
       for (j = 0; j < q.nphi * 6; j++) residual_names.push_back("XY2Prime[" + std::to_string(j) + "]");
   }
+  if (weight_Z2 > 0) {
+    n_terms += q.nphi * 3;
+    if (make_names)
+      for (j = 0; j < q.nphi * 3; j++) residual_names.push_back("Z2[" + std::to_string(j) + "]");
+  }
+  if (weight_Z2Prime > 0) {
+    n_terms += q.nphi * 3;
+    if (make_names)
+      for (j = 0; j < q.nphi * 3; j++) residual_names.push_back("Z2Prime[" + std::to_string(j) + "]");
+  }
   if (weight_XY3 > 0) {
     n_terms += q.nphi * 3;
     if (make_names)
@@ -332,6 +347,11 @@ void Opt::init_residuals() {
     n_terms += q.nphi * 3;
     if (make_names)
       for (j = 0; j < q.nphi * 3; j++) residual_names.push_back("XY3Prime[" + std::to_string(j) + "]");
+  }
+  if (weight_grad_B > 0) {
+    n_terms += q.nphi * 9;
+    if (make_names)
+      for (j = 0; j < q.nphi * 9; j++) residual_names.push_back("grad_B[" + std::to_string(j) + "]");
   }
   if (weight_grad_grad_B > 0) {
     n_terms += q.nphi * 27;
@@ -473,12 +493,16 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   objective_function = 0.0;
   B20_term = 0.0;
   iota_term = 0.0;
+  elongation_term = 0.0;
   R0_term = 0.0;
   d2_volume_d_psi2_term = 0.0;
   XY2_term = 0.0;
   XY2Prime_term = 0.0;
+  Z2_term = 0.0;
+  Z2Prime_term = 0.0;
   XY3_term = 0.0;
   XY3Prime_term = 0.0;
+  grad_B_term = 0.0;
   grad_grad_B_term = 0.0;
   r_singularity_term = 0.0;
 
@@ -499,6 +523,15 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
     j++;
   }
 
+  if (weight_elongation > 0) {
+    for (k = 0; k < q.nphi; k++) {
+      term = weight_elongation * arclength_factor[k] * q.elongation[k];
+      residuals[j] = term;
+      elongation_term += term * term;
+      j++;
+    }
+  }
+  
   if (weight_R0 > 0) {
     for (k = 0; k < q.nphi; k++) {
       if (q.R0[k] < min_R0) {
@@ -591,6 +624,44 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
     }
   }
 
+  if (weight_Z2 > 0) {
+    for (k = 0; k < q.nphi; k++) {
+      term = weight_Z2 * arclength_factor[k] * q.Z20[k];
+      residuals[j] = term;
+      Z2_term += term * term;
+      j++;
+      
+      term = weight_Z2 * arclength_factor[k] * q.Z2s[k];
+      residuals[j] = term;
+      Z2_term += term * term;
+      j++;
+      
+      term = weight_Z2 * arclength_factor[k] * q.Z2c[k];
+      residuals[j] = term;
+      Z2_term += term * term;
+      j++;
+    }
+  }
+
+  if (weight_Z2Prime > 0) {
+    for (k = 0; k < q.nphi; k++) {
+      term = weight_Z2Prime * arclength_factor[k] * q.d_Z20_d_varphi[k];
+      residuals[j] = term;
+      Z2Prime_term += term * term;
+      j++;
+      
+      term = weight_Z2Prime * arclength_factor[k] * q.d_Z2s_d_varphi[k];
+      residuals[j] = term;
+      Z2Prime_term += term * term;
+      j++;
+      
+      term = weight_Z2Prime * arclength_factor[k] * q.d_Z2c_d_varphi[k];
+      residuals[j] = term;
+      Z2Prime_term += term * term;
+      j++;
+    }
+  }
+
   if (weight_XY3 > 0) {
     for (k = 0; k < q.nphi; k++) {
       term = weight_XY3 * arclength_factor[k] * q.X3c1[k];
@@ -629,6 +700,17 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
     }
   }
   
+  if (weight_grad_B > 0) {
+    for (k = 0; k < q.nphi; k++) {
+      for (int j2 = 0; j2 < 9; j2++) {
+	term = weight_grad_B * arclength_factor[k] * q.grad_B_tensor[k + q.nphi * j2];
+	residuals[j] = term;
+	grad_B_term += term * term;
+	j++;
+      }
+    }
+  }
+
   if (weight_grad_grad_B > 0) {
     for (k = 0; k < q.nphi; k++) {
       for (int j2 = 0; j2 < 27; j2++) {
@@ -652,17 +734,25 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   // GSL defines the objective function with a factor of 1/2.
   B20_term *= 0.5;
   iota_term *= 0.5;
+  elongation_term *= 0.5;
   R0_term *= 0.5;
   d2_volume_d_psi2_term *= 0.5;
   XY2_term *= 0.5;
   XY2Prime_term *= 0.5;
+  Z2_term *= 0.5;
+  Z2Prime_term *= 0.5;
   XY3_term *= 0.5;
   XY3Prime_term *= 0.5;
+  grad_B_term *= 0.5;
   grad_grad_B_term *= 0.5;
   r_singularity_term *= 0.5;
     
-  objective_function = B20_term + iota_term + R0_term + d2_volume_d_psi2_term
-    + XY2_term + XY2Prime_term + XY3_term + XY3Prime_term + grad_grad_B_term
+  objective_function = B20_term + iota_term + elongation_term
+    + R0_term + d2_volume_d_psi2_term
+    + XY2_term + XY2Prime_term
+    + Z2_term + Z2Prime_term
+    + XY3_term + XY3Prime_term
+    + grad_B_term + grad_grad_B_term
     + r_singularity_term;
 
   assert (j == n_terms);
@@ -707,12 +797,16 @@ void gsl_callback(const size_t iter, void *params,
   opt->iter_objective_function[n_iter] = opt->objective_function;
   opt->iter_B20_term[n_iter] = opt->B20_term;
   opt->iter_iota_term[n_iter] = opt->iota_term;
+  opt->iter_elongation_term[n_iter] = opt->elongation_term;
   opt->iter_R0_term[n_iter] = opt->R0_term;
   opt->iter_d2_volume_d_psi2_term[n_iter] = opt->d2_volume_d_psi2_term;
   opt->iter_XY2_term[n_iter] = opt->XY2_term;
   opt->iter_XY2Prime_term[n_iter] = opt->XY2Prime_term;
+  opt->iter_Z2_term[n_iter] = opt->Z2_term;
+  opt->iter_Z2Prime_term[n_iter] = opt->Z2Prime_term;
   opt->iter_XY3_term[n_iter] = opt->XY3_term;
   opt->iter_XY3Prime_term[n_iter] = opt->XY3Prime_term;
+  opt->iter_grad_B_term[n_iter] = opt->grad_B_term;
   opt->iter_grad_grad_B_term[n_iter] = opt->grad_grad_B_term;
   opt->iter_r_singularity_term[n_iter] = opt->r_singularity_term;
 

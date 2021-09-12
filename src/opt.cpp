@@ -27,12 +27,15 @@ void Opt::defaults() {
   weight_B20 = -1.0;
   weight_iota = -1.0;
   target_iota = 0.4;
+  weight_elongation = -1.0;
   weight_R0 = -1.0;
   min_R0 = 0.3;
   weight_d2_volume_d_psi2 = -1.0;
   max_d2_volume_d_psi2 = 0.0;
   weight_XY2 = 1.0;
   weight_XY2Prime = 1.0;
+  weight_Z2 = -1.0;
+  weight_Z2Prime = -1.0;
   weight_XY3 = -1.0;
   weight_XY3Prime = -1.0;
   weight_grad_grad_B = -1.0;
