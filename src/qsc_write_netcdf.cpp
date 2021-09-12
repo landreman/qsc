@@ -90,9 +90,9 @@ void Qsc::write_netcdf(std::string filename) {
   nc.put(nphi_dim, "Y1s", Y1s, "r*sin(theta) term in Y, the component of the position vector in the direction of the binormal vector", "dimensionless");
   nc.put(nphi_dim, "Y1c", Y1c, "r*cos(theta) term in Y, the component of the position vector in the direction of the binormal vector", "dimensionless");
   nc.put(axis_nmax_plus_1_dim, "R0c", R0c, "Fourier cosine(n*phi) amplitudes defining the major radius R of the magnetic axis shape", "meter");
-  nc.put(axis_nmax_plus_1_dim, "R0s", R0c, "Fourier sine(n*phi) amplitudes defining the major radius R of the magnetic axis shape", "meter");
+  nc.put(axis_nmax_plus_1_dim, "R0s", R0s, "Fourier sine(n*phi) amplitudes defining the major radius R of the magnetic axis shape", "meter");
   nc.put(axis_nmax_plus_1_dim, "Z0c", Z0c, "Fourier cosine(n*phi) amplitudes defining the Z coordinate of the magnetic axis shape", "meter");
-  nc.put(axis_nmax_plus_1_dim, "Z0s", Z0c, "Fourier sine(n*phi) amplitudes defining the Z coordinate of the magnetic axis shape", "meter");
+  nc.put(axis_nmax_plus_1_dim, "Z0s", Z0s, "Fourier sine(n*phi) amplitudes defining the Z coordinate of the magnetic axis shape", "meter");
   nc.put(nphi_dim, "R0", R0, "Major radius of the magnetic axis", "meter");
   nc.put(nphi_dim, "Z0", Z0, "Z coordinate of the magnetic axis", "meter");
   nc.put(nphi_dim, "R0p", R0p, "d / d phi derivative of R0", "meter");
