@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -ex
+
+XQSC=../bin/xqsc
+
+$XQSC qsc_in.single_LandremanSenguptaPlunk_section5.1
+$XQSC qsc_in.single_LandremanSengupta2019_section5.1
+$XQSC qsc_in.single_LandremanSengupta2019_section5.2

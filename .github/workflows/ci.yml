@@ -110,6 +110,11 @@ jobs:
     - name: Compile
       run: make
 
+    - name: Run examples
+      run: |
+        cd examples
+        ./run_examples
+      
     - name: Run driver, double precision
       run: bin/xqsc qsc_in.foo
       if: matrix.precision == 'double'
