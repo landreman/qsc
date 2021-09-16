@@ -64,6 +64,157 @@ TEST_CASE("The objective function should equal 1/2 * sum(residuals^2) [opt]") {
   }
 }
 
+TEST_CASE("Compute each optimization term a different way and make sure we get the same result. [opt]") {
+  if (single) return;
+
+  for (int jconfig = 0; jconfig < 2; jconfig++) {
+    CAPTURE(jconfig);
+    
+    Opt opt;
+    if (jconfig == 0) {
+      // A config with magnetic well
+      opt.q = Qsc("r2 section 5.5");
+      opt.min_R0 = 0.98; // so the R0 term is nonzero.
+    } else {
+      // A config with magnetic hill
+      opt.q = Qsc("r2 section 5.1");
+      opt.min_R0 = 0.01; // so R0_term should be 0.
+    }
+    opt.q.verbose = 0;
+    opt.q.init();
+    opt.q.calculate();
+
+    opt.init_residuals();
+    gsl_vector *gsl_residual = gsl_vector_alloc(opt.n_terms);
+    opt.set_residuals(gsl_residual);
+  
+    qscfloat denominator = opt.q.d_l_d_phi.sum();
+    Vector temp;
+    int j;
+    qscfloat term;
+
+    temp = opt.q.B20_anomaly * opt.q.B20_anomaly * opt.q.d_l_d_phi;
+    CHECK(Approx(temp.sum() / denominator) == opt.B20_term);
+
+    CHECK(Approx((opt.q.iota - opt.target_iota) * (opt.q.iota - opt.target_iota)) == opt.iota_term);
+
+    temp = opt.q.elongation * opt.q.elongation * opt.q.d_l_d_phi;
+    CHECK(Approx(temp.sum() / denominator) == opt.elongation_term);
+
+    temp = opt.q.curvature * opt.q.curvature * opt.q.d_l_d_phi;
+    CHECK(Approx(temp.sum() / denominator) == opt.curvature_term);
+
+    if (jconfig == 0) {
+      CHECK(opt.R0_term > 0);
+      temp = (opt.min_R0 - opt.q.R0) * (opt.min_R0 - opt.q.R0) * opt.q.d_l_d_phi;
+      for (j = 0; j < opt.q.nphi; j++) {
+	if (opt.q.R0[j] > opt.min_R0) temp[j] = 0;
+      }
+      CHECK(Approx(temp.sum() / denominator) == opt.R0_term);
+    } else {
+      CHECK(Approx(opt.R0_term) == 0.0);
+    }
+
+    if (jconfig == 0) {
+      CHECK(Approx(opt.d2_volume_d_psi2_term) == 0.0);
+    } else {
+      CHECK(opt.d2_volume_d_psi2_term > 0);
+      CHECK(Approx((opt.max_d2_volume_d_psi2 - opt.q.d2_volume_d_psi2) * (opt.max_d2_volume_d_psi2 - opt.q.d2_volume_d_psi2)) == opt.d2_volume_d_psi2_term);
+    }
+
+    term = 0.0;
+    temp = opt.q.X20 * opt.q.X20 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.X2c * opt.q.X2c * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.X2s * opt.q.X2s * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.Y20 * opt.q.Y20 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.Y2c * opt.q.Y2c * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.Y2s * opt.q.Y2s * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    CHECK(Approx(term) == opt.XY2_term);
+    
+    term = 0.0;
+    temp = opt.q.d_X20_d_varphi * opt.q.d_X20_d_varphi * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d_X2c_d_varphi * opt.q.d_X2c_d_varphi * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d_X2s_d_varphi * opt.q.d_X2s_d_varphi * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d_Y20_d_varphi * opt.q.d_Y20_d_varphi * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d_Y2c_d_varphi * opt.q.d_Y2c_d_varphi * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d_Y2s_d_varphi * opt.q.d_Y2s_d_varphi * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    CHECK(Approx(term) == opt.XY2Prime_term);
+
+    term = 0.0;
+    temp = opt.q.Z20 * opt.q.Z20 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.Z2c * opt.q.Z2c * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.Z2s * opt.q.Z2s * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    CHECK(Approx(term) == opt.Z2_term);
+    
+    term = 0.0;
+    temp = opt.q.d_Z20_d_varphi * opt.q.d_Z20_d_varphi * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d_Z2c_d_varphi * opt.q.d_Z2c_d_varphi * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d_Z2s_d_varphi * opt.q.d_Z2s_d_varphi * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    CHECK(Approx(term) == opt.Z2Prime_term);
+
+    term = 0.0;
+    temp = opt.q.X3c1 * opt.q.X3c1 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.Y3c1 * opt.q.Y3c1 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.Y3s1 * opt.q.Y3s1 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    CHECK(Approx(term) == opt.XY3_term);
+    
+    term = 0.0;
+    temp = opt.q.d_X3c1_d_varphi * opt.q.d_X3c1_d_varphi * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d_Y3c1_d_varphi * opt.q.d_Y3c1_d_varphi * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d_Y3s1_d_varphi * opt.q.d_Y3s1_d_varphi * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    CHECK(Approx(term) == opt.XY3Prime_term);
+
+    term = 0.0;
+    for (int j2 = 0; j2 < 3; j2++) {
+      for (int j1 = 0; j1 < 3; j1++) {
+	for (int jphi = 0; jphi < opt.q.nphi; jphi++) {
+	  term += opt.q.grad_B_tensor(jphi, j1, j2) * opt.q.grad_B_tensor(jphi, j1, j2) * opt.q.d_l_d_phi[jphi];
+	}
+      }
+    }
+    CHECK(Approx(term / denominator) == opt.grad_B_term);
+
+    term = 0.0;
+    for (int j3 = 0; j3 < 3; j3++) {
+      for (int j2 = 0; j2 < 3; j2++) {
+	for (int j1 = 0; j1 < 3; j1++) {
+	  for (int jphi = 0; jphi < opt.q.nphi; jphi++) {
+	    term += opt.q.grad_grad_B_tensor(jphi, j1, j2, j3) * opt.q.grad_grad_B_tensor(jphi, j1, j2, j3) * opt.q.d_l_d_phi[jphi];
+	  }
+	}
+      }
+    }
+    CHECK(Approx(term / denominator) == opt.grad_grad_B_term);
+
+    temp = opt.q.d_l_d_phi / (opt.q.r_hat_singularity_robust * opt.q.r_hat_singularity_robust);
+    CHECK(Approx(temp.sum() / denominator) == opt.r_singularity_term);
+  }
+}
+
 TEST_CASE("Each term in the objective function should be approximately independent of nphi [opt]") {
   if (single) return;
   
