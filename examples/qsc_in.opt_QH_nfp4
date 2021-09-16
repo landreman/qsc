@@ -1,0 +1,31 @@
+# This input file runs an optimization to produce a nice QH configuration.
+
+general_option = 'opt'
+
+[qsc]
+nfp = 4
+nphi = 61
+verbose = 0
+order_r_option = "r2.1"
+
+# Initial conditions:
+R0c = [1.0, 0.17]
+Z0s = [0.0, 0.17]
+eta_bar = 1.0
+B2c = 0.0
+
+[opt]
+verbose = 1
+max_iter = 1000
+fourier_refine = 6
+
+vary_eta_bar = 1
+vary_B2c = 1
+vary_R0c = [false, false]
+vary_Z0s = [false, true]
+
+weight_grad_B = 1.0
+weight_B20 = 1.0
+
+# algorithm = 'ddogleg'
+# algorithm = 'subspace2d'

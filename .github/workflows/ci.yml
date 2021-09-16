@@ -114,6 +114,7 @@ jobs:
       run: |
         cd examples
         ./run_examples
+      if: matrix.precision == 'double'
       
     - name: Run driver, double precision
       run: bin/xqsc qsc_in.foo

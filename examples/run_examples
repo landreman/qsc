@@ -7,3 +7,5 @@ XQSC=../bin/xqsc
 $XQSC qsc_in.single_LandremanSenguptaPlunk_section5.1
 $XQSC qsc_in.single_LandremanSengupta2019_section5.1
 $XQSC qsc_in.single_LandremanSengupta2019_section5.2
+
+$XQSC qsc_in.opt_QH_nfp4
