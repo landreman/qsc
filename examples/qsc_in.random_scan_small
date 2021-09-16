@@ -1,0 +1,34 @@
+# This is a sample input file for a random scan
+
+general_option = 'random'
+
+[qsc]
+
+nfp = 2
+nphi = 31
+order_r_option = "r2"
+verbose = 0
+
+R0c = [1.0, 0.17]
+Z0s = [0.0, 0.15]
+eta_bar = 1.0
+B2c = 0.0
+
+[scan]
+
+eta_bar_max = 5
+eta_bar_min = 0.2
+eta_bar_scan_option = "log"
+
+R0c_min = [1.0, -0.3]
+R0c_max = [1.0,  0.3]
+
+Z0s_min = [0.0, -0.5]
+Z0s_max = [0.0,  0.5]
+
+keep_all = false
+
+max_seconds = 2
+save_period = 0.5
+max_attempts_per_proc = 100000
+max_keep_per_proc = 100000

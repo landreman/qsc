@@ -109,28 +109,18 @@ jobs:
 
     - name: Compile
       run: make
-
-    - name: Run examples
+   
+    - name: Run unit tests
+      run: make test
+   
+    - name: Run examples, double precision
       run: |
         cd examples
         ./run_examples
       if: matrix.precision == 'double'
       
-    - name: Run driver, double precision
-      run: bin/xqsc qsc_in.foo
-      if: matrix.precision == 'double'
-
-    - name: Run driver, single precision
-      run: bin/xqsc_single qsc_in.foo
+    - name: Run examples, single precision
+      run: |
+        cd examples
+        ./run_examples_single
       if: matrix.precision == 'single'
-
-    - name: Run driver with MPI, double precision
-      run: mpiexec -n 2 bin/xqsc qsc_in.foo
-      if: matrix.precision == 'double'
-
-    - name: Run driver with MPI, single precision
-      run: mpiexec -n 2 bin/xqsc_single qsc_in.foo
-      if: matrix.precision == 'single'
-
-    - name: Run tests
-      run: make test
