@@ -84,6 +84,7 @@ TEST_CASE("Compute each optimization term a different way and make sure we get t
     opt.q.init();
     opt.q.calculate();
 
+    opt.weight_grad_B = 1.0; // Need at least one residual term.
     opt.init_residuals();
     gsl_vector *gsl_residual = gsl_vector_alloc(opt.n_terms);
     opt.set_residuals(gsl_residual);
@@ -597,6 +598,7 @@ TEST_CASE("Check Opt::unpack_state_vector() and Opt::set_state_vector() [opt]") 
   opt.vary_R0s.resize(n_fourier, false);
   opt.vary_Z0c.resize(n_fourier, false);
   opt.vary_Z0s.resize(n_fourier, false);
+  opt.weight_grad_B = 1.0; // Need at least 1 residual term.
   // opt.q = Qsc(config);
   std::cout << "max fourier_index:" << (1 << (4 * (n_fourier - 1))) << std::endl;
 
