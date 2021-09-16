@@ -1,4 +1,3 @@
-#include <mpi.h>
 #include "opt.hpp"
 
 using namespace qsc;
@@ -10,6 +9,7 @@ void Opt::defaults() {
   make_names = true;
   algorithm = GSL_LM;
   fourier_refine = 0;
+  toml_group = "opt";
 
   vary_eta_bar = true;
   vary_sigma0 = false;

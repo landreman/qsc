@@ -22,7 +22,7 @@ void Opt::input(std::string filename) {
   vary_Z0s[0] = false;
     
   auto toml_file = toml::parse(filename);
-  auto indata = toml::find(toml_file, "opt");
+  auto indata = toml::find(toml_file, toml_group);
   
   std::vector<std::string> varlist;
 
@@ -34,10 +34,6 @@ void Opt::input(std::string filename) {
   toml_read(varlist, indata, "vary_R0s", vary_R0s);
   toml_read(varlist, indata, "vary_Z0c", vary_Z0c);
   toml_read(varlist, indata, "vary_Z0s", vary_Z0s);
-  if (vary_R0c.size() != q.R0c.size()) throw std::runtime_error("Size of vary_R0c is incorrect");
-  if (vary_R0s.size() != q.R0s.size()) throw std::runtime_error("Size of vary_R0s is incorrect");
-  if (vary_Z0c.size() != q.Z0c.size()) throw std::runtime_error("Size of vary_Z0c is incorrect");
-  if (vary_Z0s.size() != q.Z0s.size()) throw std::runtime_error("Size of vary_Z0s is incorrect");
   
   toml_read(varlist, indata, "weight_B20", weight_B20);
   toml_read(varlist, indata, "weight_iota", weight_iota);

@@ -6,11 +6,13 @@
 #include "qsc.hpp"
 #include "scan.hpp"
 #include "opt.hpp"
+#include "multiopt.hpp"
 #include "toml_util.hpp"
 
 const std::string GENERAL_OPTION_SINGLE = "single";
 const std::string GENERAL_OPTION_RANDOM = "random";
 const std::string GENERAL_OPTION_OPT = "opt";
+const std::string GENERAL_OPTION_MULTIOPT = "multiopt";
 
 int qsc::driver(int argc, char* argv[]) {
   std::cout << "QSC: Quasisymmetric Stellarator Construction" << std::endl;
@@ -63,6 +65,10 @@ int qsc::driver(int argc, char* argv[]) {
   } else if (general_option.compare(GENERAL_OPTION_OPT) == 0) {
     qsc::Opt opt;
     opt.run(infile);
+    
+  } else if (general_option.compare(GENERAL_OPTION_MULTIOPT) == 0) {
+    qsc::MultiOpt multiopt;
+    multiopt.run(infile);
     
   } else {
     throw std::runtime_error("Unrecognized setting for general_option");

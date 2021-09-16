@@ -20,6 +20,11 @@ void Opt::optimize() {
     return;
   }
 
+  if (vary_R0c.size() != q.R0c.size()) throw std::runtime_error("Size of vary_R0c is incorrect");
+  if (vary_R0s.size() != q.R0s.size()) throw std::runtime_error("Size of vary_R0s is incorrect");
+  if (vary_Z0c.size() != q.Z0c.size()) throw std::runtime_error("Size of vary_Z0c is incorrect");
+  if (vary_Z0s.size() != q.Z0s.size()) throw std::runtime_error("Size of vary_Z0s is incorrect");
+  
   // Add fourier_refine modes to the end of input arrays:
   Vector axis_arr;
   std::valarray<bool> bool_arr;

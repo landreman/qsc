@@ -26,6 +26,7 @@ namespace qsc {
     int n_parameters, n_terms;
     int verbose;
     std::string outfilename;
+    std::string toml_group;
     Vector arclength_factor;
     bool make_names;
     std::vector<std::string> state_vector_names, residual_names;

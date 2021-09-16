@@ -12,6 +12,8 @@ $XQSC qsc_in.single_LandremanSengupta2019_section5.2
 
 $XQSC qsc_in.opt_QH_nfp4
 
+$XQSC qsc_in.multiopt_QH_nfp4
+
 $XQSC qsc_in.random_scan_small
 $XQSC qsc_in.random_scan_realistic
 mpiexec -n 2 $XQSC qsc_in.random_scan_small
