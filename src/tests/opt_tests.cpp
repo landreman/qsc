@@ -7,6 +7,63 @@
 using namespace qsc;
 using doctest::Approx;
 
+TEST_CASE("The objective function should equal 1/2 * sum(residuals^2) [opt]") {
+  if (single) return;
+  for (int j = 0; j < 3; j++) {
+    CAPTURE(j);
+    
+    Opt opt;
+    opt.q = Qsc("r2 section 5.5");
+    opt.q.verbose = 0;
+    opt.q.init();
+    opt.q.calculate();
+
+    switch (j) {
+    case 0:
+      // Turn on all residual terms:
+      opt.weight_B20 = 2.0;
+      opt.weight_iota = 3.0;
+      opt.weight_elongation = 3.5;
+      opt.weight_curvature = 3.7;
+      opt.weight_R0 = 4.0;
+      opt.min_R0 = 0.8;
+      opt.weight_d2_volume_d_psi2 = 5.0;
+      opt.weight_XY2 = 6.0;
+      opt.weight_XY2Prime = 7.0;
+      opt.weight_Z2 = 6.5;
+      opt.weight_Z2Prime = 7.5;
+      opt.weight_XY3 = 8.0;
+      opt.weight_XY3Prime = 9.0;
+      opt.weight_grad_B = 10.0;
+      opt.weight_grad_grad_B = 11.0;
+      opt.weight_r_singularity = 12.0;
+      break;
+    case 1:
+      // Most residual terms off. At least 1 must be on though or qsc will raise an error.
+      opt.weight_grad_B = 15.0;
+      CHECK(opt.weight_B20 < 0);
+      break;
+    case 2:
+      // Cover the case in which weight_grad_B = 0:
+      opt.weight_B20 = 1.0;
+      CHECK(opt.weight_grad_B < 0);
+      break;
+    default:
+      CHECK(false); // Should not get here
+    }
+  
+    opt.init_residuals();
+    gsl_vector *gsl_residual = gsl_vector_alloc(opt.n_terms);
+    opt.set_residuals(gsl_residual);
+
+    Vector temp;
+    temp.resize(opt.n_terms, 0.0);
+    temp = opt.residuals * opt.residuals;
+  
+    CHECK(Approx(0.5 * temp.sum()).epsilon(1.0e-13) == opt.objective_function);
+  }
+}
+
 TEST_CASE("Each term in the objective function should be approximately independent of nphi [opt]") {
   if (single) return;
   

@@ -17,7 +17,26 @@ void Opt::write_netcdf() {
 
   // Scalars
   nc.put("n_iter", n_iter, "Number of optimization iterations saved", "dimensionless");
+  
+  nc.put("weight_B20", weight_B20, "Weight for the B20 term in the objective function for optimization", "dimensionless");
+  nc.put("weight_iota", weight_iota, "Weight for the iota term in the objective function for optimization", "dimensionless");
+  nc.put("weight_elongation", weight_elongation, "Weight for the elongation term in the objective function for optimization", "dimensionless");
+  nc.put("weight_curvature", weight_curvature, "Weight for the curvature term in the objective function for optimization", "dimensionless");
+  nc.put("weight_R0", weight_R0, "Weight for the min(R0) term in the objective function for optimization", "dimensionless");
+  nc.put("weight_d2_volume_d_psi2", weight_d2_volume_d_psi2, "Weight for the magnetic well term in the objective function for optimization", "dimensionless");
+  nc.put("weight_XY2", weight_XY2, "Weight for the (X2,Y2) term in the objective function for optimization", "dimensionless");
+  nc.put("weight_XY2Prime", weight_XY2Prime, "Weight for the (X2',Y2') term in the objective function for optimization", "dimensionless");
+  nc.put("weight_Z2", weight_Z2, "Weight for the Z2 term in the objective function for optimization", "dimensionless");
+  nc.put("weight_Z2Prime", weight_Z2Prime, "Weight for the Z2' term in the objective function for optimization", "dimensionless");
+  nc.put("weight_XY3", weight_XY3, "Weight for the (X3,Y3) term in the objective function for optimization", "dimensionless");
+  nc.put("weight_XY3Prime", weight_XY3Prime, "Weight for the (X3',Y3') term in the objective function for optimization", "dimensionless");
+  nc.put("weight_grad_B", weight_grad_B, "Weight for the ||grad B|| term in the objective function for optimization", "dimensionless");
+  nc.put("weight_grad_grad_B", weight_grad_grad_B, "Weight for the ||grad grad B|| term in the objective function for optimization", "dimensionless");
+  nc.put("weight_r_singularity", weight_r_singularity, "Weight for the r_singularity term in the objective function for optimization", "dimensionless");
 
+  nc.put("target_iota", target_iota, "Target iota for the iota term in the objective function for optimization", "dimensionless");
+  nc.put("min_R0", min_R0, "Minimum major radius of the magnetic axis for the associated penalty term in the objective function for optimization", "dimensionless");
+  
   // 1D Vectors
   nc.put(n_iter_dim, "iter_fourier_refine_step", iter_fourier_refine_step, "Step number with respect to expanding the number of Fourier modes for the axis shape", "dimensionless");
   nc.put(n_iter_dim, "iter_objective_function", iter_objective_function, "Total objective function at each iteration", "dimensionless");

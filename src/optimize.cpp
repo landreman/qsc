@@ -513,264 +513,189 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   r_singularity_term = 0.0;
 
   // The order of terms here must match the order in Opt::init().
-  if (weight_B20 > 0) {
-    for (k = 0; k < q.nphi; k++) {
-      term = weight_B20 * arclength_factor[k] * q.B20_anomaly[k];
-      residuals[j] = term;
-      B20_term += term * term;
-      j++;
-    }
+  for (k = 0; k < q.nphi; k++) {
+    term = arclength_factor[k] * q.B20_anomaly[k];
+    B20_term += term * term;
+    if (weight_B20 > 0) residuals[j++] = weight_B20 * term;
   }
   
-  if (weight_iota > 0) {
-    term = weight_iota * (q.iota - target_iota);
-    residuals[j] = term;
-    iota_term = term * term;
-    j++;
-  }
+  term = q.iota - target_iota;
+  iota_term = term * term;
+  if (weight_iota > 0) residuals[j++] = weight_iota * term;
 
-  if (weight_elongation > 0) {
-    for (k = 0; k < q.nphi; k++) {
-      term = weight_elongation * arclength_factor[k] * q.elongation[k];
-      residuals[j] = term;
-      elongation_term += term * term;
-      j++;
-    }
+  for (k = 0; k < q.nphi; k++) {
+    term = arclength_factor[k] * q.elongation[k];
+    elongation_term += term * term;
+    if (weight_elongation > 0) residuals[j++] = weight_elongation * term;
   }
   
-  if (weight_curvature > 0) {
-    for (k = 0; k < q.nphi; k++) {
-      term = weight_curvature * arclength_factor[k] * q.curvature[k];
-      residuals[j] = term;
-      curvature_term += term * term;
-      j++;
-    }
+  for (k = 0; k < q.nphi; k++) {
+    term = arclength_factor[k] * q.curvature[k];
+    curvature_term += term * term;
+    if (weight_curvature > 0) residuals[j++] = weight_curvature * term;
   }
   
-  if (weight_R0 > 0) {
-    for (k = 0; k < q.nphi; k++) {
-      if (q.R0[k] < min_R0) {
-	term = weight_R0 * arclength_factor[k] * (min_R0 - q.R0[k]);
-	residuals[j] = term;
-	R0_term += term * term;
-      } else {
-	residuals[j] = 0.0;
-      }
-      j++;
-    }
-  }
-
-  if (weight_d2_volume_d_psi2 > 0) {
-    if (q.d2_volume_d_psi2 > max_d2_volume_d_psi2) {
-      term = weight_d2_volume_d_psi2 * (q.d2_volume_d_psi2 - max_d2_volume_d_psi2);
-      residuals[j] = term;
-      d2_volume_d_psi2_term = term * term;
+  for (k = 0; k < q.nphi; k++) {
+    if (q.R0[k] < min_R0) {
+      term = arclength_factor[k] * (min_R0 - q.R0[k]);
     } else {
-      residuals[j] = 0.0;
+      term = 0.0;
     }
-    j++;
+    R0_term += term * term;
+    if (weight_R0 > 0) residuals[j++] = weight_R0 * term;
   }
 
-  if (weight_XY2 > 0) {
-    for (k = 0; k < q.nphi; k++) {
-      term = weight_XY2 * arclength_factor[k] * q.X20[k];
-      residuals[j] = term;
-      XY2_term += term * term;
-      j++;
-      
-      term = weight_XY2 * arclength_factor[k] * q.X2s[k];
-      residuals[j] = term;
-      XY2_term += term * term;
-      j++;
-      
-      term = weight_XY2 * arclength_factor[k] * q.X2c[k];
-      residuals[j] = term;
-      XY2_term += term * term;
-      j++;
-      
-      term = weight_XY2 * arclength_factor[k] * q.Y20[k];
-      residuals[j] = term;
-      XY2_term += term * term;
-      j++;
-      
-      term = weight_XY2 * arclength_factor[k] * q.Y2s[k];
-      residuals[j] = term;
-      XY2_term += term * term;
-      j++;
-      
-      term = weight_XY2 * arclength_factor[k] * q.Y2c[k];
-      residuals[j] = term;
-      XY2_term += term * term;
-      j++;      
-    }
+  if (q.d2_volume_d_psi2 > max_d2_volume_d_psi2) {
+    term = q.d2_volume_d_psi2 - max_d2_volume_d_psi2;
+  } else {
+    term = 0.0;
   }
+  if (weight_d2_volume_d_psi2 > 0) residuals[j++] = weight_d2_volume_d_psi2 * term;
+  d2_volume_d_psi2_term = term * term;
 
-  if (weight_XY2Prime > 0) {
-    for (k = 0; k < q.nphi; k++) {
-      term = weight_XY2Prime * arclength_factor[k] * q.d_X20_d_varphi[k];
-      residuals[j] = term;
-      XY2Prime_term += term * term;
-      j++;
-      
-      term = weight_XY2Prime * arclength_factor[k] * q.d_X2s_d_varphi[k];
-      residuals[j] = term;
-      XY2Prime_term += term * term;
-      j++;
-      
-      term = weight_XY2Prime * arclength_factor[k] * q.d_X2c_d_varphi[k];
-      residuals[j] = term;
-      XY2Prime_term += term * term;
-      j++;
-      
-      term = weight_XY2Prime * arclength_factor[k] * q.d_Y20_d_varphi[k];
-      residuals[j] = term;
-      XY2Prime_term += term * term;
-      j++;
-      
-      term = weight_XY2Prime * arclength_factor[k] * q.d_Y2s_d_varphi[k];
-      residuals[j] = term;
-      XY2Prime_term += term * term;
-      j++;
-      
-      term = weight_XY2Prime * arclength_factor[k] * q.d_Y2c_d_varphi[k];
-      residuals[j] = term;
-      XY2Prime_term += term * term;
-      j++;
-    }
-  }
-
-  if (weight_Z2 > 0) {
-    for (k = 0; k < q.nphi; k++) {
-      term = weight_Z2 * arclength_factor[k] * q.Z20[k];
-      residuals[j] = term;
-      Z2_term += term * term;
-      j++;
-      
-      term = weight_Z2 * arclength_factor[k] * q.Z2s[k];
-      residuals[j] = term;
-      Z2_term += term * term;
-      j++;
-      
-      term = weight_Z2 * arclength_factor[k] * q.Z2c[k];
-      residuals[j] = term;
-      Z2_term += term * term;
-      j++;
-    }
-  }
-
-  if (weight_Z2Prime > 0) {
-    for (k = 0; k < q.nphi; k++) {
-      term = weight_Z2Prime * arclength_factor[k] * q.d_Z20_d_varphi[k];
-      residuals[j] = term;
-      Z2Prime_term += term * term;
-      j++;
-      
-      term = weight_Z2Prime * arclength_factor[k] * q.d_Z2s_d_varphi[k];
-      residuals[j] = term;
-      Z2Prime_term += term * term;
-      j++;
-      
-      term = weight_Z2Prime * arclength_factor[k] * q.d_Z2c_d_varphi[k];
-      residuals[j] = term;
-      Z2Prime_term += term * term;
-      j++;
-    }
-  }
-
-  if (weight_XY3 > 0) {
-    for (k = 0; k < q.nphi; k++) {
-      term = weight_XY3 * arclength_factor[k] * q.X3c1[k];
-      residuals[j] = term;
-      XY3_term += term * term;
-      j++;
-      
-      term = weight_XY3 * arclength_factor[k] * q.Y3c1[k];
-      residuals[j] = term;
-      XY3_term += term * term;
-      j++;
-      
-      term = weight_XY3 * arclength_factor[k] * q.Y3s1[k];
-      residuals[j] = term;
-      XY3_term += term * term;
-      j++;
-    }
-  }
-  
-  if (weight_XY3Prime > 0) {
-    for (k = 0; k < q.nphi; k++) {
-      term = weight_XY3Prime * arclength_factor[k] * q.d_X3c1_d_varphi[k];
-      residuals[j] = term;
-      XY3Prime_term += term * term;
-      j++;
-      
-      term = weight_XY3Prime * arclength_factor[k] * q.d_Y3c1_d_varphi[k];
-      residuals[j] = term;
-      XY3Prime_term += term * term;
-      j++;
-      
-      term = weight_XY3Prime * arclength_factor[k] * q.d_Y3s1_d_varphi[k];
-      residuals[j] = term;
-      XY3Prime_term += term * term;
-      j++;
-    }
-  }
-  
-  if (weight_grad_B > 0) {
-    for (k = 0; k < q.nphi; k++) {
-      for (int j2 = 0; j2 < 9; j2++) {
-	term = weight_grad_B * arclength_factor[k] * q.grad_B_tensor[k + q.nphi * j2];
-	residuals[j] = term;
-	grad_B_term += term * term;
-	j++;
-      }
-    }
-  }
-
-  if (weight_grad_grad_B > 0) {
-    for (k = 0; k < q.nphi; k++) {
-      for (int j2 = 0; j2 < 27; j2++) {
-	term = weight_grad_grad_B * arclength_factor[k] * q.grad_grad_B_tensor[k + q.nphi * j2];
-	residuals[j] = term;
-	grad_grad_B_term += term * term;
-	j++;
-      }
-    }
-  }
-
-  if (weight_r_singularity > 0) {
-    for (k = 0; k < q.nphi; k++) {
-      term = weight_r_singularity * arclength_factor[k] / q.r_hat_singularity_robust[k];
-      residuals[j] = term;
-      r_singularity_term += term * term;
-      j++;
-    }
-  }
-
-  // GSL defines the objective function with a factor of 1/2.
-  B20_term *= 0.5;
-  iota_term *= 0.5;
-  elongation_term *= 0.5;
-  curvature_term *= 0.5;
-  R0_term *= 0.5;
-  d2_volume_d_psi2_term *= 0.5;
-  XY2_term *= 0.5;
-  XY2Prime_term *= 0.5;
-  Z2_term *= 0.5;
-  Z2Prime_term *= 0.5;
-  XY3_term *= 0.5;
-  XY3Prime_term *= 0.5;
-  grad_B_term *= 0.5;
-  grad_grad_B_term *= 0.5;
-  r_singularity_term *= 0.5;
+  for (k = 0; k < q.nphi; k++) {
+    term = arclength_factor[k] * q.X20[k];
+    XY2_term += term * term;
+    if (weight_XY2 > 0) residuals[j++] = weight_XY2 * term;
     
-  objective_function = B20_term + iota_term
-    + elongation_term + curvature_term
-    + R0_term + d2_volume_d_psi2_term
-    + XY2_term + XY2Prime_term
-    + Z2_term + Z2Prime_term
-    + XY3_term + XY3Prime_term
-    + grad_B_term + grad_grad_B_term
-    + r_singularity_term;
+    term = arclength_factor[k] * q.X2s[k];
+    XY2_term += term * term;
+    if (weight_XY2 > 0) residuals[j++] = weight_XY2 * term;
+    
+    term = arclength_factor[k] * q.X2c[k];
+    XY2_term += term * term;
+    if (weight_XY2 > 0) residuals[j++] = weight_XY2 * term;
+    
+    term = arclength_factor[k] * q.Y20[k];
+    XY2_term += term * term;
+    if (weight_XY2 > 0) residuals[j++] = weight_XY2 * term;
+    
+    term = arclength_factor[k] * q.Y2s[k];
+    XY2_term += term * term;
+    if (weight_XY2 > 0) residuals[j++] = weight_XY2 * term;
+    
+    term = arclength_factor[k] * q.Y2c[k];
+    XY2_term += term * term;
+    if (weight_XY2 > 0) residuals[j++] = weight_XY2 * term;
+  }
+
+  for (k = 0; k < q.nphi; k++) {
+    term = arclength_factor[k] * q.d_X20_d_varphi[k];
+    XY2Prime_term += term * term;
+    if (weight_XY2Prime > 0) residuals[j++] = weight_XY2Prime * term;
+    
+    term = arclength_factor[k] * q.d_X2s_d_varphi[k];
+    XY2Prime_term += term * term;
+    if (weight_XY2Prime > 0) residuals[j++] = weight_XY2Prime * term;
+    
+    term = arclength_factor[k] * q.d_X2c_d_varphi[k];
+    XY2Prime_term += term * term;
+    if (weight_XY2Prime > 0) residuals[j++] = weight_XY2Prime * term;
+    
+    term = arclength_factor[k] * q.d_Y20_d_varphi[k];
+    XY2Prime_term += term * term;
+    if (weight_XY2Prime > 0) residuals[j++] = weight_XY2Prime * term;
+    
+    term = arclength_factor[k] * q.d_Y2s_d_varphi[k];
+    XY2Prime_term += term * term;
+    if (weight_XY2Prime > 0) residuals[j++] = weight_XY2Prime * term;
+    
+    term = arclength_factor[k] * q.d_Y2c_d_varphi[k];
+    XY2Prime_term += term * term;
+    if (weight_XY2Prime > 0) residuals[j++] = weight_XY2Prime * term;
+  }
+
+  for (k = 0; k < q.nphi; k++) {
+    term = arclength_factor[k] * q.Z20[k];
+    Z2_term += term * term;
+    if (weight_Z2 > 0) residuals[j++] = weight_Z2 * term;
+    
+    term = arclength_factor[k] * q.Z2s[k];
+    Z2_term += term * term;
+    if (weight_Z2 > 0) residuals[j++] = weight_Z2 * term;
+    
+    term = arclength_factor[k] * q.Z2c[k];
+    Z2_term += term * term;
+    if (weight_Z2 > 0) residuals[j++] = weight_Z2 * term;
+  }
+
+  for (k = 0; k < q.nphi; k++) {
+    term = arclength_factor[k] * q.d_Z20_d_varphi[k];
+    Z2Prime_term += term * term;
+    if (weight_Z2Prime > 0) residuals[j++] = weight_Z2Prime * term;
+      
+    term = arclength_factor[k] * q.d_Z2s_d_varphi[k];
+    Z2Prime_term += term * term;
+    if (weight_Z2Prime > 0) residuals[j++] = weight_Z2Prime * term;
+      
+    term = arclength_factor[k] * q.d_Z2c_d_varphi[k];
+    Z2Prime_term += term * term;
+    if (weight_Z2Prime > 0) residuals[j++] = weight_Z2Prime * term;
+  }
+
+  for (k = 0; k < q.nphi; k++) {
+    term = arclength_factor[k] * q.X3c1[k];
+    XY3_term += term * term;
+    if (weight_XY3 > 0) residuals[j++] = weight_XY3 * term;
+      
+    term = arclength_factor[k] * q.Y3c1[k];
+    XY3_term += term * term;
+    if (weight_XY3 > 0) residuals[j++] = weight_XY3 * term;
+      
+    term = arclength_factor[k] * q.Y3s1[k];
+    XY3_term += term * term;
+    if (weight_XY3 > 0) residuals[j++] = weight_XY3 * term;
+  }
+  
+  for (k = 0; k < q.nphi; k++) {
+    term = arclength_factor[k] * q.d_X3c1_d_varphi[k];
+    XY3Prime_term += term * term;
+    if (weight_XY3Prime > 0) residuals[j++] = weight_XY3Prime * term;
+      
+    term = arclength_factor[k] * q.d_Y3c1_d_varphi[k];
+    XY3Prime_term += term * term;
+    if (weight_XY3Prime > 0) residuals[j++] = weight_XY3Prime * term;
+      
+    term = arclength_factor[k] * q.d_Y3s1_d_varphi[k];
+    XY3Prime_term += term * term;
+    if (weight_XY3Prime > 0) residuals[j++] = weight_XY3Prime * term;
+  }
+  
+  for (k = 0; k < q.nphi; k++) {
+    for (int j2 = 0; j2 < 9; j2++) {
+      term = arclength_factor[k] * q.grad_B_tensor[k + q.nphi * j2];
+      grad_B_term += term * term;
+      if (weight_grad_B > 0) residuals[j++] = weight_grad_B * term;
+    }
+  }
+
+  for (k = 0; k < q.nphi; k++) {
+    for (int j2 = 0; j2 < 27; j2++) {
+      term = arclength_factor[k] * q.grad_grad_B_tensor[k + q.nphi * j2];
+      grad_grad_B_term += term * term;
+      if (weight_grad_grad_B > 0) residuals[j++] = weight_grad_grad_B * term;
+    }
+  }
+
+  for (k = 0; k < q.nphi; k++) {
+    term = arclength_factor[k] / q.r_hat_singularity_robust[k];
+    r_singularity_term += term * term;
+    if (weight_r_singularity > 0) residuals[j++] = weight_r_singularity * term;
+  }
+
+  Vector weights = {weight_B20, weight_iota, weight_elongation, weight_curvature, weight_R0, weight_d2_volume_d_psi2,
+    weight_XY2, weight_XY2Prime, weight_Z2, weight_Z2Prime, weight_XY3, weight_XY3Prime,
+    weight_grad_B, weight_grad_grad_B, weight_r_singularity};
+
+  Vector terms = {B20_term, iota_term, elongation_term, curvature_term,
+    R0_term, d2_volume_d_psi2_term, XY2_term, XY2Prime_term, Z2_term, Z2Prime_term,
+    XY3_term, XY3Prime_term, grad_B_term, grad_grad_B_term, r_singularity_term};
+
+  assert (weights.size() == terms.size());
+  for (k = 0; k < terms.size(); k++) {
+    // GSL defines the objective function with a factor of 1/2.
+    if (weights[k] > 0) objective_function += 0.5 * weights[k] * weights[k] * terms[k];
+  }
 
   assert (j == n_terms);
 
