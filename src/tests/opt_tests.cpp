@@ -773,6 +773,8 @@ TEST_CASE("Try Fourier refinement. Make sure the vary_R0c etc arrays are extende
     opt.q.order_r_option = "r2.1";
     opt.q.R0c = {1.0, 0.05};
     opt.q.Z0s = {0.0, -0.05};
+    opt.q.R0s = {0.0, 0.0};
+    opt.q.Z0c = {0.0, 0.0};
     opt.q.eta_bar = 1.0;
     opt.q.B2c = 0.0;
     opt.vary_eta_bar = true;
@@ -826,6 +828,8 @@ TEST_CASE("Verify that Fourier refinement works gracefully if the max_iter limit
     opt.q.order_r_option = "r2.1";
     opt.q.R0c = {1.0, 0.05};
     opt.q.Z0s = {0.0, -0.05};
+    opt.q.R0s = {0.0, 0.0};
+    opt.q.Z0c = {0.0, 0.0};
     opt.q.eta_bar = 1.0;
     opt.q.B2c = 0.0;
     opt.vary_eta_bar = true;
