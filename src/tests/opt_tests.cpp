@@ -315,7 +315,7 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
       
       Opt opt;
       opt.q = Qsc(config);
-      opt.max_iter = 60;
+      opt.max_iter = 15;
 
       opt.q.nphi = q0.nphi;
       opt.q.verbose = 0;
@@ -501,6 +501,7 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
 	CHECK(Approx(opt.iter_R0s(0, j)) == q0.R0s[0]);
 	CHECK(Approx(opt.iter_Z0c(0, j)) == q0.Z0c[0]);
 	CHECK(Approx(opt.iter_Z0s(0, j)) == q0.Z0s[0]);
+	qscfloat eps = 1.0e-13;
 	switch (vary_axis_option) {
 	case 0:
 	  // Do not vary the axis
@@ -511,17 +512,17 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
 	  break;
 	case 1:
 	  // Do vary the axis, except for the major radius
-	  if (j > 0) CHECK(Approx(opt.iter_R0c(1, j)) != q0.R0c[1]);
-	  if (j > 0) CHECK(Approx(opt.iter_R0s(1, j)) != q0.R0s[1]);
-	  if (j > 0) CHECK(Approx(opt.iter_Z0c(1, j)) != q0.Z0c[1]);
-	  if (j > 0) CHECK(Approx(opt.iter_Z0s(1, j)) != q0.Z0s[1]);
+	  if (j > 0) CHECK(Approx(opt.iter_R0c(1, j)).epsilon(eps) != q0.R0c[1]);
+	  if (j > 0) CHECK(Approx(opt.iter_R0s(1, j)).epsilon(eps) != q0.R0s[1]);
+	  if (j > 0) CHECK(Approx(opt.iter_Z0c(1, j)).epsilon(eps) != q0.Z0c[1]);
+	  if (j > 0) CHECK(Approx(opt.iter_Z0s(1, j)).epsilon(eps) != q0.Z0s[1]);
 	  break;
 	case 2:
 	  // Vary only selected Fourier modes
 	  CHECK(Approx(opt.iter_R0c(1, j)) == q0.R0c[1]);
-	  if (j > 0) CHECK(Approx(opt.iter_R0s(1, j)) != q0.R0s[1]);
-	  if (j > 0) CHECK(Approx(opt.iter_Z0c(1, j)) != q0.Z0c[1]);
-	  if (j > 0) CHECK(Approx(opt.iter_Z0s(1, j)) != q0.Z0s[1]);
+	  if (j > 0) CHECK(Approx(opt.iter_R0s(1, j)).epsilon(eps) != q0.R0s[1]);
+	  if (j > 0) CHECK(Approx(opt.iter_Z0c(1, j)).epsilon(eps) != q0.Z0c[1]);
+	  if (j > 0) CHECK(Approx(opt.iter_Z0s(1, j)).epsilon(eps) != q0.Z0s[1]);
 	  break;
 	default:
 	  CHECK(false); // Should not get here
