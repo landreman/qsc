@@ -352,6 +352,7 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
 	opt.vary_R0s = {false, true};
 	opt.vary_Z0c = {false, true};
 	opt.vary_Z0s = {false, true};
+	opt.diff_method = DIFF_METHOD_CENTERED;
 	break;
       case 2:
 	// Vary only selected Fourier modes
@@ -359,6 +360,7 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
 	opt.vary_R0s = {false, true};
 	opt.vary_Z0c = {false, true};
 	opt.vary_Z0s = {false, true};
+	opt.diff_method = DIFF_METHOD_FORWARD;
 	break;
       default:
 	CHECK(false); // Should not get here
@@ -718,12 +720,14 @@ TEST_CASE("1d optimization for iota [opt]") {
 	opt.vary_eta_bar = false;
 	opt.vary_R0c = {false, true};
 	opt.vary_Z0s = {false, false};
+	opt.diff_method = DIFF_METHOD_CENTERED;
 	break;
       case 2:
 	// Vary eta_bar
 	opt.vary_eta_bar = true;
 	opt.vary_R0c = {false, false};
 	opt.vary_Z0s = {false, false};
+	opt.diff_method = DIFF_METHOD_FORWARD;
 	break;
       default:
 	CHECK(false); // Should not get here.
@@ -792,6 +796,7 @@ TEST_CASE("Try Fourier refinement. Make sure the vary_R0c etc arrays are extende
     opt.weight_XY3Prime = 1.0;
     opt.weight_B20 = 300.0;
     opt.max_iter = 1000;
+    opt.diff_method = DIFF_METHOD_FORWARD;
 
     opt.allocate();
     opt.optimize();
@@ -847,6 +852,7 @@ TEST_CASE("Verify that Fourier refinement works gracefully if the max_iter limit
     opt.weight_XY3Prime = 1.0;
     opt.weight_B20 = 300.0;
     opt.max_iter = 5;
+    opt.diff_method = DIFF_METHOD_CENTERED;
 
     opt.allocate();
     opt.optimize();

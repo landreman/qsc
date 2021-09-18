@@ -28,7 +28,7 @@ Z0s_max = [0.0,  0.5]
 
 keep_all = false
 
-max_seconds = 2
+max_seconds = 2.2
 save_period = 0.5
 max_attempts_per_proc = 100000
 max_keep_per_proc = 100000

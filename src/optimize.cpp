@@ -144,6 +144,16 @@ void Opt::optimize() {
     // For the above option, there is a trade-off between speed vs
     // robustness when the problem may be rank-deficient. Other options
     // are described in the GSL documentation.
+    switch (diff_method) {
+    case DIFF_METHOD_FORWARD:
+      gsl_optimizer_params.fdtype = GSL_MULTIFIT_NLINEAR_FWDIFF;
+      break;
+    case DIFF_METHOD_CENTERED:
+      gsl_optimizer_params.fdtype = GSL_MULTIFIT_NLINEAR_CTRDIFF;
+      break;
+    default:
+      throw std::runtime_error("Unrecognized diff_method.");
+    }
     const gsl_multifit_nlinear_type *T = gsl_multifit_nlinear_trust;
     const double xtol = 1.0e-8;
     const double gtol = 1.0e-8;
@@ -277,7 +287,7 @@ void Opt::init_parameters() {
   }
 
   if (verbose > 0 && make_names) {
-    std::cout << "State vector:" << std::endl;
+    std::cout << "State vector names:" << std::endl;
     for (j = 0; j < n_parameters; j++)
       std::cout << "  " << j << ", " << state_vector_names[j] << std::endl;
   }
@@ -490,6 +500,7 @@ void Opt::unpack_state_vector(qscfloat *state_vector) {
     }
   }
   assert (j == n_parameters);
+
 }
 
 /** Set the vector of residuals using values from the Qsc object.

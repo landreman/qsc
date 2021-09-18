@@ -74,6 +74,18 @@ void Opt::input(std::string filename) {
   } else {
     throw std::runtime_error("Unrecognized algorithm");
   }
+
+  std::string diff_method_str = "";
+  toml_read(varlist, indata, "diff_method", diff_method_str);
+  if (diff_method_str.compare("forward") == 0) {
+    diff_method = DIFF_METHOD_FORWARD;
+  } else if (diff_method_str.compare("centered") == 0) {
+    diff_method = DIFF_METHOD_CENTERED;
+  } else if (diff_method_str.compare("") == 0) {
+    // Stick with the default
+  } else {
+    throw std::runtime_error("Unrecognized diff_method");
+  }
   
   toml_unused(varlist, indata);
   

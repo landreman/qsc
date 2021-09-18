@@ -14,6 +14,11 @@ namespace qsc {
     GSL_DDOGLEG,
     GSL_SUBSPACE2D
   } algorithm_type;
+
+  typedef enum {
+    DIFF_METHOD_FORWARD,
+    DIFF_METHOD_CENTERED
+  } diff_method_type;
   
   class Opt {
   private:    
@@ -33,6 +38,7 @@ namespace qsc {
     algorithm_type algorithm;
     Vector residuals;
     int fourier_refine;
+    diff_method_type diff_method;
 
     bool vary_eta_bar, vary_sigma0;
     bool vary_B2c, vary_B2s;
