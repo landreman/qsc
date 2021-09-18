@@ -123,4 +123,3 @@ namespace qsc {
 }
 
 #endif
-
