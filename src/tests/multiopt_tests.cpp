@@ -197,6 +197,7 @@ TEST_CASE("Running a standalone opt should yield identical results to a 1-stage 
 }
 
 TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refinement. [multiopt]") {
+  if (single) return;
   int j, k;
   for (int fourier_refine1 = 0; fourier_refine1 < 4; fourier_refine1++) {
     CAPTURE(fourier_refine1);
@@ -230,8 +231,8 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
       mo.opts[1].vary_eta_bar = true;
       mo.opts[1].vary_B2c = true;
       mo.opts[1].weight_grad_B = 1.0;
-      mo.opts[1].weight_B20 = 2.0;
-      mo.opts[1].weight_grad_grad_B = 0.01;
+      mo.opts[1].weight_B20 = 0.3;
+      mo.opts[1].weight_grad_grad_B = 1.0e-4;
       mo.opts[1].vary_R0c.resize(2 + fourier_refine1, false);
       mo.opts[1].vary_R0s.resize(2 + fourier_refine1, false);
       mo.opts[1].vary_Z0c.resize(2 + fourier_refine1, false);
