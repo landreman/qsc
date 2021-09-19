@@ -196,7 +196,7 @@ TEST_CASE("Running a standalone opt should yield identical results to a 1-stage 
   }
 }
 
-TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refinement. [multiopt]") {
+TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refinement. Also check that stage 0 and 1 of the multiopt each match standalone opts with the same parameters. [multiopt]") {
   if (single) return;
   int j, k;
   for (int fourier_refine1 = 0; fourier_refine1 < 4; fourier_refine1++) {
@@ -243,6 +243,38 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
 	mo.opts[1].vary_Z0s[j + 2] = true;
       }
 
+      // Set up a standalone opt with the same parameters as
+      // mo.opts[0].  We do this before running the multiopt because
+      // running the multiopt will alter the parameters of the qsc
+      // object.
+      Opt opt0;
+      opt0.q.verbose = 0;
+      opt0.q.nphi = mo.opts[0].q.nphi;
+      opt0.q.nfp = mo.opts[0].q.nfp;
+      opt0.q.eta_bar = mo.opts[0].q.eta_bar;
+      opt0.q.sigma0 = mo.opts[0].q.sigma0;
+      opt0.q.B2c = mo.opts[0].q.B2c;
+      opt0.q.B2s = mo.opts[0].q.B2s;
+      opt0.q.order_r_option = mo.opts[0].q.order_r_option;
+      opt0.q.R0c = mo.opts[0].q.R0c;
+      opt0.q.R0s = mo.opts[0].q.R0s;
+      opt0.q.Z0c = mo.opts[0].q.Z0c;
+      opt0.q.Z0s = mo.opts[0].q.Z0s;
+      
+      opt0.diff_method = mo.opts[0].diff_method;
+      opt0.max_iter = mo.opts[0].max_iter;
+      opt0.fourier_refine = mo.opts[0].fourier_refine;
+      opt0.vary_sigma0 = mo.opts[0].vary_sigma0;
+      opt0.vary_eta_bar = mo.opts[0].vary_eta_bar;
+      opt0.vary_B2c = mo.opts[0].vary_B2c;
+      opt0.vary_B2s = mo.opts[0].vary_B2s;
+      opt0.vary_R0c = mo.opts[0].vary_R0c;
+      opt0.vary_R0s = mo.opts[0].vary_R0s;
+      opt0.vary_Z0c = mo.opts[0].vary_Z0c;
+      opt0.vary_Z0s = mo.opts[0].vary_Z0s;
+      opt0.weight_grad_B = mo.opts[0].weight_grad_B;
+      opt0.weight_B20 = mo.opts[0].weight_B20;
+      
       mo.optimize();
 
       int newsize = 2 + fourier_refine1 + fourier_refine2;
@@ -289,6 +321,111 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
 	CHECK(Approx(mo.opts[1].iter_Z0c(k, 0)) == 0.0);
 	CHECK(Approx(mo.opts[1].iter_Z0s(k, 0)) == 0.0);
       }
+
+      // Now that the multiopt has run, we know the initial conditions
+      // for the latter stage. Set up a standalone opt with the same
+      // parameters as mo.opts[1].
+      Opt opt1;
+      opt1.q.verbose = 0;
+      opt1.q.nphi = mo.opts[1].q.nphi;
+      opt1.q.nfp = mo.opts[1].q.nfp;
+      index = mo.opts[0].n_iter - 1;
+      opt1.q.eta_bar = mo.opts[0].iter_eta_bar[index];
+      opt1.q.sigma0 = mo.opts[0].iter_sigma0[index];
+      opt1.q.B2c = mo.opts[0].iter_B2c[index];
+      opt1.q.B2s = mo.opts[0].iter_B2s[index];
+      opt1.q.order_r_option = mo.opts[1].q.order_r_option;
+      opt1.q.R0c.resize(2 + fourier_refine1);
+      opt1.q.R0s.resize(2 + fourier_refine1);
+      opt1.q.Z0c.resize(2 + fourier_refine1);
+      opt1.q.Z0s.resize(2 + fourier_refine1);
+      for (k = 0; k < 2 + fourier_refine1; k++) {
+	opt1.q.R0c[k] = mo.opts[0].iter_R0c(k, index);
+	opt1.q.R0s[k] = mo.opts[0].iter_R0s(k, index);
+	opt1.q.Z0c[k] = mo.opts[0].iter_Z0c(k, index);
+	opt1.q.Z0s[k] = mo.opts[0].iter_Z0s(k, index);
+      }
+      
+      opt1.diff_method = mo.opts[1].diff_method;
+      opt1.max_iter = mo.opts[1].max_iter;
+      opt1.fourier_refine = mo.opts[1].fourier_refine;
+      opt1.vary_sigma0 = mo.opts[1].vary_sigma0;
+      opt1.vary_eta_bar = mo.opts[1].vary_eta_bar;
+      opt1.vary_B2c = mo.opts[1].vary_B2c;
+      opt1.vary_B2s = mo.opts[1].vary_B2s;
+      opt1.vary_R0c.resize(2 + fourier_refine1, true);
+      opt1.vary_R0s.resize(2 + fourier_refine1, false);
+      opt1.vary_Z0c.resize(2 + fourier_refine1, false);
+      opt1.vary_Z0s.resize(2 + fourier_refine1, true);
+      opt1.vary_R0c[0] = false;
+      opt1.vary_R0c[1] = false;
+      opt1.vary_Z0s[0] = false;
+      opt1.weight_grad_B = mo.opts[1].weight_grad_B;
+      opt1.weight_B20 = mo.opts[1].weight_B20;
+      opt1.weight_grad_grad_B = mo.opts[1].weight_grad_grad_B;
+      
+      // Run the standalone opts:
+      opt0.allocate();
+      opt0.optimize();
+      opt1.allocate();
+      opt1.optimize();
+      
+      // Compare stage 0 of the multiopt to the standalone opt:
+      for (j = 0; j < opt0.n_iter; j++) {
+	CAPTURE(j);
+	CHECK(Approx(mo.opts[0].iter_eta_bar[j]) == opt0.iter_eta_bar[j]);
+	CHECK(Approx(mo.opts[0].iter_sigma0[j]) == opt0.iter_sigma0[j]);
+	CHECK(Approx(mo.opts[0].iter_B2c[j]) == opt0.iter_B2c[j]);
+	CHECK(Approx(mo.opts[0].iter_B2s[j]) == opt0.iter_B2s[j]);
+	for (int k = 0; k < 2 + fourier_refine1; k++) {
+	  CHECK(Approx(mo.opts[0].iter_R0c(k, j)) == opt0.iter_R0c(k, j));
+	  CHECK(Approx(mo.opts[0].iter_R0s(k, j)) == opt0.iter_R0s(k, j));
+	  CHECK(Approx(mo.opts[0].iter_Z0c(k, j)) == opt0.iter_Z0c(k, j));
+	  CHECK(Approx(mo.opts[0].iter_Z0s(k, j)) == opt0.iter_Z0s(k, j));
+	}
+	CHECK(Approx(mo.opts[0].iter_min_R0[j]) == opt0.iter_min_R0[j]);
+	CHECK(Approx(mo.opts[0].iter_max_curvature[j]) == opt0.iter_max_curvature[j]);
+	CHECK(Approx(mo.opts[0].iter_iota[j]) == opt0.iter_iota[j]);
+	CHECK(Approx(mo.opts[0].iter_max_elongation[j]) == opt0.iter_max_elongation[j]);
+	CHECK(Approx(mo.opts[0].iter_min_L_grad_B[j]) == opt0.iter_min_L_grad_B[j]);
+	CHECK(Approx(mo.opts[0].iter_min_L_grad_grad_B[j]) == opt0.iter_min_L_grad_grad_B[j]);
+	CHECK(Approx(mo.opts[0].iter_r_singularity[j]) == opt0.iter_r_singularity[j]);
+	CHECK(Approx(mo.opts[0].iter_B20_variation[j]) == opt0.iter_B20_variation[j]);
+	CHECK(Approx(mo.opts[0].iter_B20_residual[j]) == opt0.iter_B20_residual[j]);
+	CHECK(Approx(mo.opts[0].iter_d2_volume_d_psi2[j]) == opt0.iter_d2_volume_d_psi2[j]);
+	CHECK(Approx(mo.opts[0].iter_DMerc_times_r2[j]) == opt0.iter_DMerc_times_r2[j]);
+	CHECK(Approx(mo.opts[0].iter_standard_deviation_of_R[j]) == opt0.iter_standard_deviation_of_R[j]);
+	CHECK(Approx(mo.opts[0].iter_standard_deviation_of_Z[j]) == opt0.iter_standard_deviation_of_Z[j]);
+      }
+      
+      // Compare stage 1 of the multiopt to the standalone opt:
+      for (j = 0; j < opt1.n_iter; j++) {
+	CAPTURE(j);
+	CHECK(Approx(mo.opts[1].iter_eta_bar[j]) == opt1.iter_eta_bar[j]);
+	CHECK(Approx(mo.opts[1].iter_sigma0[j]) == opt1.iter_sigma0[j]);
+	CHECK(Approx(mo.opts[1].iter_B2c[j]) == opt1.iter_B2c[j]);
+	CHECK(Approx(mo.opts[1].iter_B2s[j]) == opt1.iter_B2s[j]);
+	for (int k = 0; k < newsize; k++) {
+	  CHECK(Approx(mo.opts[1].iter_R0c(k, j)) == opt1.iter_R0c(k, j));
+	  CHECK(Approx(mo.opts[1].iter_R0s(k, j)) == opt1.iter_R0s(k, j));
+	  CHECK(Approx(mo.opts[1].iter_Z0c(k, j)) == opt1.iter_Z0c(k, j));
+	  CHECK(Approx(mo.opts[1].iter_Z0s(k, j)) == opt1.iter_Z0s(k, j));
+	}
+	CHECK(Approx(mo.opts[1].iter_min_R0[j]) == opt1.iter_min_R0[j]);
+	CHECK(Approx(mo.opts[1].iter_max_curvature[j]) == opt1.iter_max_curvature[j]);
+	CHECK(Approx(mo.opts[1].iter_iota[j]) == opt1.iter_iota[j]);
+	CHECK(Approx(mo.opts[1].iter_max_elongation[j]) == opt1.iter_max_elongation[j]);
+	CHECK(Approx(mo.opts[1].iter_min_L_grad_B[j]) == opt1.iter_min_L_grad_B[j]);
+	CHECK(Approx(mo.opts[1].iter_min_L_grad_grad_B[j]) == opt1.iter_min_L_grad_grad_B[j]);
+	CHECK(Approx(mo.opts[1].iter_r_singularity[j]) == opt1.iter_r_singularity[j]);
+	CHECK(Approx(mo.opts[1].iter_B20_variation[j]) == opt1.iter_B20_variation[j]);
+	CHECK(Approx(mo.opts[1].iter_B20_residual[j]) == opt1.iter_B20_residual[j]);
+	CHECK(Approx(mo.opts[1].iter_d2_volume_d_psi2[j]) == opt1.iter_d2_volume_d_psi2[j]);
+	CHECK(Approx(mo.opts[1].iter_DMerc_times_r2[j]) == opt1.iter_DMerc_times_r2[j]);
+	CHECK(Approx(mo.opts[1].iter_standard_deviation_of_R[j]) == opt1.iter_standard_deviation_of_R[j]);
+	CHECK(Approx(mo.opts[1].iter_standard_deviation_of_Z[j]) == opt1.iter_standard_deviation_of_Z[j]);
+      }
+      
     }
   }
 }
