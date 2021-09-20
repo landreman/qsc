@@ -52,6 +52,7 @@ namespace qsc {
     qscfloat weight_Z2, weight_Z2Prime;
     qscfloat weight_XY3, weight_XY3Prime;
     qscfloat weight_grad_B, weight_grad_grad_B, weight_r_singularity;
+    qscfloat weight_axis_length, weight_standard_deviation_of_R;
 
     qscfloat objective_function;
     qscfloat B20_term, iota_term;
@@ -61,6 +62,7 @@ namespace qsc {
     qscfloat Z2_term, Z2Prime_term;
     qscfloat XY3_term, XY3Prime_term;
     qscfloat grad_B_term, grad_grad_B_term, r_singularity_term;
+    qscfloat axis_length_term, standard_deviation_of_R_term;
 
     Vector iter_objective_function;
     Vector iter_B20_term, iter_iota_term;
@@ -70,6 +72,7 @@ namespace qsc {
     Vector iter_Z2_term, iter_Z2Prime_term;
     Vector iter_XY3_term, iter_XY3Prime_term;
     Vector iter_grad_B_term, iter_grad_grad_B_term, iter_r_singularity_term;
+    Vector iter_axis_length_term, iter_standard_deviation_of_R_term;
     
     Vector iter_eta_bar, iter_sigma0, iter_B2s, iter_B2c;
     Matrix iter_R0c, iter_R0s, iter_Z0c, iter_Z0s;
@@ -79,6 +82,7 @@ namespace qsc {
     Vector iter_r_singularity, iter_B20_variation, iter_B20_residual;
     Vector iter_d2_volume_d_psi2, iter_DMerc_times_r2;
     Vector iter_standard_deviation_of_R, iter_standard_deviation_of_Z;
+    Vector iter_axis_length;
     std::valarray<int> iter_fourier_refine_step;
     
     Opt();

@@ -185,8 +185,9 @@ void Opt::optimize() {
       std::cout << "  Z0s: " << q.Z0s << std::endl;
       std::cout << "  iota: " << q.iota << "  r_singularity: " << q.r_singularity_robust << std::endl;
       std::cout << "  L grad B: " << q.grid_min_L_grad_B << "  L grad grad B: " << q.grid_min_L_grad_grad_B << std::endl;
-      std::cout << "  B20 variation: " << q.B20_grid_variation << std::endl;
+      std::cout << "  B20 variation: " << q.B20_grid_variation << "  min(R0): " << q.grid_min_R0 << std::endl;
       std::cout << "  d2 volume / d psi2: " << q.d2_volume_d_psi2 << std::endl;
+      std::cout << "  axis_length: " << q.axis_length << "  stddev(R): " << q.standard_deviation_of_R << std::endl;
     }
     
     gsl_multifit_nlinear_free(work);
@@ -383,6 +384,15 @@ void Opt::init_residuals() {
     if (make_names)
       for (j = 0; j < q.nphi; j++) residual_names.push_back("r_singularity[" + std::to_string(j) + "]");
   }
+  if (weight_axis_length > 0) {
+    n_terms += 1;
+    if (make_names) residual_names.push_back("axis_length");
+  }
+  if (weight_standard_deviation_of_R > 0) {
+    n_terms += q.nphi;
+    if (make_names)
+      for (j = 0; j < q.nphi; j++) residual_names.push_back("standard_deviation_of_R[" + std::to_string(j) + "]");
+  }
   
   if (make_names) {
     output_file.open("residual_vector");
@@ -527,8 +537,10 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   grad_B_term = 0.0;
   grad_grad_B_term = 0.0;
   r_singularity_term = 0.0;
+  axis_length_term = 0.0;
+  standard_deviation_of_R_term = 0.0;
 
-  // The order of terms here must match the order in Opt::init().
+  // The order of terms here must match the order in Opt::init_residuals().
   for (k = 0; k < q.nphi; k++) {
     term = arclength_factor[k] * q.B20_anomaly[k];
     B20_term += term * term;
@@ -699,13 +711,25 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
     if (weight_r_singularity > 0) residuals[j++] = weight_r_singularity * term;
   }
 
+  term = q.axis_length;
+  axis_length_term = term * term;
+  if (weight_axis_length > 0) residuals[j++] = weight_axis_length * term;
+
+  for (k = 0; k < q.nphi; k++) {
+    term = arclength_factor[k] * (q.R0[k] - q.mean_R);
+    standard_deviation_of_R_term += term * term;
+    if (weight_standard_deviation_of_R > 0) residuals[j++] = weight_standard_deviation_of_R * term;
+  }
+
   Vector weights = {weight_B20, weight_iota, weight_elongation, weight_curvature, weight_R0, weight_d2_volume_d_psi2,
     weight_XY2, weight_XY2Prime, weight_Z2, weight_Z2Prime, weight_XY3, weight_XY3Prime,
-    weight_grad_B, weight_grad_grad_B, weight_r_singularity};
+    weight_grad_B, weight_grad_grad_B, weight_r_singularity,
+    weight_axis_length, weight_standard_deviation_of_R};
 
   Vector terms = {B20_term, iota_term, elongation_term, curvature_term,
     R0_term, d2_volume_d_psi2_term, XY2_term, XY2Prime_term, Z2_term, Z2Prime_term,
-    XY3_term, XY3Prime_term, grad_B_term, grad_grad_B_term, r_singularity_term};
+    XY3_term, XY3Prime_term, grad_B_term, grad_grad_B_term, r_singularity_term,
+    axis_length_term, standard_deviation_of_R_term};
 
   assert (weights.size() == terms.size());
   for (k = 0; k < terms.size(); k++) {
@@ -768,6 +792,8 @@ void gsl_callback(const size_t iter, void *params,
   opt->iter_grad_B_term[n_iter] = opt->grad_B_term;
   opt->iter_grad_grad_B_term[n_iter] = opt->grad_grad_B_term;
   opt->iter_r_singularity_term[n_iter] = opt->r_singularity_term;
+  opt->iter_axis_length_term[n_iter] = opt->axis_length_term;
+  opt->iter_standard_deviation_of_R_term[n_iter] = opt->standard_deviation_of_R_term;
 
   opt->iter_eta_bar[n_iter] = opt->q.eta_bar;
   opt->iter_sigma0[n_iter] = opt->q.sigma0;
@@ -786,6 +812,7 @@ void gsl_callback(const size_t iter, void *params,
   opt->iter_DMerc_times_r2[n_iter] = opt->q.DMerc_times_r2;
   opt->iter_standard_deviation_of_R[n_iter] = opt->q.standard_deviation_of_R;
   opt->iter_standard_deviation_of_Z[n_iter] = opt->q.standard_deviation_of_Z;
+  opt->iter_axis_length[n_iter] = opt->q.axis_length;
   for (j = 0; j < opt->q.R0c.size(); j++) {
     opt->iter_R0c(j, n_iter) = opt->q.R0c[j];
     opt->iter_R0s(j, n_iter) = opt->q.R0s[j];

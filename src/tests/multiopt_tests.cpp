@@ -40,6 +40,8 @@ TEST_CASE("Running a standalone opt should yield identical results to a 1-stage 
       opt.weight_grad_B = 10.0;
       opt.weight_grad_grad_B = 11.0;
       opt.weight_r_singularity = 12.0;
+      opt.weight_axis_length = 13.0;
+      opt.weight_standard_deviation_of_R = 14.0;
       
       switch (vary_axis_option) {
       case 0:
@@ -150,6 +152,8 @@ TEST_CASE("Running a standalone opt should yield identical results to a 1-stage 
       mo.opts[0].weight_grad_B = opt.weight_grad_B;
       mo.opts[0].weight_grad_grad_B = opt.weight_grad_grad_B;
       mo.opts[0].weight_r_singularity = opt.weight_r_singularity;
+      mo.opts[0].weight_axis_length = opt.weight_axis_length;
+      mo.opts[0].weight_standard_deviation_of_R = opt.weight_standard_deviation_of_R;
       
       mo.opts[0].vary_R0c = opt.vary_R0c;
       mo.opts[0].vary_R0s = opt.vary_R0s;
@@ -189,7 +193,7 @@ TEST_CASE("Running a standalone opt should yield identical results to a 1-stage 
 	CHECK(Approx(mo.opts[0].iter_DMerc_times_r2[j]) == opt.iter_DMerc_times_r2[j]);
 	CHECK(Approx(mo.opts[0].iter_standard_deviation_of_R[j]) == opt.iter_standard_deviation_of_R[j]);
 	CHECK(Approx(mo.opts[0].iter_standard_deviation_of_Z[j]) == opt.iter_standard_deviation_of_Z[j]);
-
+	CHECK(Approx(mo.opts[0].iter_axis_length[j]) == opt.iter_axis_length[j]);
       
       }
     }
@@ -396,6 +400,7 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
 	CHECK(Approx(mo.opts[0].iter_DMerc_times_r2[j]) == opt0.iter_DMerc_times_r2[j]);
 	CHECK(Approx(mo.opts[0].iter_standard_deviation_of_R[j]) == opt0.iter_standard_deviation_of_R[j]);
 	CHECK(Approx(mo.opts[0].iter_standard_deviation_of_Z[j]) == opt0.iter_standard_deviation_of_Z[j]);
+	CHECK(Approx(mo.opts[0].iter_axis_length[j]) == opt0.iter_axis_length[j]);
       }
       
       // Compare stage 1 of the multiopt to the standalone opt:
@@ -424,6 +429,7 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
 	CHECK(Approx(mo.opts[1].iter_DMerc_times_r2[j]) == opt1.iter_DMerc_times_r2[j]);
 	CHECK(Approx(mo.opts[1].iter_standard_deviation_of_R[j]) == opt1.iter_standard_deviation_of_R[j]);
 	CHECK(Approx(mo.opts[1].iter_standard_deviation_of_Z[j]) == opt1.iter_standard_deviation_of_Z[j]);
+	CHECK(Approx(mo.opts[1].iter_axis_length[j]) == opt1.iter_axis_length[j]);
       }
       
     }

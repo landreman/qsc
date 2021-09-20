@@ -37,6 +37,8 @@ TEST_CASE("The objective function should equal 1/2 * sum(residuals^2) [opt]") {
       opt.weight_grad_B = 10.0;
       opt.weight_grad_grad_B = 11.0;
       opt.weight_r_singularity = 12.0;
+      opt.weight_axis_length = 13.0;
+      opt.weight_standard_deviation_of_R = 14.0;
       break;
     case 1:
       // Most residual terms off. At least 1 must be on though or qsc will raise an error.
@@ -213,6 +215,11 @@ TEST_CASE("Compute each optimization term a different way and make sure we get t
 
     temp = opt.q.d_l_d_phi / (opt.q.r_hat_singularity_robust * opt.q.r_hat_singularity_robust);
     CHECK(Approx(temp.sum() / denominator) == opt.r_singularity_term);
+
+    CHECK(Approx(opt.q.axis_length * opt.q.axis_length) == opt.axis_length_term);
+
+    temp = opt.q.d_l_d_phi * (opt.q.R0 - opt.q.mean_R) * (opt.q.R0 - opt.q.mean_R);
+    CHECK(Approx(temp.sum() / denominator) == opt.standard_deviation_of_R_term);
   }
 }
 
@@ -249,6 +256,8 @@ TEST_CASE("Each term in the objective function should be approximately independe
   o1.weight_grad_B = 10.0;
   o1.weight_grad_grad_B = 11.0;
   o1.weight_r_singularity = 12.0;
+  o1.weight_axis_length = 13.0;
+  o1.weight_standard_deviation_of_R = 14.0;
   
   o2.weight_B20 = 2.0;
   o2.weight_iota = 3.0;
@@ -266,6 +275,8 @@ TEST_CASE("Each term in the objective function should be approximately independe
   o2.weight_grad_B = 10.0;
   o2.weight_grad_grad_B = 11.0;
   o2.weight_r_singularity = 12.0;
+  o2.weight_axis_length = 13.0;
+  o2.weight_standard_deviation_of_R = 14.0;
 
   o1.init_parameters();
   o1.init_residuals();
@@ -294,6 +305,8 @@ TEST_CASE("Each term in the objective function should be approximately independe
   CHECK(Approx(o1.grad_B_term).epsilon(tol) == o2.grad_B_term);
   CHECK(Approx(o1.grad_grad_B_term).epsilon(tol) == o2.grad_grad_B_term);
   CHECK(Approx(o1.r_singularity_term).epsilon(tol) == o2.r_singularity_term);
+  CHECK(Approx(o1.axis_length_term).epsilon(tol) == o2.axis_length_term);
+  CHECK(Approx(o1.standard_deviation_of_R_term).epsilon(tol) == o2.standard_deviation_of_R_term);
 
 }
 
@@ -337,6 +350,8 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
       opt.weight_grad_B = 10.0;
       opt.weight_grad_grad_B = 11.0;
       opt.weight_r_singularity = 12.0;
+      opt.weight_axis_length = 13.0;
+      opt.weight_standard_deviation_of_R = 14.0;
       
       switch (vary_axis_option) {
       case 0:
@@ -448,6 +463,7 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
       CHECK(Approx(q0.DMerc_times_r2) == opt.iter_DMerc_times_r2[0]);
       CHECK(Approx(q0.standard_deviation_of_R) == opt.iter_standard_deviation_of_R[0]);
       CHECK(Approx(q0.standard_deviation_of_Z) == opt.iter_standard_deviation_of_Z[0]);
+      CHECK(Approx(q0.axis_length) == opt.iter_axis_length[0]);
 
       // Now set up a standalone QSC to check each iteration
       Qsc q;
@@ -493,7 +509,7 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
 	CHECK(Approx(q.DMerc_times_r2) == opt.iter_DMerc_times_r2[j]);
 	CHECK(Approx(q.standard_deviation_of_R) == opt.iter_standard_deviation_of_R[j]);
 	CHECK(Approx(q.standard_deviation_of_Z) == opt.iter_standard_deviation_of_Z[j]);
-
+	CHECK(Approx(q.axis_length) == opt.iter_axis_length[j]);
       
 	// Check if things were fixed that were supposed to be fixed,
 	// and things were varied that were supposed to be varied:

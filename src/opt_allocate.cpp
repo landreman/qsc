@@ -24,6 +24,8 @@ void Opt::allocate() {
   iter_grad_B_term.resize(max_iter, 0.0);
   iter_grad_grad_B_term.resize(max_iter, 0.0);
   iter_r_singularity_term.resize(max_iter, 0.0);
+  iter_axis_length_term.resize(max_iter, 0.0);
+  iter_standard_deviation_of_R_term.resize(max_iter, 0.0);
   
   iter_eta_bar.resize(max_iter, 0.0);
   iter_sigma0.resize(max_iter, 0.0);
@@ -48,6 +50,7 @@ void Opt::allocate() {
   iter_DMerc_times_r2.resize(max_iter, 0.0);
   iter_standard_deviation_of_R.resize(max_iter, 0.0);
   iter_standard_deviation_of_Z.resize(max_iter, 0.0);
+  iter_axis_length.resize(max_iter, 0.0);
 
   iter_fourier_refine_step.resize(max_iter, 0);
 }

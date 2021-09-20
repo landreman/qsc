@@ -33,6 +33,8 @@ void Opt::write_netcdf() {
   nc.put("weight_grad_B", weight_grad_B, "Weight for the ||grad B|| term in the objective function for optimization", "dimensionless");
   nc.put("weight_grad_grad_B", weight_grad_grad_B, "Weight for the ||grad grad B|| term in the objective function for optimization", "dimensionless");
   nc.put("weight_r_singularity", weight_r_singularity, "Weight for the r_singularity term in the objective function for optimization", "dimensionless");
+  nc.put("weight_axis_length", weight_axis_length, "Weight for the axis_length term in the objective function for optimization", "dimensionless");
+  nc.put("weight_standard_deviation_of_R", weight_standard_deviation_of_R, "Weight for the standard_deviation_of_R term in the objective function for optimization", "dimensionless");
 
   nc.put("target_iota", target_iota, "Target iota for the iota term in the objective function for optimization", "dimensionless");
   nc.put("min_R0", min_R0, "Minimum major radius of the magnetic axis for the associated penalty term in the objective function for optimization", "dimensionless");
@@ -55,6 +57,8 @@ void Opt::write_netcdf() {
   nc.put(n_iter_dim, "iter_grad_B_term", iter_grad_B_term, "grad B term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_grad_grad_B_term", iter_grad_grad_B_term, "grad grad B term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_r_singularity_term", iter_r_singularity_term, "r_singularity term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_axis_length_term", iter_axis_length_term, "axis_length term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_standard_deviation_of_R_term", iter_standard_deviation_of_R_term, "standard_deviation_of_R term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_eta_bar", iter_eta_bar, "eta_bar at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_sigma0", iter_sigma0, "sigma0 at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_B2c", iter_B2c, "B2c at each iteration", "dimensionless");
@@ -72,6 +76,8 @@ void Opt::write_netcdf() {
   nc.put(n_iter_dim, "iter_DMerc_times_r2", iter_DMerc_times_r2, "DMerc_times_r2 at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_standard_deviation_of_R", iter_standard_deviation_of_R, "standard_deviation_of_R at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_standard_deviation_of_Z", iter_standard_deviation_of_Z, "standard_deviation_of_Z at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_axis_length", iter_axis_length, "Length of the magnetic axis at each iteration", "meters");
+  
   /*
   std::string general_option = "random";
   nc.put("general_option", general_option, "Whether this job was a single configuration vs a scan");
