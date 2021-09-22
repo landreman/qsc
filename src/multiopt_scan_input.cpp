@@ -26,6 +26,7 @@ void MultiOptScan::input(std::string filename) {
   toml_read(varlist, indata, "params_min", params_min);
   toml_read(varlist, indata, "params_max", params_max);
   toml_read(varlist, indata, "params_n", params_n);
+  toml_read(varlist, indata, "params_stage", params_stage);
   toml_read(varlist, indata, "params_log", params_log);
   
   toml_read(varlist, indata, "keep_all", keep_all);
@@ -47,10 +48,11 @@ void MultiOptScan::input(std::string filename) {
   assert (params_min.size() == ndim);
   assert (params_n.size() == ndim);
   assert (params_log.size() == ndim);
-  std::cout << "parameters to scan, min, max, n, log: " << std::endl;
+  assert (params_stage.size() == ndim);
+  std::cout << "parameters to scan, min, max, n, log, stage: " << std::endl;
   for (int j = 0; j < ndim; j++) {
     std::cout << " " << params[j] << ", " << params_min[j] << ", " << params_max[j];
-    std::cout << ", " << params_n[j] << ", " << params_log[j] << std::endl;
+    std::cout << ", " << params_n[j] << ", " << params_log[j] << ", " << params_stage[j] << std::endl;
   }
   std::cout << "save_period: " << save_period << std::endl;
   std::cout << "max_seconds: " << max_seconds << std::endl;

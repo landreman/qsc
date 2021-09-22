@@ -61,6 +61,7 @@ void MultiOpt::optimize() {
       // opts[jopt].q = Qsc();
 
       if (verbose > 0) std::cout << "Transferring data to optimization stage " << jopt << " from previous stage." << std::endl;
+      /*
       opts[jopt].q.nfp = opts[jopt - 1].q.nfp;
       opts[jopt].q.nphi = opts[jopt - 1].q.nphi;
       opts[jopt].q.order_r_option = opts[jopt - 1].q.order_r_option;
@@ -76,6 +77,8 @@ void MultiOpt::optimize() {
       opts[jopt].q.Z0s = opts[jopt - 1].q.Z0s;
       opts[jopt].q.I2 = opts[jopt - 1].q.I2;
       opts[jopt].q.p2 = opts[jopt - 1].q.p2;
+      */
+      opts[jopt].q = opts[jopt - 1].q;
     }
 
     // Run the given stage of the optimization.

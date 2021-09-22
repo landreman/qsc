@@ -16,7 +16,6 @@ namespace qsc {
     enum {ATTEMPTS,
       KEPT,
       REJECTED_DUE_TO_R0,
-      REJECTED_DUE_TO_CURVATURE,
       REJECTED_DUE_TO_IOTA,
       REJECTED_DUE_TO_ELONGATION,
       REJECTED_DUE_TO_L_GRAD_B,
@@ -44,7 +43,7 @@ namespace qsc {
     std::vector<std::string> params;
     Vector params_max, params_min;
     std::valarray<bool> params_log;
-    std::valarray<int> params_n;
+    std::valarray<int> params_n, params_stage;
     std::vector<Vector> params_vals;
     
     MultiOptScan();
