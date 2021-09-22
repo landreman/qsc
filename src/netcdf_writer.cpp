@@ -177,14 +177,22 @@ void qsc::NetCDFWriter::put(std::vector<dim_id_type> dim_id, std::string varname
 
 void qsc::NetCDFWriter::write_and_close() {
   int retval;
-
+  bool verbose = false;
+  char varname[NC_MAX_NAME];
+  
   // End define mode. This tells netCDF we are done defining metadata.
   if ((retval = nc_enddef(ncid))) ERR(retval);
 
   // Write the data
   for (int j = 0; j < var_ids.size(); j++) {
+    if (verbose) {
+      std::cout << "NetCDFWriter::write_and_close: j=" << j << std::endl;
+      nc_inq_varname(ncid, var_ids[j], varname);
+      std::cout << "NetCDFWriter::write_and_close: name:" << varname << std::endl;
+    }
     if (types[j] == QSC_NC_INT) {
       // ints
+      if (verbose) std::cout << "NetCDFWriter::write_and_close: Writing an int" << std::endl;
       if ((retval = nc_put_var_int(ncid, var_ids[j], (int*) pointers[j])))
 	ERR(retval);
     } else if (types[j] == QSC_NC_BIG) {
@@ -194,10 +202,12 @@ void qsc::NetCDFWriter::write_and_close() {
 	ERR(retval);
     } else if (types[j] == QSC_NC_STRING) {
       // strings
+      if (verbose) std::cout << "NetCDFWriter::write_and_close: Writing a string" << std::endl;
       if ((retval = nc_put_var_text(ncid, var_ids[j], (char*) pointers[j])))
 	ERR(retval);
     } else {
       // floats
+      if (verbose) std::cout << "NetCDFWriter::write_and_close: Writing a float" << std::endl;
       if ((retval = nc_put_var_qscfloat(ncid, var_ids[j], (qscfloat*) pointers[j])))
 	ERR(retval);
     }

@@ -45,13 +45,24 @@ namespace qsc {
     std::valarray<bool> params_log;
     std::valarray<int> params_n, params_stage;
     std::vector<Vector> params_vals;
+    int axis_nmax_plus_1;
+    
+    Vector scan_eta_bar, scan_sigma0, scan_B2s, scan_B2c;
+    Matrix scan_R0c, scan_R0s, scan_Z0c, scan_Z0s;
+    Vector scan_min_R0, scan_max_curvature;
+    Vector scan_iota, scan_max_elongation;
+    Vector scan_min_L_grad_B, scan_min_L_grad_grad_B;
+    Vector scan_r_singularity, scan_B20_variation, scan_B20_residual;
+    Vector scan_d2_volume_d_psi2, scan_DMerc_times_r2;
+    Vector scan_standard_deviation_of_R, scan_standard_deviation_of_Z;
+    std::valarray<int> scan_helicity;
     
     MultiOptScan();
     void run(std::string);
     void input(std::string);
     void init();
     void scan();
-    //void write_netcdf();
+    void write_netcdf();
   };
 }
 
