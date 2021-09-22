@@ -8,12 +8,14 @@ using doctest::Approx;
 TEST_CASE("Check linear and logarithmic spacing of scan parameters. [multiopt_scan]") {
   if (single) return;
   MultiOptScan mos;
+  mos.mo_ref.opts.resize(1); // mos.init() requires that at least 1 opt be present.
   mos.params = {"R0c1", "weight_B20"};
   mos.params_min = {0.1, 0.01};
   mos.params_max = {0.4, 1.0};
   mos.params_n = {4, 3};
   mos.params_log = {false, true};
-
+  mos.params_stage = {-1, -1};
+  
   mos.init();
   CHECK(mos.n_scan_all == 12);
   

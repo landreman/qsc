@@ -54,7 +54,7 @@ weight_grad_grad_B = 0.01
 
 verbose = 2
 
-keep_all = false
+keep_all = true
 min_R0_to_keep = 0.5
 max_elongation_to_keep = 3.0
 

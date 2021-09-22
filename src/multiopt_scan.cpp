@@ -49,6 +49,7 @@ void MultiOptScan::init() {
   assert (params_min.size() == ndim);
   assert (params_n.size() == ndim);
   assert (params_log.size() == ndim);
+  assert (params_stage.size() == ndim);
   params_vals.resize(ndim);
   n_scan_all = 1;
   for (j = 0; j < ndim; j++) {
@@ -70,7 +71,6 @@ void MultiOptScan::init() {
   if (verbose > 0) std::cout << "Total number of points in scan: " << n_scan_all << std::endl;
 
   for (j = 0; j < N_FILTERS; j++) filters[j] = 0;
-  
   axis_nmax_plus_1 = mo_ref.opts[0].q.R0c.size();
   for (j = 0; j < mo_ref.opts.size(); j++) axis_nmax_plus_1 += mo_ref.opts[j].fourier_refine;
 
@@ -107,6 +107,27 @@ void MultiOptScan::scan() {
   scan_Z0c.resize(axis_nmax_plus_1, n_scan_all, 0.0);
   scan_Z0s.resize(axis_nmax_plus_1, n_scan_all, 0.0);
 
+  scan_weight_B20.resize(n_scan_all, 0.0);
+  scan_weight_iota.resize(n_scan_all, 0.0);
+  scan_target_iota.resize(n_scan_all, 0.0);
+  scan_weight_elongation.resize(n_scan_all, 0.0);
+  scan_weight_curvature.resize(n_scan_all, 0.0);
+  scan_weight_R0.resize(n_scan_all, 0.0);
+  scan_target_min_R0.resize(n_scan_all, 0.0);
+  scan_weight_d2_volume_d_psi2.resize(n_scan_all, 0.0);
+  scan_max_d2_volume_d_psi2.resize(n_scan_all, 0.0);
+  scan_weight_XY2.resize(n_scan_all, 0.0);
+  scan_weight_XY2Prime.resize(n_scan_all, 0.0);
+  scan_weight_Z2.resize(n_scan_all, 0.0);
+  scan_weight_Z2Prime.resize(n_scan_all, 0.0);
+  scan_weight_XY3.resize(n_scan_all, 0.0);
+  scan_weight_XY3Prime.resize(n_scan_all, 0.0);
+  scan_weight_grad_B.resize(n_scan_all, 0.0);
+  scan_weight_grad_grad_B.resize(n_scan_all, 0.0);
+  scan_weight_r_singularity.resize(n_scan_all, 0.0);
+  scan_weight_axis_length.resize(n_scan_all, 0.0);
+  scan_weight_standard_deviation_of_R.resize(n_scan_all, 0.0);
+  
   indices.resize(ndim);
   n_scan = 0;
   for (j_scan = 0; j_scan < n_scan_all; j_scan++) {
@@ -282,6 +303,28 @@ void MultiOptScan::scan() {
       scan_Z0c(j, n_scan) = mo.opts[index].q.Z0c[j];
       scan_Z0s(j, n_scan) = mo.opts[index].q.Z0s[j];
     }
+
+    scan_weight_B20[n_scan] = mo.opts[index].weight_B20;
+    scan_weight_iota[n_scan] = mo.opts[index].weight_iota;
+    scan_target_iota[n_scan] = mo.opts[index].target_iota;
+    scan_weight_elongation[n_scan] = mo.opts[index].weight_elongation;
+    scan_weight_curvature[n_scan] = mo.opts[index].weight_curvature;
+    scan_weight_R0[n_scan] = mo.opts[index].weight_R0;
+    scan_target_min_R0[n_scan] = mo.opts[index].min_R0;
+    scan_weight_d2_volume_d_psi2[n_scan] = mo.opts[index].weight_d2_volume_d_psi2;
+    scan_max_d2_volume_d_psi2[n_scan] = mo.opts[index].max_d2_volume_d_psi2;
+    scan_weight_XY2[n_scan] = mo.opts[index].weight_XY2;
+    scan_weight_XY2Prime[n_scan] = mo.opts[index].weight_XY2Prime;
+    scan_weight_Z2[n_scan] = mo.opts[index].weight_Z2;
+    scan_weight_Z2Prime[n_scan] = mo.opts[index].weight_Z2Prime;
+    scan_weight_XY3[n_scan] = mo.opts[index].weight_XY3;
+    scan_weight_XY3Prime[n_scan] = mo.opts[index].weight_XY3Prime;
+    scan_weight_grad_B[n_scan] = mo.opts[index].weight_grad_B;
+    scan_weight_grad_grad_B[n_scan] = mo.opts[index].weight_grad_grad_B;
+    scan_weight_r_singularity[n_scan] = mo.opts[index].weight_r_singularity;
+    scan_weight_axis_length[n_scan] = mo.opts[index].weight_axis_length;
+    scan_weight_standard_deviation_of_R[n_scan] = mo.opts[index].weight_standard_deviation_of_R;
+    
     n_scan += 1;
   }
 

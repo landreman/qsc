@@ -103,6 +103,27 @@ void MultiOptScan::write_netcdf() {
   nc.put(n_scan_dim, "scan_d2_volume_d_psi2", scan_d2_volume_d_psi2, "For each configuration kept from the scan, the value of magnetic well d2_volume_d_psi2, the second derivative of flux surface volume with respect to psi, where 2*pi*psi is the toroidal flux.", "Tesla^{-2} meter^{-1}");
   nc.put(n_scan_dim, "scan_DMerc_times_r2", scan_DMerc_times_r2, "For each configuration kept from the scan, the overall Mercier stability criterion times the square of the effective minor radius r. This quantity corresponds to DMerc_times_r2 for a single Qsc run. DMerc (without the r^2) corresponds to the quantity DMerc in VMEC, and to DMerc in Landreman and Jorge, J Plasma Phys (2020).", "Tesla^{-2} meter^{-2}");
 
+  nc.put(n_scan_dim, "scan_weight_B20", scan_weight_B20, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_weight_iota", scan_weight_iota, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_target_iota", scan_target_iota, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_weight_elongation", scan_weight_elongation, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_weight_curvature", scan_weight_curvature, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_weight_R0", scan_weight_R0, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_target_min_R0", scan_target_min_R0, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_weight_d2_volume_d_psi2", scan_weight_d2_volume_d_psi2, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_max_d2_volume_d_psi2", scan_max_d2_volume_d_psi2, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_weight_XY2", scan_weight_XY2, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_weight_XY2Prime", scan_weight_XY2Prime, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_weight_Z2", scan_weight_Z2, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_weight_Z2Prime", scan_weight_Z2Prime, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_weight_XY3", scan_weight_XY3, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_weight_XY3Prime", scan_weight_XY3Prime, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_weight_grad_B", scan_weight_grad_B, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_weight_grad_grad_B", scan_weight_grad_grad_B, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_weight_r_singularity", scan_weight_r_singularity, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_weight_axis_length", scan_weight_axis_length, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_weight_standard_deviation_of_R", scan_weight_standard_deviation_of_R, " ", "dimensionless");
+
   // ND arrays for N > 1:
   std::vector<dim_id_type> axis_nmax_plus_1_n_scan_dim {axis_nmax_plus_1_dim, n_scan_dim};
   nc.put(axis_nmax_plus_1_n_scan_dim, "scan_R0c", &scan_R0c(0, 0), "For each configuration kept from the scan, the amplitudes of the cos(n*phi) components of the major radius of the magnetic axis", "meter");

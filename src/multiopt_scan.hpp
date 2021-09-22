@@ -10,7 +10,7 @@ namespace qsc {
 
   class MultiOptScan {
   private:
-    MultiOpt mo, mo_ref;
+    MultiOpt mo;
     void defaults();
     
     enum {ATTEMPTS,
@@ -27,6 +27,7 @@ namespace qsc {
       N_FILTERS};
 
   public:
+    MultiOpt mo_ref;
     MPI_Comm mpi_comm;
     qscfloat max_seconds, save_period;
     big n_scan, n_scan_all, filters[N_FILTERS];
@@ -56,6 +57,16 @@ namespace qsc {
     Vector scan_d2_volume_d_psi2, scan_DMerc_times_r2;
     Vector scan_standard_deviation_of_R, scan_standard_deviation_of_Z;
     std::valarray<int> scan_helicity;
+    
+    Vector scan_weight_B20, scan_weight_iota, scan_target_iota;
+    Vector scan_weight_elongation, scan_weight_curvature;
+    Vector scan_weight_R0, scan_target_min_R0;
+    Vector scan_weight_d2_volume_d_psi2, scan_max_d2_volume_d_psi2;
+    Vector scan_weight_XY2, scan_weight_XY2Prime;
+    Vector scan_weight_Z2, scan_weight_Z2Prime;
+    Vector scan_weight_XY3, scan_weight_XY3Prime;
+    Vector scan_weight_grad_B, scan_weight_grad_grad_B, scan_weight_r_singularity;
+    Vector scan_weight_axis_length, scan_weight_standard_deviation_of_R;
     
     MultiOptScan();
     void run(std::string);
