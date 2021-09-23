@@ -3,16 +3,20 @@
 
 #include <vector>
 #include <valarray>
+#include <chrono>
 #include <mpi.h>
 #include "multiopt.hpp"
+
+#ifdef SINGLE
+#define MPI_QSCFLOAT MPI_FLOAT
+#else
+#define MPI_QSCFLOAT MPI_DOUBLE
+#endif
 
 namespace qsc {
 
   class MultiOptScan {
   private:
-    MultiOpt mo;
-    void defaults();
-    
     enum {ATTEMPTS,
       KEPT,
       REJECTED_DUE_TO_R0,
@@ -26,13 +30,22 @@ namespace qsc {
       REJECTED_DUE_TO_R_SINGULARITY,
       N_FILTERS};
 
+    MultiOpt mo;
+    std::chrono::time_point<std::chrono::steady_clock> start_time;
+    big filters_local[N_FILTERS];
+    void defaults();
+    void collect_results(int, Matrix&, Matrix&, int, std::valarray<int>&, big);
+    
   public:
     MultiOpt mo_ref;
     MPI_Comm mpi_comm;
-    qscfloat max_seconds, save_period;
+    int mpi_rank, n_procs;
+    bool proc0;
+    qscfloat max_seconds;
+    int save_period;
     big n_scan, n_scan_all, filters[N_FILTERS];
+    big scan_index_min, scan_index_max, n_scan_local;
     qscfloat filter_fractions[N_FILTERS];
-    int max_keep_per_proc, max_attempts_per_proc; // Can I read in a "big" from toml?
     qscfloat min_R0_to_keep, min_iota_to_keep, max_elongation_to_keep;
     qscfloat min_L_grad_B_to_keep, min_L_grad_grad_B_to_keep;
     qscfloat max_B20_variation_to_keep, min_r_singularity_to_keep;
@@ -47,6 +60,7 @@ namespace qsc {
     std::valarray<int> params_n, params_stage;
     std::vector<Vector> params_vals;
     int axis_nmax_plus_1;
+    bool quit_after_init;
     
     Vector scan_eta_bar, scan_sigma0, scan_B2s, scan_B2c;
     Matrix scan_R0c, scan_R0s, scan_Z0c, scan_Z0s;

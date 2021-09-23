@@ -17,10 +17,9 @@ void MultiOptScan::input(std::string filename) {
   std::vector<std::string> varlist;
   
   toml_read(varlist, indata, "verbose", verbose);
+  toml_read(varlist, indata, "quit_after_init", quit_after_init);
   toml_read(varlist, indata, "save_period", save_period);
   toml_read(varlist, indata, "max_seconds", max_seconds);
-  toml_read(varlist, indata, "max_keep_per_proc", max_keep_per_proc);
-  toml_read(varlist, indata, "max_attempts_per_proc", max_attempts_per_proc);
 
   toml_read(varlist, indata, "params", params);
   toml_read(varlist, indata, "params_min", params_min);
@@ -56,7 +55,6 @@ void MultiOptScan::input(std::string filename) {
   }
   std::cout << "save_period: " << save_period << std::endl;
   std::cout << "max_seconds: " << max_seconds << std::endl;
-  std::cout << "max_keep_per_proc: " << max_keep_per_proc << std::endl;
   std::cout << "keep_all: " << keep_all << std::endl;
   if (!keep_all) {
     std::cout << "min_R0_to_keep: " << min_R0_to_keep << std::endl;

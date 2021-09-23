@@ -73,8 +73,12 @@ int qsc::driver(int argc, char* argv[]) {
     multiopt.run(infile);
     
   } else if (general_option.compare(GENERAL_OPTION_MULTIOPT_SCAN) == 0) {
+    MPI_Init(NULL, NULL);
+    
     qsc::MultiOptScan mos;
     mos.run(infile);
+
+    MPI_Finalize();
     
   } else {
     throw std::runtime_error("Unrecognized setting for general_option");

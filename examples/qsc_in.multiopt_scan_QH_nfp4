@@ -2,6 +2,23 @@
 
 general_option = 'multiopt_scan'
 
+[multiopt_scan]
+
+verbose = 2
+
+keep_all = 0
+min_R0_to_keep = 0.5
+max_elongation_to_keep = 3.0
+
+params = ["R0c1", "weight_B20"]
+params_min = [0.15, 0.1]
+params_max = [0.2, 1.0]
+params_n   = [ 2,   2]
+params_log = [false, true]
+params_stage = [-1, 1]
+
+quit_after_init = 0
+
 [qsc]
 nfp = 4
 nphi = 25
@@ -15,11 +32,11 @@ eta_bar = 1.0
 B2c = 0.0
 
 [multiopt]
-verbose = 1
+verbose = 0
 nopts = 2
 
 [opt0]
-verbose = 1
+verbose = 0
 max_iter = 1000
 fourier_refine = 2
 
@@ -32,7 +49,7 @@ weight_grad_B = 1.0
 weight_B20 = 1.0
 
 [opt1]
-verbose = 1
+verbose = 0
 max_iter = 1000
 fourier_refine = 0
 
@@ -50,17 +67,3 @@ weight_grad_grad_B = 0.01
 # algorithm = 'ddogleg'
 # algorithm = 'subspace2d'
 
-[multiopt_scan]
-
-verbose = 2
-
-keep_all = true
-min_R0_to_keep = 0.5
-max_elongation_to_keep = 3.0
-
-params = ["R0c1", "weight_B20"]
-params_min = [0.15, 0.1]
-params_max = [0.2, 1.0]
-params_n   = [ 2,   2]
-params_log = [false, true]
-params_stage = [-1, 1]

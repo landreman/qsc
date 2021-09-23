@@ -8,11 +8,7 @@ using namespace qsc;
 
 void MultiOptScan::write_netcdf() {
   // Only proc 0 should run this subroutine:
-  /*
-  int mpi_rank;
-  MPI_Comm_rank(mpi_comm, &mpi_rank);
-  if (mpi_rank != 0) return;
-  */
+  if (!proc0) return;
   
   std::chrono::time_point<std::chrono::steady_clock> start;
   if (verbose > 0) start = std::chrono::steady_clock::now();

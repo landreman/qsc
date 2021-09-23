@@ -3,6 +3,8 @@
 #include <cmath>
 #include <stdexcept>
 #include <iomanip>
+#include <sstream>
+#include <algorithm>
 #include "multiopt_scan.hpp"
 
 using namespace qsc;
@@ -12,9 +14,8 @@ void MultiOptScan::defaults() {
   mpi_comm = MPI_COMM_WORLD;
   verbose = 1;
   max_seconds = 60;
-  save_period = 60;
-  max_keep_per_proc = 1000;
-  max_attempts_per_proc = -1;
+  save_period = 2;
+  quit_after_init = false;
   
   keep_all = true;
   min_R0_to_keep = -1.0;
@@ -36,13 +37,23 @@ void MultiOptScan::run(std::string directory_and_infile) {
   outfilename = qsc::outfile(directory_and_infile);
   input(directory_and_infile);
   init();
-  scan();
-  write_netcdf();
+  if (!quit_after_init) {
+    scan();
+    write_netcdf();
+  }
 }
 
 void MultiOptScan::init() {
   int j, k;
+  MPI_Status mpi_status;
+  char str_buffer[100];
   
+  // Initialize MPI-related variables
+  MPI_Comm_rank(mpi_comm, &mpi_rank);
+  MPI_Comm_size(mpi_comm, &n_procs);
+  proc0 = (mpi_rank == 0);
+  MPI_Barrier(mpi_comm);
+
   // Set the values for each dimension of the scan.
   ndim = params.size();
   assert (params_max.size() == ndim);
@@ -65,79 +76,94 @@ void MultiOptScan::init() {
       for (int k = 0; k < params_n[j]; k++)
 	params_vals[j][k] = params_min[j] + (params_max[j] - params_min[j]) * k / (params_n[j] - 1);
     }
-    if (verbose > 0)
+    if (verbose > 0 && proc0)
       std::cout << "Values for parameter " << params[j] << ": " << params_vals[j] << std::endl;
   }
-  if (verbose > 0) std::cout << "Total number of points in scan: " << n_scan_all << std::endl;
+  if (verbose > 0 && proc0) std::cout << "Total number of points in scan: " << n_scan_all << std::endl;
 
-  for (j = 0; j < N_FILTERS; j++) filters[j] = 0;
+  for (j = 0; j < N_FILTERS; j++) filters_local[j] = 0;
   axis_nmax_plus_1 = mo_ref.opts[0].q.R0c.size();
   for (j = 0; j < mo_ref.opts.size(); j++) axis_nmax_plus_1 += mo_ref.opts[j].fourier_refine;
 
+  if (n_scan_all >= n_procs) {
+    scan_index_min = (mpi_rank * n_scan_all) / n_procs;
+    scan_index_max = ((mpi_rank + 1) * n_scan_all) / n_procs - 1;
+  } else {
+    // An uncommon case: There are more procs than solves to do                                    
+    scan_index_min = std::min((big)mpi_rank, n_scan_all);
+    if (mpi_rank < n_scan_all) {
+      scan_index_max = scan_index_min;
+    } else {
+      scan_index_max = scan_index_min - 1;
+    }
+  }
+  n_scan_local = scan_index_max - scan_index_min + 1;
+
+  // Print the processor assignments in a coordinated manner.
+  std::string proc_assignments_string;
+  std::stringstream ss;
+  ss << "Proc" << std::setw(5) << mpi_rank << " of" << std::setw(5) << n_procs << " will handle points"
+     << std::setw(9) << scan_index_min << " to" << std::setw(9) << scan_index_max
+     << " (n =" << std::setw(9) << n_scan_local << ")";
+  proc_assignments_string = ss.str();
+  //std::cout << " Length: " << proc_assignments_string.length() << std::endl;
+  int str_length = 72;
+  assert (proc_assignments_string.length() == str_length);
+  if (proc0) {
+    std::cout << proc_assignments_string << std::endl;
+    for (j = 1; j < n_procs; j++) {
+      MPI_Recv(str_buffer, str_length, MPI_CHAR, j, j, mpi_comm, &mpi_status);
+      std::cout << str_buffer << std::endl;
+    }
+  } else {
+    MPI_Send(proc_assignments_string.data(), str_length, MPI_CHAR, 0, mpi_rank, mpi_comm);
+  }
 }
 
 void MultiOptScan::scan() {
-  big j_scan, jmod;
+  const int n_parameters = 37;
+  const int n_int_parameters = 1;
+  const int n_fourier_parameters = axis_nmax_plus_1 * 4;
+  Matrix parameters_local(n_parameters, n_scan_local);
+  Matrix fourier_parameters_local(n_fourier_parameters, n_scan_local);
+  std::valarray<int> int_parameters_local(n_int_parameters * n_scan_local);
+  big j_scan, j_scan_global, jmod;
   int j, k, stage, stage_min, stage_max, index;
   std::valarray<int> indices;
   qscfloat val;
-
-  scan_eta_bar.resize(n_scan_all, 0.0);
-  scan_sigma0.resize(n_scan_all, 0.0);
-  scan_B2c.resize(n_scan_all, 0.0);
-  scan_B2s.resize(n_scan_all, 0.0);
-  scan_min_R0.resize(n_scan_all, 0.0);
-  scan_max_curvature.resize(n_scan_all, 0.0);
-  scan_iota.resize(n_scan_all, 0.0);
-  scan_max_elongation.resize(n_scan_all, 0.0);
-  scan_min_L_grad_B.resize(n_scan_all, 0.0);
-  scan_min_L_grad_grad_B.resize(n_scan_all, 0.0);
-  scan_r_singularity.resize(n_scan_all, 0.0);
-  scan_d2_volume_d_psi2.resize(n_scan_all, 0.0);
-  scan_DMerc_times_r2.resize(n_scan_all, 0.0);
-  scan_B20_variation.resize(n_scan_all, 0.0);
-  scan_B20_residual.resize(n_scan_all, 0.0);
-  scan_standard_deviation_of_R.resize(n_scan_all, 0.0);
-  scan_standard_deviation_of_Z.resize(n_scan_all, 0.0);
-
-  scan_helicity.resize(n_scan_all, 0);
-
-  scan_R0c.resize(axis_nmax_plus_1, n_scan_all, 0.0);
-  scan_R0s.resize(axis_nmax_plus_1, n_scan_all, 0.0);
-  scan_Z0c.resize(axis_nmax_plus_1, n_scan_all, 0.0);
-  scan_Z0s.resize(axis_nmax_plus_1, n_scan_all, 0.0);
-
-  scan_weight_B20.resize(n_scan_all, 0.0);
-  scan_weight_iota.resize(n_scan_all, 0.0);
-  scan_target_iota.resize(n_scan_all, 0.0);
-  scan_weight_elongation.resize(n_scan_all, 0.0);
-  scan_weight_curvature.resize(n_scan_all, 0.0);
-  scan_weight_R0.resize(n_scan_all, 0.0);
-  scan_target_min_R0.resize(n_scan_all, 0.0);
-  scan_weight_d2_volume_d_psi2.resize(n_scan_all, 0.0);
-  scan_max_d2_volume_d_psi2.resize(n_scan_all, 0.0);
-  scan_weight_XY2.resize(n_scan_all, 0.0);
-  scan_weight_XY2Prime.resize(n_scan_all, 0.0);
-  scan_weight_Z2.resize(n_scan_all, 0.0);
-  scan_weight_Z2Prime.resize(n_scan_all, 0.0);
-  scan_weight_XY3.resize(n_scan_all, 0.0);
-  scan_weight_XY3Prime.resize(n_scan_all, 0.0);
-  scan_weight_grad_B.resize(n_scan_all, 0.0);
-  scan_weight_grad_grad_B.resize(n_scan_all, 0.0);
-  scan_weight_r_singularity.resize(n_scan_all, 0.0);
-  scan_weight_axis_length.resize(n_scan_all, 0.0);
-  scan_weight_standard_deviation_of_R.resize(n_scan_all, 0.0);
+  std::chrono::time_point<std::chrono::steady_clock> end_time;
+  std::chrono::duration<double> elapsed;
+  
+  // Some indices of interest:
+  // j_scan_global is the index into the complete tensor-product set of points.
+  // j_scan is the index into the current saved solution on this process, after filtering out some configs.
+  // filters_local[ATTEMPTS] is the number of configurations considered so far on this process.
   
   indices.resize(ndim);
-  n_scan = 0;
-  for (j_scan = 0; j_scan < n_scan_all; j_scan++) {
-    // From the global scan index j_scan, determine the indices for each dimension of the scan:
-    jmod = j_scan;
+  j_scan = 0;
+  start_time = std::chrono::steady_clock::now();
+  for (j_scan_global = scan_index_min; j_scan_global <= scan_index_max; j_scan_global++) {
+    filters_local[ATTEMPTS]++;
+
+    // Don't collect results if we are close to finishing (reaching
+    // n_scan_all / n_procs attempts), since different procs may have
+    // n_scan_local values differing by 1. Be careful to put +2 on the
+    // LHS instead of -2 on the RHS since bigs are unsigned.
+    //std::cout << "proc " << mpi_rank << " attempts: " << filters_local[ATTEMPTS] << " rhs: " << n_scan_local_approx << std::endl;
+    
+    if ((filters_local[ATTEMPTS] % save_period == 0) && (filters_local[ATTEMPTS] + 2 < n_scan_all / n_procs)) {
+      std::cout << "proc " << mpi_rank << " calling collect_results in loop" << std::endl;
+      collect_results(n_parameters, parameters_local, fourier_parameters_local,
+                      n_int_parameters, int_parameters_local, j_scan);
+    }
+    
+    // From the global scan index j_scan_global, determine the indices for each dimension of the scan:
+    jmod = j_scan_global;
     for (k = ndim - 1; k >= 0; k--) {
       indices[k] = jmod % params_n[k];
       jmod = (jmod - indices[k]) / params_n[k];
     }
-    if (verbose > 0) {
+    if (verbose > 0 && proc0) {
       std::cout << "Scan indices:";
       for (j = 0; j < ndim; j++) std::cout << " " << indices[j];
       std::cout << std::endl;
@@ -223,55 +249,55 @@ void MultiOptScan::scan() {
     if (!keep_all) {
       
       if (mo.opts[index].q.grid_min_R0 < min_R0_to_keep) {
-	filters[REJECTED_DUE_TO_R0]++;
+	filters_local[REJECTED_DUE_TO_R0]++;
 	if (verbose > 1) std::cout << "Rejecting this configuration due to min_R0." << std::endl;
 	continue;	
       } else if (verbose > 1) std::cout << "Passed min_R0 filter." << std::endl;
       
       if (std::abs(mo.opts[index].q.iota) < min_iota_to_keep) {
-	filters[REJECTED_DUE_TO_IOTA]++;
+	filters_local[REJECTED_DUE_TO_IOTA]++;
 	if (verbose > 1) std::cout << "Rejecting this configuration due to iota." << std::endl;
 	continue;	
       } else if (verbose > 1) std::cout << "Passed iota filter." << std::endl;
       
       if (mo.opts[index].q.grid_max_elongation > max_elongation_to_keep) {
-	filters[REJECTED_DUE_TO_ELONGATION]++;
+	filters_local[REJECTED_DUE_TO_ELONGATION]++;
 	if (verbose > 1) std::cout << "Rejecting this configuration due to elongation." << std::endl;
 	continue;	
       } else if (verbose > 1) std::cout << "Passed elongation filter." << std::endl;
       
       if (mo.opts[index].q.grid_min_L_grad_B < min_L_grad_B_to_keep) {
-	filters[REJECTED_DUE_TO_L_GRAD_B]++;
+	filters_local[REJECTED_DUE_TO_L_GRAD_B]++;
 	if (verbose > 1) std::cout << "Rejecting this configuration due to L_grad_B." << std::endl;
 	continue;	
       } else if (verbose > 1) std::cout << "Passed L_grad_B filter." << std::endl;
       
       if (mo.opts[index].q.B20_grid_variation > max_B20_variation_to_keep) {
-	filters[REJECTED_DUE_TO_B20_VARIATION]++;
+	filters_local[REJECTED_DUE_TO_B20_VARIATION]++;
 	if (verbose > 1) std::cout << "Rejecting this configuration due to B20 variation." << std::endl;
 	continue;	
       } else if (verbose > 1) std::cout << "Passed B20 variation filter." << std::endl;
       
       if (mo.opts[index].q.d2_volume_d_psi2 > max_d2_volume_d_psi2_to_keep) {
-	filters[REJECTED_DUE_TO_D2_VOLUME_D_PSI2]++;
+	filters_local[REJECTED_DUE_TO_D2_VOLUME_D_PSI2]++;
 	if (verbose > 1) std::cout << "Rejecting this configuration due to d2_volume_d_psi2." << std::endl;
 	continue;	
       } else if (verbose > 1) std::cout << "Passed d2_volume_d_psi2 filter." << std::endl;
       
       if (mo.opts[index].q.DMerc_times_r2 < min_DMerc_to_keep) {
-	filters[REJECTED_DUE_TO_DMERC]++;
+	filters_local[REJECTED_DUE_TO_DMERC]++;
 	if (verbose > 1) std::cout << "Rejecting this configuration due to DMerc." << std::endl;
 	continue;	
       } else if (verbose > 1) std::cout << "Passed DMerc filter." << std::endl;
       
       if (mo.opts[index].q.grid_min_L_grad_grad_B < min_L_grad_grad_B_to_keep) {
-	filters[REJECTED_DUE_TO_L_GRAD_GRAD_B]++;
+	filters_local[REJECTED_DUE_TO_L_GRAD_GRAD_B]++;
 	if (verbose > 1) std::cout << "Rejecting this configuration due to L_grad_grad_B." << std::endl;
 	continue;	
       } else if (verbose > 1) std::cout << "Passed L_grad_grad_B filter." << std::endl;
       
       if (mo.opts[index].q.r_singularity_robust < min_r_singularity_to_keep) {
-	filters[REJECTED_DUE_TO_R_SINGULARITY]++;
+	filters_local[REJECTED_DUE_TO_R_SINGULARITY]++;
 	if (verbose > 1) std::cout << "Rejecting this configuration due to r_singularity." << std::endl;
 	continue;	
       } else if (verbose > 1) std::cout << "Passed r_singularity filter." << std::endl;
@@ -279,152 +305,64 @@ void MultiOptScan::scan() {
     }
 
     // If we make it this far, then save the configuration.
-    scan_eta_bar[n_scan] = mo.opts[index].q.eta_bar;
-    scan_sigma0[n_scan] = mo.opts[index].q.sigma0;
-    scan_B2c[n_scan] = mo.opts[index].q.B2c;
-    scan_B2s[n_scan] = mo.opts[index].q.B2s;
-    scan_min_R0[n_scan] = mo.opts[index].q.grid_min_R0;
-    scan_max_curvature[n_scan] = mo.opts[index].q.grid_max_curvature;
-    scan_iota[n_scan] = mo.opts[index].q.iota;
-    scan_max_elongation[n_scan] = mo.opts[index].q.grid_max_elongation;
-    scan_min_L_grad_B[n_scan] = mo.opts[index].q.grid_min_L_grad_B;
-    scan_min_L_grad_grad_B[n_scan] = mo.opts[index].q.grid_min_L_grad_grad_B;
-    scan_r_singularity[n_scan] = mo.opts[index].q.r_singularity_robust;
-    scan_d2_volume_d_psi2[n_scan] = mo.opts[index].q.d2_volume_d_psi2;
-    scan_DMerc_times_r2[n_scan] = mo.opts[index].q.DMerc_times_r2;
-    scan_B20_variation[n_scan] = mo.opts[index].q.B20_grid_variation;
-    scan_B20_residual[n_scan] = mo.opts[index].q.B20_residual;
-    scan_standard_deviation_of_R[n_scan] = mo.opts[index].q.standard_deviation_of_R;
-    scan_standard_deviation_of_Z[n_scan] = mo.opts[index].q.standard_deviation_of_Z;
-    scan_helicity[n_scan] = mo.opts[index].q.helicity;
+    parameters_local(0 , j_scan) = mo.opts[index].q.eta_bar;
+    parameters_local(1 , j_scan) = mo.opts[index].q.sigma0;
+    parameters_local(2 , j_scan) = mo.opts[index].q.B2c;
+    parameters_local(3 , j_scan) = mo.opts[index].q.B2s;
+    parameters_local(4 , j_scan) = mo.opts[index].q.grid_min_R0;
+    parameters_local(5 , j_scan) = mo.opts[index].q.grid_max_curvature;
+    parameters_local(6 , j_scan) = mo.opts[index].q.iota;
+    parameters_local(7 , j_scan) = mo.opts[index].q.grid_max_elongation;
+    parameters_local(8 , j_scan) = mo.opts[index].q.grid_min_L_grad_B;
+    parameters_local(9 , j_scan) = mo.opts[index].q.grid_min_L_grad_grad_B;
+    parameters_local(10, j_scan) = mo.opts[index].q.r_singularity_robust;
+    parameters_local(11, j_scan) = mo.opts[index].q.d2_volume_d_psi2;
+    parameters_local(12, j_scan) = mo.opts[index].q.DMerc_times_r2;
+    parameters_local(13, j_scan) = mo.opts[index].q.B20_grid_variation;
+    parameters_local(14, j_scan) = mo.opts[index].q.B20_residual;
+    parameters_local(15, j_scan) = mo.opts[index].q.standard_deviation_of_R;
+    parameters_local(16, j_scan) = mo.opts[index].q.standard_deviation_of_Z;
+    
+    parameters_local(17, j_scan) = mo.opts[index].weight_B20;
+    parameters_local(18, j_scan) = mo.opts[index].weight_iota;
+    parameters_local(19, j_scan) = mo.opts[index].target_iota;
+    parameters_local(20, j_scan) = mo.opts[index].weight_elongation;
+    parameters_local(21, j_scan) = mo.opts[index].weight_curvature;
+    parameters_local(22, j_scan) = mo.opts[index].weight_R0;
+    parameters_local(23, j_scan) = mo.opts[index].min_R0;
+    parameters_local(24, j_scan) = mo.opts[index].weight_d2_volume_d_psi2;
+    parameters_local(25, j_scan) = mo.opts[index].max_d2_volume_d_psi2;
+    parameters_local(26, j_scan) = mo.opts[index].weight_XY2;
+    parameters_local(27, j_scan) = mo.opts[index].weight_XY2Prime;
+    parameters_local(28, j_scan) = mo.opts[index].weight_Z2;
+    parameters_local(29, j_scan) = mo.opts[index].weight_Z2Prime;
+    parameters_local(30, j_scan) = mo.opts[index].weight_XY3;
+    parameters_local(31, j_scan) = mo.opts[index].weight_XY3Prime;
+    parameters_local(32, j_scan) = mo.opts[index].weight_grad_B;
+    parameters_local(33, j_scan) = mo.opts[index].weight_grad_grad_B;
+    parameters_local(34, j_scan) = mo.opts[index].weight_r_singularity;
+    parameters_local(35, j_scan) = mo.opts[index].weight_axis_length;
+    parameters_local(36, j_scan) = mo.opts[index].weight_standard_deviation_of_R;
+
+    int_parameters_local[0 + n_int_parameters * j_scan] = mo.opts[index].q.helicity;
+    
     for (j = 0; j < axis_nmax_plus_1; j++) {
-      scan_R0c(j, n_scan) = mo.opts[index].q.R0c[j];
-      scan_R0s(j, n_scan) = mo.opts[index].q.R0s[j];
-      scan_Z0c(j, n_scan) = mo.opts[index].q.Z0c[j];
-      scan_Z0s(j, n_scan) = mo.opts[index].q.Z0s[j];
+      fourier_parameters_local(j + 0 * axis_nmax_plus_1, j_scan) = mo.opts[index].q.R0c[j];
+      fourier_parameters_local(j + 1 * axis_nmax_plus_1, j_scan) = mo.opts[index].q.R0s[j];
+      fourier_parameters_local(j + 2 * axis_nmax_plus_1, j_scan) = mo.opts[index].q.Z0c[j];
+      fourier_parameters_local(j + 3 * axis_nmax_plus_1, j_scan) = mo.opts[index].q.Z0s[j];
     }
-
-    scan_weight_B20[n_scan] = mo.opts[index].weight_B20;
-    scan_weight_iota[n_scan] = mo.opts[index].weight_iota;
-    scan_target_iota[n_scan] = mo.opts[index].target_iota;
-    scan_weight_elongation[n_scan] = mo.opts[index].weight_elongation;
-    scan_weight_curvature[n_scan] = mo.opts[index].weight_curvature;
-    scan_weight_R0[n_scan] = mo.opts[index].weight_R0;
-    scan_target_min_R0[n_scan] = mo.opts[index].min_R0;
-    scan_weight_d2_volume_d_psi2[n_scan] = mo.opts[index].weight_d2_volume_d_psi2;
-    scan_max_d2_volume_d_psi2[n_scan] = mo.opts[index].max_d2_volume_d_psi2;
-    scan_weight_XY2[n_scan] = mo.opts[index].weight_XY2;
-    scan_weight_XY2Prime[n_scan] = mo.opts[index].weight_XY2Prime;
-    scan_weight_Z2[n_scan] = mo.opts[index].weight_Z2;
-    scan_weight_Z2Prime[n_scan] = mo.opts[index].weight_Z2Prime;
-    scan_weight_XY3[n_scan] = mo.opts[index].weight_XY3;
-    scan_weight_XY3Prime[n_scan] = mo.opts[index].weight_XY3Prime;
-    scan_weight_grad_B[n_scan] = mo.opts[index].weight_grad_B;
-    scan_weight_grad_grad_B[n_scan] = mo.opts[index].weight_grad_grad_B;
-    scan_weight_r_singularity[n_scan] = mo.opts[index].weight_r_singularity;
-    scan_weight_axis_length[n_scan] = mo.opts[index].weight_axis_length;
-    scan_weight_standard_deviation_of_R[n_scan] = mo.opts[index].weight_standard_deviation_of_R;
     
-    n_scan += 1;
+    j_scan++;
+
   }
 
-  filters[ATTEMPTS] = n_scan_all;
-  filters[KEPT] = n_scan;
-  big total_rejected = 0;
-  for (j = REJECTED_DUE_TO_R0; j < N_FILTERS; j++) total_rejected += filters[j];
-  for (j = 0; j < N_FILTERS; j++) filter_fractions[j] = ((qscfloat)filters[j]) / filters[0];
+  end_time = std::chrono::steady_clock::now();
+  elapsed = end_time - start_time;
+  std::cout << "Proc " << mpi_rank << " finished after " << elapsed.count() << " seconds" << std::endl;
 
-  int width = 13;
-  std::cout << std::setprecision(4) << std::endl;
-  std::cout << "Summary of scan results:                           (fractions in parentheses)" << std::endl;
-  std::cout << "  Configurations attempted:          " << std::setw(width) << filters[ATTEMPTS] << std::endl;
-  std::cout << "  Rejected due to min_R0:            " << std::setw(width) << filters[REJECTED_DUE_TO_R0]
-	    << " (" << filter_fractions[REJECTED_DUE_TO_R0] << ")" << std::endl;
-  std::cout << "  Rejected due to min iota:          " << std::setw(width) << filters[REJECTED_DUE_TO_IOTA]
-	    << " (" << filter_fractions[REJECTED_DUE_TO_IOTA] << ")" << std::endl;
-  std::cout << "  Rejected due to max elongation:    " << std::setw(width) << filters[REJECTED_DUE_TO_ELONGATION]
-	    << " (" << filter_fractions[REJECTED_DUE_TO_ELONGATION] << ")" << std::endl;
-  std::cout << "  Rejected due to min L_grad_B:      " << std::setw(width) << filters[REJECTED_DUE_TO_L_GRAD_B]
-	    << " (" << filter_fractions[REJECTED_DUE_TO_L_GRAD_B] << ")" << std::endl;
-  std::cout << "  Rejected due to B20 variation:     " << std::setw(width) << filters[REJECTED_DUE_TO_B20_VARIATION]
-	    << " (" << filter_fractions[REJECTED_DUE_TO_B20_VARIATION] << ")" << std::endl;
-  std::cout << "  Rejected due to min L_grad_grad_B: " << std::setw(width) << filters[REJECTED_DUE_TO_L_GRAD_GRAD_B]
-	    << " (" << filter_fractions[REJECTED_DUE_TO_L_GRAD_GRAD_B] << ")" << std::endl;
-  std::cout << "  Rejected due to d2_volume_d_psi2:  " << std::setw(width) << filters[REJECTED_DUE_TO_D2_VOLUME_D_PSI2]
-	    << " (" << filter_fractions[REJECTED_DUE_TO_D2_VOLUME_D_PSI2] << ")" << std::endl;
-  std::cout << "  Rejected due to DMerc:             " << std::setw(width) << filters[REJECTED_DUE_TO_DMERC]
-	    << " (" << filter_fractions[REJECTED_DUE_TO_DMERC] << ")" << std::endl;
-  std::cout << "  Rejected due to r_singularity:     " << std::setw(width) << filters[REJECTED_DUE_TO_R_SINGULARITY]
-	    << " (" << filter_fractions[REJECTED_DUE_TO_R_SINGULARITY] << ")" << std::endl;
-  std::cout << "  Total rejected:                    " << std::setw(width) << total_rejected
-	    << " (" << ((qscfloat)total_rejected) / filters[ATTEMPTS] << ")" << std::endl;
-  std::cout << "  Kept:                              " << std::setw(width) << n_scan
-	    << " (" << filter_fractions[KEPT] << ")" << std::endl;
-  std::cout << "  Kept + rejected:                   " << std::setw(width) << n_scan + total_rejected
-	    << std::endl;
-  
-  /*
-    std::cout << std::setprecision(4) << "Time elapsed, summed over processors:" << std::endl;
-    width = 10;
-    
-    std::cout << "  Time for random number generation: " << std::setw(width) << timing[TIME_RANDOM]
-    << " (" << timing[TIME_RANDOM] / timing_total << ")" << std::endl;
-    
-    std::cout << "  Time for init_axis:                " << std::setw(width) << timing[TIME_INIT_AXIS]
-    << " (" << timing[TIME_INIT_AXIS] / timing_total << ")" << std::endl;
-    
-    std::cout << "  Time for solving sigma equation:   " << std::setw(width) << timing[TIME_SIGMA_EQUATION]
-    << " (" << timing[TIME_SIGMA_EQUATION] / timing_total << ")" << std::endl;
-    
-    std::cout << "  Time for O(r^1) diagnostics:       " << std::setw(width) << timing[TIME_R1_DIAGNOSTICS]
-    << " (" << timing[TIME_R1_DIAGNOSTICS] / timing_total << ")" << std::endl;
-    
-    if (q.at_least_order_r2) {
-      std::cout << "  Time for calculate_r2:             " << std::setw(width) << timing[TIME_CALCULATE_R2]
-		<< " (" << timing[TIME_CALCULATE_R2] / timing_total << ")" << std::endl;
-    
-      std::cout << "  Time for mercier:                  " << std::setw(width) << timing[TIME_MERCIER]
-		<< " (" << timing[TIME_MERCIER] / timing_total << ")" << std::endl;
-    
-      std::cout << "  Time for grad grad B tensor:       " << std::setw(width) << timing[TIME_GRAD_GRAD_B_TENSOR]
-		<< " (" << timing[TIME_GRAD_GRAD_B_TENSOR] / timing_total << ")" << std::endl;
-    
-      std::cout << "  Time for r_singularity:            " << std::setw(width) << timing[TIME_R_SINGULARITY]
-		<< " (" << timing[TIME_R_SINGULARITY] / timing_total << ")" << std::endl;
-    }
-  */
-  if (n_scan < 1000) {
-    std::cout << std::setprecision(2) << std::endl;
-    std::cout << "min_R0: " << scan_min_R0 << std::endl;
-    std::cout << std::endl;
-    std::cout << "iota: " << scan_iota << std::endl;
-    std::cout << std::endl;
-    std::cout << "max_elongation: " << scan_max_elongation << std::endl;
-    std::cout << std::endl;
-    std::cout << "helicity:";
-    for (j = 0; j < n_scan; j++) std::cout << " " << scan_helicity[j];
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << "min_L_grad_B: " << scan_min_L_grad_B << std::endl;
-    if (mo_ref.opts[0].q.at_least_order_r2) {
-      std::cout << std::endl;
-      std::cout << "min_L_grad_grad_B: " << scan_min_L_grad_grad_B << std::endl;
-      std::cout << std::endl;
-      std::cout << "d2_volume_d_psi2: " << scan_d2_volume_d_psi2 << std::endl;
-      std::cout << std::endl;
-      std::cout << "r_singularity: " << scan_r_singularity << std::endl;
-      std::cout << std::endl;
-      std::cout << "B20_variation: " << scan_B20_variation << std::endl;
-    }
-    std::cout << std::endl;
-    
-    // Restore precision for printing
-    if (single) {
-      std::cout.precision(8);
-      std::cerr.precision(8);
-    } else {
-      std::cout.precision(15);
-      std::cerr.precision(15);
-    }
-  }
+  // Collect final results:
+  std::cout << "proc " << mpi_rank << " calling collect_results at end" << std::endl;
+  collect_results(n_parameters, parameters_local, fourier_parameters_local,
+                  n_int_parameters, int_parameters_local, j_scan);
 }
