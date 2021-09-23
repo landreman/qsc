@@ -4,6 +4,17 @@
 
 set -ex
 
+# In the next line, ${GITHUB_ACTIONS:+--oversubscribe} evaluates to
+# --oversubscribe if the environment variable GITHUB_ACTIONS is set,
+# and evaluates to nothing if the variable is not set.  The motivation
+# is that Github Actions only gives you 2 processors, so we have to
+# "oversubscribe" to test on >2 mpi processes. But we don't want to
+# set --oversubscribe when outside Github Actions, since other
+# versions of mpi like mpich do not have this flag.
+
+MPI_OPTIONS=${GITHUB_ACTIONS:+--oversubscribe}
+echo MPI_OPTIONS=$MPI_OPTIONS
+
 XQSC=../bin/xqsc
 
 $XQSC qsc_in.single_LandremanSenguptaPlunk_section5.1
@@ -16,7 +27,14 @@ $XQSC qsc_in.multiopt_QH_nfp4
 $XQSC qsc_in.multiopt_QH_nfp4_well
 $XQSC qsc_in.multiopt_QA_nfp2
 
+$XQSC qsc_in.multiopt_scan_QH_nfp4_small_keep_all_1
 $XQSC qsc_in.random_scan_small
 $XQSC qsc_in.random_scan_realistic
-mpiexec -n 2 $XQSC qsc_in.random_scan_small
-mpiexec -n 2 $XQSC qsc_in.random_scan_realistic
+
+mpiexec $MPI_OPTIONS -n 2 $XQSC qsc_in.multiopt_scan_QH_nfp4_small_keep_all_1
+mpiexec $MPI_OPTIONS -n 2 $XQSC qsc_in.random_scan_small
+mpiexec $MPI_OPTIONS -n 2 $XQSC qsc_in.random_scan_realistic
+
+mpiexec $MPI_OPTIONS -n 3 $XQSC qsc_in.multiopt_scan_QH_nfp4_small_keep_all_1
+mpiexec $MPI_OPTIONS -n 3 $XQSC qsc_in.random_scan_small
+mpiexec $MPI_OPTIONS -n 3 $XQSC qsc_in.random_scan_realistic

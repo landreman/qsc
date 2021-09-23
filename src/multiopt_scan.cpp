@@ -149,8 +149,6 @@ void MultiOptScan::scan() {
     // n_scan_all / n_procs attempts), since different procs may have
     // n_scan_local values differing by 1. Be careful to put +2 on the
     // LHS instead of -2 on the RHS since bigs are unsigned.
-    //std::cout << "proc " << mpi_rank << " attempts: " << filters_local[ATTEMPTS] << " rhs: " << n_scan_local_approx << std::endl;
-    
     if ((filters_local[ATTEMPTS] % save_period == 0) && (filters_local[ATTEMPTS] + 2 < n_scan_all / n_procs)) {
       std::cout << "proc " << mpi_rank << " calling collect_results in loop" << std::endl;
       collect_results(n_parameters, parameters_local, fourier_parameters_local,

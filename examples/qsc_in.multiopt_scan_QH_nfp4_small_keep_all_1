@@ -6,7 +6,7 @@ general_option = 'multiopt_scan'
 
 verbose = 2
 
-keep_all = 0
+keep_all = 1
 min_R0_to_keep = 0.5
 max_elongation_to_keep = 3.0
 
