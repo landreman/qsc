@@ -28,13 +28,16 @@ $XQSC qsc_in.multiopt_QH_nfp4_well
 $XQSC qsc_in.multiopt_QA_nfp2
 
 $XQSC qsc_in.multiopt_scan_QH_nfp4_small_keep_all_1
+$XQSC qsc_in.multiopt_scan_QA_nfp2_small_keep_all_0
 $XQSC qsc_in.random_scan_small
 $XQSC qsc_in.random_scan_realistic
 
 mpiexec $MPI_OPTIONS -n 2 $XQSC qsc_in.multiopt_scan_QH_nfp4_small_keep_all_1
+mpiexec $MPI_OPTIONS -n 2 $XQSC qsc_in.multiopt_scan_QA_nfp2_small_keep_all_0
 mpiexec $MPI_OPTIONS -n 2 $XQSC qsc_in.random_scan_small
 mpiexec $MPI_OPTIONS -n 2 $XQSC qsc_in.random_scan_realistic
 
 mpiexec $MPI_OPTIONS -n 3 $XQSC qsc_in.multiopt_scan_QH_nfp4_small_keep_all_1
+mpiexec $MPI_OPTIONS -n 3 $XQSC qsc_in.multiopt_scan_QA_nfp2_small_keep_all_0
 mpiexec $MPI_OPTIONS -n 3 $XQSC qsc_in.random_scan_small
 mpiexec $MPI_OPTIONS -n 3 $XQSC qsc_in.random_scan_realistic
