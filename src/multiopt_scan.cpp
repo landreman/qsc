@@ -113,7 +113,7 @@ void MultiOptScan::init() {
     std::cout << proc_assignments_string << std::endl;
     for (j = 1; j < n_procs; j++) {
       MPI_Recv(str_buffer, str_length, MPI_CHAR, j, j, mpi_comm, &mpi_status);
-      std::cout << str_buffer << std::endl;
+      std::cout << std::string(str_buffer) << std::endl;
     }
   } else {
     MPI_Send(proc_assignments_string.data(), str_length, MPI_CHAR, 0, mpi_rank, mpi_comm);
@@ -150,7 +150,10 @@ void MultiOptScan::scan() {
     // n_scan_local values differing by 1. Be careful to put +2 on the
     // LHS instead of -2 on the RHS since bigs are unsigned.
     if ((filters_local[ATTEMPTS] % save_period == 0) && (filters_local[ATTEMPTS] + 2 < n_scan_all / n_procs)) {
-      std::cout << "proc " << mpi_rank << " calling collect_results in loop" << std::endl;
+      end_time = std::chrono::steady_clock::now();
+      elapsed = end_time - start_time;
+      std::cout << "proc " << mpi_rank << " calling collect_results in loop after "
+		<< elapsed.count() << " seconds" << std::endl;
       collect_results(n_parameters, parameters_local, fourier_parameters_local,
                       n_int_parameters, int_parameters_local, j_scan);
     }
