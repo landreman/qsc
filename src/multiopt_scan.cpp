@@ -51,6 +51,8 @@ void MultiOptScan::init() {
   // Initialize MPI-related variables
   MPI_Comm_rank(mpi_comm, &mpi_rank);
   MPI_Comm_size(mpi_comm, &n_procs);
+  if (n_procs < 2)
+    throw std::runtime_error("For MultiOptScan, the number of MPI processes must be at least 2.");
   proc0 = (mpi_rank == 0);
   MPI_Barrier(mpi_comm);
 
@@ -85,6 +87,9 @@ void MultiOptScan::init() {
   axis_nmax_plus_1 = mo_ref.opts[0].q.R0c.size();
   for (j = 0; j < mo_ref.opts.size(); j++) axis_nmax_plus_1 += mo_ref.opts[j].fourier_refine;
 
+  if (n_procs - 1 > n_scan_all)
+    throw std::runtime_error("For MultiOptScan, the number of MPI processes cannot exceed n_scan_all + 1.");
+  
   if (n_scan_all >= n_procs) {
     scan_index_min = (mpi_rank * n_scan_all) / n_procs;
     scan_index_max = ((mpi_rank + 1) * n_scan_all) / n_procs - 1;
@@ -117,6 +122,54 @@ void MultiOptScan::init() {
     }
   } else {
     MPI_Send(proc_assignments_string.data(), str_length, MPI_CHAR, 0, mpi_rank, mpi_comm);
+  }
+
+  // Begin test code for MPI master-slave system.
+  int intbuf[1];
+  int proc_that_finished;
+  if (proc0) {
+    // Send off the first batch of work:
+    for (j = 1; j < n_procs; j++) {
+      intbuf[0] = j - 1;
+      MPI_Send(intbuf, 1, MPI_INT, j, 0, mpi_comm);
+    }
+    // Handle the rest of the tasks:
+    for (j = n_procs - 1; j < n_scan_all; j++) {
+      // Wait for any proc to finish:
+      MPI_Recv(intbuf, 1, MPI_INT, MPI_ANY_SOURCE, 0, mpi_comm, &mpi_status);
+      proc_that_finished = intbuf[0];
+      std::cout << "proc0: I see that proc " << proc_that_finished << " just finished, so I'll send him index " << j << std::endl;
+      intbuf[0] = j;
+      // Give that proc the next piece of work:
+      MPI_Send(intbuf, 1, MPI_INT, proc_that_finished, 0, mpi_comm);
+    }
+    // Receive the final completion messages from all other procs:
+    for (j = 1; j < n_procs; j++) {
+      MPI_Recv(intbuf, 1, MPI_INT, MPI_ANY_SOURCE, 0, mpi_comm, &mpi_status);
+      proc_that_finished = intbuf[0];
+      std::cout << "proc0: I see that proc " << proc_that_finished << " just finished. No further work." << std::endl;
+      // Tell that proc to exit:
+      intbuf[0] = -1;
+      MPI_Send(intbuf, 1, MPI_INT, j, 0, mpi_comm);
+    }
+    
+  } else {
+    // Code for procs >0.
+
+    bool keep_going = true;
+    while (keep_going) {
+      // Wait for an instruction from proc0:
+      MPI_Recv(intbuf, 1, MPI_INT, 0, 0, mpi_comm, &mpi_status);
+      if (intbuf[0] < 0) {
+	keep_going = false;
+	std::cout << "proc " << mpi_rank << " is exiting." << std::endl;
+      } else {
+	std::cout << "proc " << mpi_rank << " is handling index " << intbuf[0] << std::endl;
+	// Notify proc0 that we are done.
+	intbuf[0] = mpi_rank;
+	MPI_Send(intbuf, 1, MPI_INT, 0, 0, mpi_comm);
+      }
+    }
   }
 }
 
