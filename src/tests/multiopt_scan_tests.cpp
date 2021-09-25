@@ -49,12 +49,11 @@ TEST_CASE("Run a small MultiOptScan with keep_all true. [mpi] [multiopt_scan]") 
 
   // Set 2 opt stages:
   mos.mo_ref.opts.resize(2);
-  mos.mo_ref.nphi = {21, 25};
   mos.mo_ref.verbose = 2;
 
   // Set the initial QSC configuration:
   mos.mo_ref.opts[0].q.nfp = 4;
-  mos.mo_ref.opts[0].q.nphi = 15; // This value should be over-ridden by mos.mo_ref.nphi
+  mos.mo_ref.opts[0].q.nphi = 61; // This value should be over-ridden by mo_ref.opts[0].nphi
   mos.mo_ref.opts[0].q.verbose = 0;
   mos.mo_ref.opts[0].q.order_r_option = "r2.1";
   mos.mo_ref.opts[0].q.eta_bar = 1.0;
@@ -66,6 +65,7 @@ TEST_CASE("Run a small MultiOptScan with keep_all true. [mpi] [multiopt_scan]") 
   // Set parameters for opt stage 0:
   mos.mo_ref.opts[0].verbose = 0;
   mos.mo_ref.opts[0].fourier_refine = 2;
+  mos.mo_ref.opts[0].nphi = {17, 19, 21};
   mos.mo_ref.opts[0].vary_eta_bar = true;
   mos.mo_ref.opts[0].vary_B2c = true;
   mos.mo_ref.opts[0].vary_R0c = {false, false};
@@ -78,6 +78,7 @@ TEST_CASE("Run a small MultiOptScan with keep_all true. [mpi] [multiopt_scan]") 
   // Set parameters for opt stage 1:
   mos.mo_ref.opts[1].verbose = 0;
   mos.mo_ref.opts[1].fourier_refine = 0;
+  mos.mo_ref.opts[1].nphi = {25};
   mos.mo_ref.opts[1].vary_eta_bar = true;
   mos.mo_ref.opts[1].vary_B2c = true;
   mos.mo_ref.opts[1].vary_R0c = {false, false, true, true};

@@ -818,6 +818,7 @@ TEST_CASE("Try Fourier refinement. Make sure the vary_R0c etc arrays are extende
     opt.allocate();
     opt.optimize();
 
+    CHECK(opt.q.nphi == 31);
     REQUIRE(opt.vary_R0c.size() == 2 + fourier_refine);
     REQUIRE(opt.vary_R0s.size() == 2 + fourier_refine);
     REQUIRE(opt.vary_Z0c.size() == 2 + fourier_refine);
@@ -880,3 +881,60 @@ TEST_CASE("Verify that Fourier refinement works gracefully if the max_iter limit
     REQUIRE(opt.vary_Z0s.size() == 2 + fourier_refine);
   }
 }
+
+TEST_CASE("Try changing nphi at each stage of Fourier refinement. [opt]") {
+  if (single) return;
+
+  int fourier_refine = 2;
+  Opt opt;
+  // Set up a realistic optimization for QH:
+  opt.q.nfp = 4;
+  opt.q.nphi = 61; // This value will be over-written by the values in opt.nphi.
+  opt.q.verbose = 0;
+  opt.q.order_r_option = "r2.1";
+  opt.q.R0c = {1.0, 0.17};
+  opt.q.Z0s = {0.0, 0.17};
+  opt.q.R0s = {0.0, 0.0};
+  opt.q.Z0c = {0.0, 0.0};
+  opt.q.eta_bar = 1.0;
+  opt.q.B2c = 0.0;
+  opt.vary_eta_bar = true;
+  opt.vary_B2c = true;
+  opt.vary_R0c = {false, false};
+  opt.vary_R0s = {false, false};
+  opt.vary_Z0c = {false, false};
+  opt.vary_Z0s = {false, true};
+  opt.fourier_refine = fourier_refine;
+  opt.nphi = {19, 25, 31};
+  opt.weight_grad_B = 1.0;
+  opt.weight_B20 = 1.0;
+
+  opt.allocate();
+  opt.optimize();
+
+  CHECK(opt.q.nphi == 31);
+  REQUIRE(opt.vary_R0c.size() == 2 + fourier_refine);
+  REQUIRE(opt.vary_R0s.size() == 2 + fourier_refine);
+  REQUIRE(opt.vary_Z0c.size() == 2 + fourier_refine);
+  REQUIRE(opt.vary_Z0s.size() == 2 + fourier_refine);
+  CHECK_FALSE(opt.vary_R0c[0]);
+  CHECK_FALSE(opt.vary_R0s[0]);
+  CHECK_FALSE(opt.vary_Z0c[0]);
+  CHECK_FALSE(opt.vary_Z0s[0]);
+  
+  CHECK_FALSE(opt.vary_R0c[1]);
+  CHECK_FALSE(opt.vary_R0s[1]);
+  CHECK_FALSE(opt.vary_Z0c[1]);
+  CHECK(opt.vary_Z0s[1]);
+    
+  CHECK(opt.vary_R0c[2]);
+  CHECK_FALSE(opt.vary_R0s[2]);
+  CHECK_FALSE(opt.vary_Z0c[2]);
+  CHECK(opt.vary_Z0s[2]);
+    
+  CHECK(opt.vary_R0c[3]);
+  CHECK_FALSE(opt.vary_R0s[3]);
+  CHECK_FALSE(opt.vary_Z0c[3]);
+  CHECK(opt.vary_Z0s[3]);
+}
+

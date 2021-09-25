@@ -60,6 +60,9 @@ void Opt::input(std::string filename) {
   toml_read(varlist, indata, "verbose", verbose);
   toml_read(varlist, indata, "make_names", make_names);
   toml_read(varlist, indata, "fourier_refine", fourier_refine);
+  toml_read(varlist, indata, "nphi", nphi);
+  if (nphi.size() > 0 && nphi.size() != fourier_refine + 1)
+    throw std::runtime_error("Size of the multiopt nphi array does not match fourier_refine + 1");
 
   std::string algorithm_str = "";
   toml_read(varlist, indata, "algorithm", algorithm_str);

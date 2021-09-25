@@ -439,17 +439,16 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
 TEST_CASE("Check that using a stage-dependent nphi works. [multiopt]") {
   if (single) return;
   int j, k;
-  for (int fourier_refine1 = 0; fourier_refine1 < 2; fourier_refine1++) {
+  for (int fourier_refine1 = 1; fourier_refine1 < 2; fourier_refine1++) {
     CAPTURE(fourier_refine1);
-    for (int fourier_refine2 = 0; fourier_refine2 < 2; fourier_refine2++) {
+    for (int fourier_refine2 = 2; fourier_refine2 < 3; fourier_refine2++) {
       CAPTURE(fourier_refine2);
     
       MultiOpt mo;
       mo.opts.resize(2);
-      mo.nphi = {15, 25};
 
       mo.opts[0].q.verbose = 0;
-      mo.opts[0].q.nphi = 31;
+      mo.opts[0].nphi = {17, 23};
       mo.opts[0].q.nfp = 4;
       mo.opts[0].q.R0c = {1.0, 0.17};
       mo.opts[0].q.R0s = {0.0, 0.0};
@@ -467,6 +466,7 @@ TEST_CASE("Check that using a stage-dependent nphi works. [multiopt]") {
       mo.opts[0].weight_grad_B = 1.0;
       mo.opts[0].weight_B20 = 0.1;
 
+      mo.opts[1].nphi = {27, 31, 37};
       mo.opts[1].q.verbose = 0;
       mo.opts[1].fourier_refine = fourier_refine2;
       mo.opts[1].vary_eta_bar = true;
@@ -490,7 +490,7 @@ TEST_CASE("Check that using a stage-dependent nphi works. [multiopt]") {
       // object.
       Opt opt0;
       opt0.q.verbose = 0;
-      opt0.q.nphi = mo.nphi[0];
+      opt0.nphi = mo.opts[0].nphi;
       opt0.q.nfp = mo.opts[0].q.nfp;
       opt0.q.eta_bar = mo.opts[0].q.eta_bar;
       opt0.q.sigma0 = mo.opts[0].q.sigma0;
@@ -568,7 +568,7 @@ TEST_CASE("Check that using a stage-dependent nphi works. [multiopt]") {
       // parameters as mo.opts[1].
       Opt opt1;
       opt1.q.verbose = 0;
-      opt1.q.nphi = mo.nphi[1];
+      opt1.nphi = mo.opts[1].nphi;
       opt1.q.nfp = mo.opts[1].q.nfp;
       index = mo.opts[0].n_iter - 1;
       opt1.q.eta_bar = mo.opts[0].iter_eta_bar[index];

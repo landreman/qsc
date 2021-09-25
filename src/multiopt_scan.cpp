@@ -51,8 +51,10 @@ void MultiOptScan::init() {
   // Initialize MPI-related variables
   MPI_Comm_rank(mpi_comm, &mpi_rank);
   MPI_Comm_size(mpi_comm, &n_procs);
+  /*
   if (n_procs < 2)
     throw std::runtime_error("For MultiOptScan, the number of MPI processes must be at least 2.");
+  */
   proc0 = (mpi_rank == 0);
   MPI_Barrier(mpi_comm);
 
@@ -124,6 +126,7 @@ void MultiOptScan::init() {
     MPI_Send(proc_assignments_string.data(), str_length, MPI_CHAR, 0, mpi_rank, mpi_comm);
   }
 
+  /*
   // Begin test code for MPI master-slave system.
   int intbuf[1];
   int proc_that_finished;
@@ -171,6 +174,7 @@ void MultiOptScan::init() {
       }
     }
   }
+  */
 }
 
 void MultiOptScan::scan() {

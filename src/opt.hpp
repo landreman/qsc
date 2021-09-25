@@ -39,6 +39,7 @@ namespace qsc {
     Vector residuals;
     int fourier_refine;
     diff_method_type diff_method;
+    std::valarray<int> nphi;
 
     bool vary_eta_bar, vary_sigma0;
     bool vary_B2c, vary_B2s;

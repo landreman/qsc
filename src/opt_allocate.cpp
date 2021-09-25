@@ -6,7 +6,7 @@ using namespace qsc;
  */
 void Opt::allocate() {
   q.allocate();
-  arclength_factor.resize(q.nphi, 0.0);
+  //arclength_factor.resize(q.nphi, 0.0); // Not sure this is necessary
 
   iter_objective_function.resize(max_iter, 0.0);
   iter_B20_term.resize(max_iter, 0.0);

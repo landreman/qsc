@@ -17,12 +17,12 @@ B2c = 0.0
 [multiopt]
 verbose = 1
 nopts = 2
-nphi = [31, 45]
 
 [opt0]
 verbose = 1
 max_iter = 1000
 fourier_refine = 2
+nphi = [15, 19, 23]
 
 vary_eta_bar = 1
 vary_B2c = 1
@@ -36,6 +36,7 @@ weight_B20 = 1.0
 verbose = 1
 max_iter = 1000
 fourier_refine = 4
+nphi = [27, 31, 37, 41, 45]
 
 vary_eta_bar = 1
 vary_B2c = 1

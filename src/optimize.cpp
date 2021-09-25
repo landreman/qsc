@@ -83,7 +83,7 @@ void Opt::optimize() {
 
   std::cout << "optimizing..." << std::endl;
   
-  init_residuals();
+  // init_residuals();
   n_iter = 0;
   for (j_fourier_refine = 0; j_fourier_refine <= fourier_refine; j_fourier_refine++) {
     if (n_iter >= max_iter - 1) {
@@ -95,6 +95,17 @@ void Opt::optimize() {
       vary_Z0s[oldsize + j_fourier_refine - 1] = true;
       // For non-stellarator-symmetry, could also modify vary_R0s and vary_Z0c here.
     }
+    // If the opt nphi vector is empty, nphi from the original qsc object will be used.
+    if (nphi.size() > 0) {
+      q.nphi = nphi[j_fourier_refine];
+      q.allocate();
+      // Changing nphi means the residuals may change size, hence call init_residuals:
+      init_residuals();
+    } else if (j_fourier_refine == 0) {
+      // Make sure init_residuals is always called when j_fourier_refine = 0.
+      init_residuals();
+    }
+    
     if (verbose > 0) {
       std::cout << "`````````````````````````````````````````````````" << std::endl;
       std::cout << "Beginning optimization with j_fourier_refine = " << j_fourier_refine << std::endl;
@@ -106,6 +117,7 @@ void Opt::optimize() {
       std::cout << vary_Z0c << std::endl;
       std::cout << "vary_Z0s: ";
       std::cout << vary_Z0s << std::endl;
+      std::cout << "nphi: " << q.nphi << std::endl;
     }
     init_parameters();
     q.init();
@@ -520,7 +532,7 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   j = 0;
   qscfloat term;
   arclength_factor = sqrt(q.d_l_d_phi * (q.d_phi * q.nfp / q.axis_length));
-
+  
   objective_function = 0.0;
   B20_term = 0.0;
   iota_term = 0.0;
