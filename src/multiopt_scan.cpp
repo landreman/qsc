@@ -14,7 +14,7 @@ void MultiOptScan::defaults() {
   mpi_comm = MPI_COMM_WORLD;
   verbose = 1;
   max_seconds = 60;
-  save_period = 2;
+  save_period = 10;
   quit_after_init = false;
   
   keep_all = true;

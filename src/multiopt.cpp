@@ -45,6 +45,7 @@ void MultiOpt::input(std::string filename) {
   if (nopts < 1) throw std::runtime_error("In the multiopt parameter list, nopts must be at least 1.");
   opts.resize(nopts);
   for (int jopt = 0; jopt < nopts; jopt++) {
+    opts[jopt].make_names = false; // Do not save a file with the names of the residuals.
     opts[jopt].toml_group = "opt" + std::to_string(jopt);
     if (verbose > 0) std::cout << "About to read toml group " << opts[jopt].toml_group << std::endl;
     opts[jopt].input(filename);
