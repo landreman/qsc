@@ -23,7 +23,7 @@ quit_after_init = 0
 
 [qsc]
 nfp = 2
-nphi = 25
+# nphi = 25  # nphi will be set by multiopt
 verbose = 0
 order_r_option = "r2.1"
 
@@ -36,6 +36,7 @@ B2c = 0.0
 [multiopt]
 verbose = 0
 nopts = 2
+nphi = [19, 25]
 
 [opt0]
 verbose = 0
