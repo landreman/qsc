@@ -40,6 +40,7 @@ void MultiOpt::input(std::string filename) {
   int nopts;
   toml_read(varlist, indata, "nopts", nopts);
   toml_read(varlist, indata, "verbose", verbose);
+  toml_read(varlist, indata, "nphi", nphi);
   toml_unused(varlist, indata);
 
   if (nopts < 1) throw std::runtime_error("In the multiopt parameter list, nopts must be at least 1.");
@@ -50,6 +51,9 @@ void MultiOpt::input(std::string filename) {
     if (verbose > 0) std::cout << "About to read toml group " << opts[jopt].toml_group << std::endl;
     opts[jopt].input(filename);
   }
+
+  if (nphi.size() > 0 && nphi.size() != nopts)
+    throw std::runtime_error("Size of the multiopt nphi array does not match nopts");
 }
 
 /**
@@ -82,6 +86,12 @@ void MultiOpt::optimize() {
       opts[jopt].q = opts[jopt - 1].q;
     }
 
+    // If the multiopt nphi vector is empty, just use nphi from the original qsc object.
+    if (nphi.size() > 0) {
+      if (verbose > 0) std::cout << "multiopt: changing nphi to " << nphi[jopt] << std::endl;
+      opts[jopt].q.nphi = nphi[jopt];
+    }
+    
     // Run the given stage of the optimization.
     if (verbose > 0) {
       std::cout << "################################################" << std::endl;

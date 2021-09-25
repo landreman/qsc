@@ -4,7 +4,7 @@ general_option = 'multiopt'
 
 [qsc]
 nfp = 4
-nphi = 45
+nphi = 15
 verbose = 0
 order_r_option = "r2.1"
 
@@ -17,6 +17,7 @@ B2c = 0.0
 [multiopt]
 verbose = 1
 nopts = 2
+nphi = [31, 45]
 
 [opt0]
 verbose = 1

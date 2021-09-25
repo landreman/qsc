@@ -49,11 +49,12 @@ TEST_CASE("Run a small MultiOptScan with keep_all true. [mpi] [multiopt_scan]") 
 
   // Set 2 opt stages:
   mos.mo_ref.opts.resize(2);
+  mos.mo_ref.nphi = {21, 25};
   mos.mo_ref.verbose = 2;
 
   // Set the initial QSC configuration:
   mos.mo_ref.opts[0].q.nfp = 4;
-  mos.mo_ref.opts[0].q.nphi = 25;
+  mos.mo_ref.opts[0].q.nphi = 15; // This value should be over-ridden by mos.mo_ref.nphi
   mos.mo_ref.opts[0].q.verbose = 0;
   mos.mo_ref.opts[0].q.order_r_option = "r2.1";
   mos.mo_ref.opts[0].q.eta_bar = 1.0;
@@ -93,6 +94,8 @@ TEST_CASE("Run a small MultiOptScan with keep_all true. [mpi] [multiopt_scan]") 
 
   // Check results. Only MPI proc 0 has the final data.
   if (mos.proc0) {
+    CHECK(mos.mo.opts[0].q.nphi == 21);
+    CHECK(mos.mo.opts[1].q.nphi == 25);
     CHECK(mos.n_scan == 4);
 
     CHECK(Approx(mos.scan_weight_B20[0]) == 0.1);

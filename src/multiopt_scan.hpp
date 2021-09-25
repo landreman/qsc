@@ -30,14 +30,13 @@ namespace qsc {
       REJECTED_DUE_TO_R_SINGULARITY,
       N_FILTERS};
 
-    MultiOpt mo;
     std::chrono::time_point<std::chrono::steady_clock> start_time;
     big filters_local[N_FILTERS];
     void defaults();
     void collect_results(int, Matrix&, Matrix&, int, std::valarray<int>&, big);
     
   public:
-    MultiOpt mo_ref;
+    MultiOpt mo_ref, mo;
     MPI_Comm mpi_comm;
     int mpi_rank, n_procs;
     bool proc0;
