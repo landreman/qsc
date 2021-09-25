@@ -28,6 +28,9 @@ elseif("$ENV{CLUSTER}" STREQUAL "COBRA")
   message("Detected host is IPP Cobra")
   # CMake detects gnu compiler unless you specify Intel:
   set(CMAKE_CXX_COMPILER "mpiicpc")
+  # Compiled optimization flags recommended on the cobra website:
+  # https://docs.mpcdf.mpg.de/doc/computing/software/compilers_languages.html#compiler-optimization-flags
+  add_definitions(-xCORE-AVX512 -qopt-zmm-usage=high -ipo -O2)
 
 elseif("$ENV{CLUSTER}" STREQUAL "RAVEN")
   message("Detected host is IPP Raven")
