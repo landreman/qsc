@@ -1,0 +1,154 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import numpy as np
+from scipy.io import netcdf
+import matplotlib.pyplot as plt
+
+print()
+print("Usage: ", os.path.basename(__file__), ' qsc_out.<extension>.nc')
+
+if len(sys.argv) != 2:
+   raise RuntimeError("A qsc_out.*.nc file must be provided as an argument")
+
+filename = sys.argv[1]
+bare_filename = os.path.basename(filename)
+s = 'qsc_out.'
+if bare_filename[:len(s)] != s or filename[-3:] != '.nc':
+   raise RuntimeError("A qsc_out.*.nc file must be provided as an argument")
+   
+f = netcdf.netcdf_file(filename, 'r', mmap=False)
+n_scan = f.variables['n_scan'][()]
+iota = f.variables['scan_iota'][()]
+B20_variation = f.variables['scan_B20_variation'][()]
+r_singularity = f.variables['scan_r_singularity'][()]
+d2_volume_d_psi2 = f.variables['scan_d2_volume_d_psi2'][()]
+L_grad_B = f.variables['scan_min_L_grad_B'][()]
+L_grad_grad_B = f.variables['scan_min_L_grad_grad_B'][()]
+elongation = f.variables['scan_max_elongation'][()]
+weight_grad_grad_B = f.variables['scan_weight_grad_grad_B'][()]
+weight_B20 = f.variables['scan_weight_B20'][()]
+R0c = f.variables['scan_R0c'][()]
+Z0s = f.variables['scan_Z0s'][()]
+print('R0c.shape:', R0c.shape)
+R0c1 = R0c[:, 1]
+Z0s1 = Z0s[:, 1]
+
+well = (d2_volume_d_psi2 < 0)
+hill = (d2_volume_d_psi2 >= 0)
+
+def loghist(x, bins=10, **kwargs):
+  hist, bins = np.histogram(x, bins=bins)
+  logbins = np.logspace(np.log10(bins[0]), np.log10(bins[-1]), len(bins))
+  plt.hist(x, bins=logbins, **kwargs)
+  plt.xscale('log')
+  
+fig = plt.figure(figsize=(14,7))
+plt.rcParams.update({'font.size': 6})
+
+nrows = 3
+ncols = 6
+jplot = 1
+bins = 20
+
+def plot_row(title, logx=False):
+    global jplot
+    x = eval(title)
+    
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    if logx:
+        loghist(x, bins=bins)
+    else:
+        plt.hist(x, bins=bins)
+    plt.xlabel(title)
+
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    plt.scatter(x, B20_variation, c=r_singularity, s=4)
+    plt.xlabel(title)
+    if logx:
+        plt.xscale('log')
+    plt.ylabel('B20_variation')
+    plt.yscale('log')
+    plt.title('color = r_singularity')
+    plt.colorbar()
+
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    plt.scatter(x, r_singularity, c=B20_variation, s=4)
+    plt.xlabel(title)
+    if logx:
+        plt.xscale('log')
+    plt.ylabel('r_singularity')
+    plt.title('color = B20_variation')
+    plt.colorbar()
+
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    plt.scatter(x, L_grad_B, c=L_grad_grad_B, s=4)
+    plt.xlabel(title)
+    if logx:
+        plt.xscale('log')
+    plt.ylabel('L_grad_B')
+    plt.title('color = L_grad_grad_B')
+    plt.colorbar()
+
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    plt.scatter(x, L_grad_grad_B, c=L_grad_B, s=4)
+    plt.xlabel(title)
+    if logx:
+        plt.xscale('log')
+    plt.ylabel('L_grad_grad_B')
+    plt.title('color = L_grad_B')
+    plt.colorbar()
+
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    plt.scatter(x, d2_volume_d_psi2, c=r_singularity, s=4)
+    plt.xlabel(title)
+    if logx:
+        plt.xscale('log')
+    plt.ylabel('d2_volume_d_psi2')
+    plt.title('color = r_singularity')
+    plt.colorbar()
+
+plot_row('R0c1')
+plot_row('weight_B20', True)
+plot_row('weight_grad_grad_B', True)
+
+"""
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.hist(weight_B20, bins=bins)
+plt.xlabel('weight_B20')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+loghist(weight_B20, bins=bins)
+plt.xlabel('weight_B20')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.scatter(weight_B20, B20_variation, c=r_singularity, s=4)
+plt.xlabel('weight_B20')
+plt.ylabel('B20_variation')
+plt.xscale('log')
+plt.yscale('log')
+plt.title('color = r_singularity')
+plt.colorbar()
+
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.hist(weight_grad_grad_B, bins=bins)
+plt.xlabel('weight_grad_grad_B')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+loghist(weight_grad_grad_B, bins=bins)
+plt.xlabel('weight_grad_grad_B')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.scatter(weight_grad_grad_B, r_singularity, c=B20_variation, s=4)
+plt.xlabel('weight_grad_grad_B')
+plt.ylabel('r_singularity')
+plt.xscale('log')
+plt.yscale('log')
+plt.title('color = B20_variation')
+plt.colorbar()
+"""
+
+plt.tight_layout()
+plt.show()
