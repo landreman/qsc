@@ -94,6 +94,7 @@ void MultiOptScan::init() {
     attempts_per_proc.resize(n_procs, 0);
     for (j = 0; j < N_FILTERS; j++) filters[j] = 0;
   }
+  total_cpu_seconds = 0.0;
 
   if (n_procs - 1 > n_scan_all)
     throw std::runtime_error("For MultiOptScan, the number of MPI processes cannot exceed n_scan_all + 1.");
@@ -222,6 +223,7 @@ int MultiOptScan::proc0_recv() {
   }
   attempts_per_proc[proc_that_finished]++;
   if (filters_local[KEPT] > 0) n_solves_kept[proc_that_finished]++;
+  total_cpu_seconds += parameters_single[37];
   
   return proc_that_finished;
 }
@@ -429,6 +431,10 @@ void MultiOptScan::eval_scan_index(int j_scan) {
   parameters_single[35] = mo.opts[index].weight_axis_length;
   parameters_single[36] = mo.opts[index].weight_standard_deviation_of_R;
 
+  end_time_single = std::chrono::steady_clock::now();
+  elapsed = end_time_single - start_time_single;
+  parameters_single[37] = elapsed.count();
+
   for (j = 0; j < axis_nmax_plus_1; j++) {
     parameters_single[j + 0 * axis_nmax_plus_1 + n_parameters_base] = mo.opts[index].q.R0c[j];
     parameters_single[j + 1 * axis_nmax_plus_1 + n_parameters_base] = mo.opts[index].q.R0s[j];
@@ -455,6 +461,8 @@ void MultiOptScan::print_status() {
   qscfloat fraction_completed = ((qscfloat)filters[ATTEMPTS]) / n_scan_all;
   std::cout << filters[ATTEMPTS] << " of " << n_scan_all << " (" << fraction_completed << ") configs completed." << std::endl;
   std::cout << "Expected total scan time: " << elapsed.count() / fraction_completed << std::endl;
+  std::cout << "CPU seconds for solves: " << total_cpu_seconds
+	    << "  Wallclock time for that should be " << total_cpu_seconds / (n_procs - 1) << " seconds" << std::endl;
   
   std::cout << "Attempts on each proc:";
   for (j = 0; j < n_procs; j++) std::cout << " " << attempts_per_proc[j];

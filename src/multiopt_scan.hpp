@@ -58,7 +58,7 @@ namespace qsc {
     int axis_nmax_plus_1;
     bool quit_after_init;
     
-    const int n_parameters_base = 37;
+    const int n_parameters_base = 38;
     const int n_int_parameters_base = 3;
     const int n_int_parameters = n_int_parameters_base + N_FILTERS;
     int n_parameters;
@@ -67,6 +67,7 @@ namespace qsc {
     Vector parameters_single;
     std::valarray<int> int_parameters_single;
     std::valarray<int> n_solves_kept, attempts_per_proc;
+    qscfloat total_cpu_seconds;
     
     Vector scan_eta_bar, scan_sigma0, scan_B2s, scan_B2c;
     Matrix scan_R0c, scan_R0s, scan_Z0c, scan_Z0s;
