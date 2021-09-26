@@ -512,7 +512,7 @@ void MultiOptScan::filter_global_arrays() {
   // Unpack parameters.
   // The order here must match the order at the end of eval_scan_index()!
   j = -1;
-  for (j_global = 0; j_global < n_scan; j_global++) {
+  for (j_global = 0; j_global < n_scan_all; j_global++) {
     if (int_parameters[1 + j_global * n_int_parameters_base] < 1) continue;
     j++;
     
