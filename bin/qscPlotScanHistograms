@@ -21,6 +21,8 @@ if bare_filename[:len(s)] != s or filename[-3:] != '.nc':
 f = netcdf.netcdf_file(filename, 'r', mmap=False)
 n_scan = f.variables['n_scan'][()]
 iota = f.variables['scan_iota'][()]
+eta_bar = f.variables['scan_eta_bar'][()]
+B2c = f.variables['scan_B2c'][()]
 B20_variation = f.variables['scan_B20_variation'][()]
 r_singularity = f.variables['scan_r_singularity'][()]
 d2_volume_d_psi2 = f.variables['scan_d2_volume_d_psi2'][()]
@@ -149,6 +151,26 @@ plt.yscale('log')
 plt.title('color = B20_variation')
 plt.colorbar()
 """
+
+plt.tight_layout()
+
+fig = plt.figure(figsize=(14,7))
+
+nrows = 2
+ncols = 2
+jplot = 1
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.hist(iota, bins=bins)
+plt.xlabel('iota')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.hist(eta_bar, bins=bins)
+plt.xlabel('eta_bar')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.hist(B2c, bins=bins)
+plt.xlabel('B2c')
 
 plt.tight_layout()
 plt.show()
