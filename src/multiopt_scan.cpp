@@ -418,7 +418,7 @@ void MultiOptScan::eval_scan_index(int j_scan) {
 }
 
 void MultiOptScan::print_filters() {
-  int total_rejected, j;
+  int j;
   
   n_scan = filters[KEPT];
   
@@ -429,14 +429,14 @@ void MultiOptScan::print_filters() {
   for (j = 0; j < n_procs; j++) std::cout << " " << n_solves_kept[j];
   std::cout << std::endl;
 
-  total_rejected = 0;
-  for (j = REJECTED_DUE_TO_R0; j < N_FILTERS; j++) total_rejected += filters[j];
   for (j = 0; j < N_FILTERS; j++) filter_fractions[j] = ((qscfloat)filters[j]) / filters[0];
 
   int width = 13;
   std::cout << std::setprecision(4) << std::endl;
   std::cout << "Summary of scan results:                           (fractions in parentheses)" << std::endl;
   std::cout << "  Configurations attempted:          " << std::setw(width) << filters[ATTEMPTS] << std::endl;
+  std::cout << "  Kept:                              " << std::setw(width) << n_scan
+	    << " (" << filter_fractions[KEPT] << ")" << std::endl;
   std::cout << "  Rejected due to min_R0:            " << std::setw(width) << filters[REJECTED_DUE_TO_R0]
 	    << " (" << filter_fractions[REJECTED_DUE_TO_R0] << ")" << std::endl;
   std::cout << "  Rejected due to min iota:          " << std::setw(width) << filters[REJECTED_DUE_TO_IOTA]
@@ -455,12 +455,6 @@ void MultiOptScan::print_filters() {
 	    << " (" << filter_fractions[REJECTED_DUE_TO_DMERC] << ")" << std::endl;
   std::cout << "  Rejected due to r_singularity:     " << std::setw(width) << filters[REJECTED_DUE_TO_R_SINGULARITY]
 	    << " (" << filter_fractions[REJECTED_DUE_TO_R_SINGULARITY] << ")" << std::endl;
-  std::cout << "  Total rejected:                    " << std::setw(width) << total_rejected
-	    << " (" << ((qscfloat)total_rejected) / filters[ATTEMPTS] << ")" << std::endl;
-  std::cout << "  Kept:                              " << std::setw(width) << n_scan
-	    << " (" << filter_fractions[KEPT] << ")" << std::endl;
-  std::cout << "  Kept + rejected:                   " << std::setw(width) << n_scan + total_rejected
-	    << std::endl;
   
 }
 
@@ -569,5 +563,9 @@ void MultiOptScan::filter_global_arrays() {
       scan_Z0c(k, j) = parameters(k + 2 * axis_nmax_plus_1 + n_parameters_base, j_global);
       scan_Z0s(k, j) = parameters(k + 3 * axis_nmax_plus_1 + n_parameters_base, j_global);
     }
+  }
+  if (j + 1 != n_scan) {
+    std::cout << "Error! mismatch in number of configs saved. n_scan=" << n_scan << " j=" << j << std::endl;
+    throw std::runtime_error("mismatch in number of configs saved.");
   }
 }
