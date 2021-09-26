@@ -31,9 +31,8 @@ namespace qsc {
       N_FILTERS};
 
     std::chrono::time_point<std::chrono::steady_clock> start_time;
-    big filters_local[N_FILTERS];
+    int filters_local[N_FILTERS];
     void defaults();
-    void collect_results(int, Matrix&, Matrix&, int, std::valarray<int>&, big);
     
   public:
     MultiOpt mo_ref, mo;
@@ -42,8 +41,7 @@ namespace qsc {
     bool proc0;
     qscfloat max_seconds;
     int save_period;
-    big n_scan, n_scan_all, filters[N_FILTERS];
-    big scan_index_min, scan_index_max, n_scan_local;
+    int n_scan, n_scan_all, filters[N_FILTERS];
     qscfloat filter_fractions[N_FILTERS];
     qscfloat min_R0_to_keep, min_iota_to_keep, max_elongation_to_keep;
     qscfloat min_L_grad_B_to_keep, min_L_grad_grad_B_to_keep;
@@ -60,6 +58,16 @@ namespace qsc {
     std::vector<Vector> params_vals;
     int axis_nmax_plus_1;
     bool quit_after_init;
+    
+    const int n_parameters_base = 37;
+    const int n_int_parameters_base = 3;
+    const int n_int_parameters = n_int_parameters_base + N_FILTERS;
+    int n_parameters;
+    Matrix parameters;
+    std::valarray<int> int_parameters;
+    Vector parameters_single;
+    std::valarray<int> int_parameters_single;
+    std::valarray<int> n_solves_kept, attempts_per_proc;
     
     Vector scan_eta_bar, scan_sigma0, scan_B2s, scan_B2c;
     Matrix scan_R0c, scan_R0s, scan_Z0c, scan_Z0s;
@@ -86,6 +94,10 @@ namespace qsc {
     void input(std::string);
     void init();
     void scan();
+    void eval_scan_index(int);
+    int proc0_recv();
+    void print_filters();
+    void filter_global_arrays();
     void write_netcdf();
   };
 }

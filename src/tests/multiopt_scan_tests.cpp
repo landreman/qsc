@@ -1,4 +1,5 @@
 #include <iostream>
+#include <mpi.h>
 #include "doctest.h"
 #include "multiopt_scan.hpp"
 
@@ -7,6 +8,12 @@ using doctest::Approx;
 
 TEST_CASE("Check linear and logarithmic spacing of scan parameters. [multiopt_scan]") {
   if (single) return;
+  
+  // MultiOptScan::init() throws an error if there are < 2 or > n_scan_all procs.
+  int n_procs;
+  MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
+  if (n_procs < 2 || n_procs > 12) return;
+  
   MultiOptScan mos;
   mos.mo_ref.opts.resize(1); // mos.init() requires that at least 1 opt be present.
   mos.params = {"R0c1", "weight_B20"};
@@ -33,6 +40,12 @@ TEST_CASE("Run a small MultiOptScan with keep_all true. [mpi] [multiopt_scan]") 
   // This example runs an optimization for QH with nfp = 4.
   
   if (single) return;
+
+  // This example only works for 2-4 procs.
+  int n_procs;
+  MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
+  if (n_procs < 2 || n_procs > 4) return;
+      
   MultiOptScan mos;
 
   // Set scan parameters:
@@ -95,8 +108,6 @@ TEST_CASE("Run a small MultiOptScan with keep_all true. [mpi] [multiopt_scan]") 
 
   // Check results. Only MPI proc 0 has the final data.
   if (mos.proc0) {
-    CHECK(mos.mo.opts[0].q.nphi == 21);
-    CHECK(mos.mo.opts[1].q.nphi == 25);
     CHECK(mos.n_scan == 4);
 
     CHECK(Approx(mos.scan_weight_B20[0]) == 0.1);
@@ -113,6 +124,10 @@ TEST_CASE("Run a small MultiOptScan with keep_all true. [mpi] [multiopt_scan]") 
     CHECK(Approx(mos.scan_B20_variation[2]) == 0.630219083075497);
     CHECK(Approx(mos.scan_B20_variation[3]) == 0.291004337639454);
 
+  } else {
+    // Only procs other than 0 have actually done any solves.
+    CHECK(mos.mo.opts[0].q.nphi == 21);
+    CHECK(mos.mo.opts[1].q.nphi == 25);
   }
 }
 
@@ -120,6 +135,12 @@ TEST_CASE("Run a small MultiOptScan with keep_all false. [mpi] [multiopt_scan]")
   // This example runs an optimization for QA with nfp = 2.
   
   if (single) return;
+  
+  // This example only works for 2-6 procs.
+  int n_procs;
+  MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
+  if (n_procs < 2 || n_procs > 6) return;
+  
   MultiOptScan mos;
 
   // Set scan parameters:
