@@ -19,6 +19,7 @@ void MultiOptScan::input(std::string filename) {
   toml_read(varlist, indata, "verbose", verbose);
   toml_read(varlist, indata, "quit_after_init", quit_after_init);
   toml_read(varlist, indata, "save_period", save_period);
+  toml_read(varlist, indata, "print_status_period", print_status_period);
   toml_read(varlist, indata, "max_seconds", max_seconds);
 
   toml_read(varlist, indata, "params", params);

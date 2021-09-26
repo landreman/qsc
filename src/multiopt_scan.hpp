@@ -39,8 +39,7 @@ namespace qsc {
     MPI_Comm mpi_comm;
     int mpi_rank, n_procs;
     bool proc0;
-    qscfloat max_seconds;
-    int save_period;
+    qscfloat max_seconds, print_status_period, save_period;
     int n_scan, n_scan_all, filters[N_FILTERS];
     qscfloat filter_fractions[N_FILTERS];
     qscfloat min_R0_to_keep, min_iota_to_keep, max_elongation_to_keep;
@@ -96,7 +95,7 @@ namespace qsc {
     void scan();
     void eval_scan_index(int);
     int proc0_recv();
-    void print_filters();
+    void print_status();
     void filter_global_arrays();
     void write_netcdf();
   };

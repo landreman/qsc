@@ -1,3 +1,4 @@
+
 #include <fstream>
 #include <string>
 #include <stdexcept>
@@ -81,7 +82,7 @@ void Opt::optimize() {
   }
 
 
-  std::cout << "optimizing..." << std::endl;
+  if (verbose > 0) std::cout << "optimizing..." << std::endl;
   
   // init_residuals();
   n_iter = 0;

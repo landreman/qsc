@@ -11,9 +11,9 @@ void MultiOptScan::write_netcdf() {
   if (!proc0) return;
   
   std::chrono::time_point<std::chrono::steady_clock> start;
-  if (verbose > 0) start = std::chrono::steady_clock::now();
+  start = std::chrono::steady_clock::now();
 
-  if (verbose > 0) std::cout << "Writing output to " << outfilename << std::endl;
+  std::cout << "Writing output to " << outfilename << std::endl;
   qsc::NetCDFWriter nc(outfilename, false);
 
   // Define dimensions
@@ -133,10 +133,8 @@ void MultiOptScan::write_netcdf() {
   // Done defining the NetCDF data.
   nc.write_and_close();
   
-  if (verbose > 0) {
-    auto end = std::chrono::steady_clock::now();    
-    std::chrono::duration<double> elapsed = end - start;
-    std::cout << "Time for write_netcdf: "
-              << elapsed.count() << " seconds" << std::endl;
-  }
+  auto end = std::chrono::steady_clock::now();    
+  std::chrono::duration<double> elapsed = end - start;
+  std::cout << "Time for write_netcdf: "
+	    << elapsed.count() << " seconds" << std::endl;
 }

@@ -14,7 +14,8 @@ void MultiOptScan::defaults() {
   mpi_comm = MPI_COMM_WORLD;
   verbose = 1;
   max_seconds = 60;
-  save_period = 10;
+  print_status_period = 20.0;
+  save_period = 5 * 60.0;
   quit_after_init = false;
   
   keep_all = true;
@@ -102,10 +103,12 @@ void MultiOptScan::scan() {
   MPI_Status mpi_status;
   int intbuf[1];
   int proc_that_finished, j;
-  std::chrono::time_point<std::chrono::steady_clock> start_time2, end_time;
+  std::chrono::time_point<std::chrono::steady_clock> start_time2, end_time, start_time_print_status, start_time_save;
   std::chrono::duration<double> elapsed;
   
   start_time = std::chrono::steady_clock::now();
+  start_time_print_status = start_time;
+  start_time_save = start_time;
   if (proc0) {
     // Allocate the big arrays for global results:
     if (verbose > 0) std::cout << "proc0 about to allocate big arrays." << std::endl;
@@ -123,6 +126,24 @@ void MultiOptScan::scan() {
     }
     // Handle the rest of the tasks:
     for (j = n_procs - 1; j < n_scan_all; j++) {
+      // Print a status summary every time interval print_status_period;
+      end_time = std::chrono::steady_clock::now();
+      elapsed = end_time - start_time_print_status;
+      if (elapsed.count() > print_status_period) {
+	print_status();
+	start_time_print_status = end_time;
+      }
+      
+      // Save intermediate results every time interval save_period;
+      end_time = std::chrono::steady_clock::now();
+      elapsed = end_time - start_time_save;
+      if (elapsed.count() > save_period) {
+	print_status();
+	filter_global_arrays();
+	write_netcdf();
+	start_time_save = end_time;
+      }
+	
       // Wait for any proc to finish:
       proc_that_finished = proc0_recv();
       //MPI_Recv(intbuf, 1, MPI_INT, MPI_ANY_SOURCE, 0, mpi_comm, &mpi_status);
@@ -142,8 +163,6 @@ void MultiOptScan::scan() {
       intbuf[0] = -1;
       MPI_Send(intbuf, 1, MPI_INT, j, 0, mpi_comm);
     }
-    print_filters();
-    filter_global_arrays();
     
   } else {
     // Code for procs >0.
@@ -171,6 +190,12 @@ void MultiOptScan::scan() {
   end_time = std::chrono::steady_clock::now();
   elapsed = end_time - start_time;
   std::cout << "Proc " << mpi_rank << " finished after " << elapsed.count() << " seconds" << std::endl;
+
+  MPI_Barrier(mpi_comm);
+  if (proc0) {
+    print_status();
+    filter_global_arrays();
+  }
 }
 
 /**
@@ -417,10 +442,19 @@ void MultiOptScan::eval_scan_index(int j_scan) {
     std::cout << "Proc " << mpi_rank << " eval of index " << j_scan << " took " << elapsed.count() << " seconds" << std::endl;
 }
 
-void MultiOptScan::print_filters() {
+void MultiOptScan::print_status() {
   int j;
+  std::chrono::time_point<std::chrono::steady_clock> end_time;
+  std::chrono::duration<double> elapsed;
   
   n_scan = filters[KEPT];
+  
+  end_time = std::chrono::steady_clock::now();
+  elapsed = end_time - start_time;
+  std::cout  << std::endl << "Status at " << elapsed.count() << " seconds:" << std::endl;
+  qscfloat fraction_completed = ((qscfloat)filters[ATTEMPTS]) / n_scan_all;
+  std::cout << filters[ATTEMPTS] << " of " << n_scan_all << " (" << fraction_completed << ") configs completed." << std::endl;
+  std::cout << "Expected total scan time: " << elapsed.count() / fraction_completed << std::endl;
   
   std::cout << "Attempts on each proc:";
   for (j = 0; j < n_procs; j++) std::cout << " " << attempts_per_proc[j];
@@ -455,11 +489,15 @@ void MultiOptScan::print_filters() {
 	    << " (" << filter_fractions[REJECTED_DUE_TO_DMERC] << ")" << std::endl;
   std::cout << "  Rejected due to r_singularity:     " << std::setw(width) << filters[REJECTED_DUE_TO_R_SINGULARITY]
 	    << " (" << filter_fractions[REJECTED_DUE_TO_R_SINGULARITY] << ")" << std::endl;
-  
+  std::cout << std::endl;
 }
 
 void MultiOptScan::filter_global_arrays() {
   int j, k, j_global;
+  std::chrono::time_point<std::chrono::steady_clock> start_time_filter, end_time;
+  std::chrono::duration<double> elapsed;
+  
+  start_time_filter = std::chrono::steady_clock::now();
   
   n_scan = filters[KEPT];
   
@@ -568,4 +606,7 @@ void MultiOptScan::filter_global_arrays() {
     std::cout << "Error! mismatch in number of configs saved. n_scan=" << n_scan << " j=" << j << std::endl;
     throw std::runtime_error("mismatch in number of configs saved.");
   }
+  end_time = std::chrono::steady_clock::now();
+  elapsed = end_time - start_time_filter;
+  std::cout << "Time for filter_global_arrays: " << elapsed.count() << " seconds:" << std::endl;  
 }
