@@ -22,7 +22,10 @@ index = int(sys.argv[2])
 
 f = netcdf.netcdf_file(filename, 'r', mmap=False)
 nfp = f.variables['nfp'][()]
-nphi = f.variables['nphi'][()]
+try:
+   nphi = f.variables['nphi'][()]
+except:
+   nphi = 45
 p2 = f.variables['p2'][()]
 I2 = f.variables['I2'][()]
 iota = f.variables['scan_iota'][()]

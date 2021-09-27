@@ -31,11 +31,68 @@ L_grad_grad_B = f.variables['scan_min_L_grad_grad_B'][()]
 elongation = f.variables['scan_max_elongation'][()]
 weight_grad_grad_B = f.variables['scan_weight_grad_grad_B'][()]
 weight_B20 = f.variables['scan_weight_B20'][()]
+max_XY2 = f.variables['scan_max_XY2'][()]
+max_Z2 = f.variables['scan_max_Z2'][()]
+max_XY3 = f.variables['scan_max_XY3'][()]
+max_d_XY2_d_varphi = f.variables['scan_max_d_XY2_d_varphi'][()]
+max_d_Z2_d_varphi = f.variables['scan_max_d_Z2_d_varphi'][()]
+max_d_XY3_d_varphi = f.variables['scan_max_d_XY3_d_varphi'][()]
 R0c = f.variables['scan_R0c'][()]
 Z0s = f.variables['scan_Z0s'][()]
 print('R0c.shape:', R0c.shape)
 R0c1 = R0c[:, 1]
 Z0s1 = Z0s[:, 1]
+
+max_XYZ23 = np.max(np.array([max_XY2, max_Z2, max_XY3]), axis=0)
+max_d_XYZ23_d_varphi = np.max(np.array([max_d_XY2_d_varphi, max_d_Z2_d_varphi, max_d_XY3_d_varphi]), axis=0)
+
+# Further filter the results:
+mask = max_d_XYZ23_d_varphi < 1e30
+"""
+mask = max_d_XYZ23_d_varphi < 3.6
+mask = np.logical_and(mask, max_XYZ23 < 0.7)
+mask = np.logical_and(mask, B20_variation < 4e-3)
+mask = np.logical_and(mask, r_singularity > 0.5)
+"""
+
+print('Scan indices that pass the mask:')
+print(np.nonzero(mask)[0])
+#print(np.where(mask)[0])
+#exit(0)
+
+"""
+fields = ['iota', 'eta_bar', 'B2c', 'B20_variation', 'r_singularity', 'd2_volume_d_psi2',
+          'L_grad_B', 'L_grad_grad_B', 'elongation', 'weight_grad_grad_B', 'weight_B20',
+          'max_XY2', 'max_Z2', 'max_XY3', 'max_d_XY2_d_varphi', 'max_d_Z2_d_varphi', 'max_d_XY3_d_varphi',
+          'R0c1', 'Z0s1']
+
+for field in fields:
+   eval(field + " = " + field + "[mask]")
+"""
+iota = iota[mask]
+eta_bar = eta_bar[mask]
+B2c = B2c[mask]
+B20_variation = B20_variation[mask]
+r_singularity = r_singularity[mask]
+d2_volume_d_psi2 = d2_volume_d_psi2[mask]
+L_grad_B = L_grad_B[mask]
+L_grad_grad_B = L_grad_grad_B[mask]
+elongation = elongation[mask]
+weight_grad_grad_B = weight_grad_grad_B[mask]
+weight_B20 = weight_B20[mask]
+max_XY2 = max_XY2[mask]
+max_Z2 = max_Z2[mask]
+max_XY3 = max_XY3[mask]
+max_d_XY2_d_varphi = max_d_XY2_d_varphi[mask]
+max_d_Z2_d_varphi = max_d_Z2_d_varphi[mask]
+max_d_XY3_d_varphi = max_d_XY3_d_varphi[mask]
+R0c1 = R0c1[mask]
+Z0s1 = Z0s1[mask]
+max_XYZ23 = max_XYZ23[mask]
+max_d_XYZ23_d_varphi = max_d_XYZ23_d_varphi[mask]
+
+n_scan = len(iota)
+print('Number of points passing filters:', n_scan)
 
 well = (d2_volume_d_psi2 < 0)
 hill = (d2_volume_d_psi2 >= 0)
@@ -50,7 +107,7 @@ fig = plt.figure(figsize=(14,7))
 plt.rcParams.update({'font.size': 6})
 
 nrows = 3
-ncols = 6
+ncols = 8
 jplot = 1
 bins = 20
 
@@ -111,6 +168,20 @@ def plot_row(title, logx=False):
     plt.title('color = r_singularity')
     plt.colorbar()
 
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    plt.scatter(x, max_XYZ23, s=4)
+    plt.xlabel(title)
+    if logx:
+        plt.xscale('log')
+    plt.ylabel('max_XYZ23')
+
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    plt.scatter(x, max_d_XYZ23_d_varphi, s=4)
+    plt.xlabel(title)
+    if logx:
+        plt.xscale('log')
+    plt.ylabel('max_d_XYZ23_d_varphi')
+
 plot_row('R0c1')
 plot_row('weight_B20', True)
 plot_row('weight_grad_grad_B', True)
@@ -152,12 +223,14 @@ plt.title('color = B20_variation')
 plt.colorbar()
 """
 
+plt.figtext(0.5, 0.998, os.path.abspath(filename), ha='center', va='top', fontsize=6)
+plt.figtext(0.5, 0.002, 'Plotted by ' + os.path.abspath(__file__), ha='center', va='bottom', fontsize=6)
 plt.tight_layout()
 
 fig = plt.figure(figsize=(14,7))
 
 nrows = 2
-ncols = 2
+ncols = 3
 jplot = 1
 
 plt.subplot(nrows, ncols, jplot); jplot += 1
@@ -171,6 +244,23 @@ plt.xlabel('eta_bar')
 plt.subplot(nrows, ncols, jplot); jplot += 1
 plt.hist(B2c, bins=bins)
 plt.xlabel('B2c')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+histtype = 'step'
+plt.hist(max_XY2, bins=bins, histtype=histtype, label="max XY2")
+plt.hist(max_Z2, bins=bins, histtype=histtype, label="max Z2")
+plt.hist(max_XY3, bins=bins, histtype=histtype, label="max XY3")
+plt.legend(loc=0)
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+histtype = 'step'
+plt.hist(max_d_XY2_d_varphi, bins=bins, histtype=histtype, label="max d XY2 / d varphi")
+plt.hist(max_d_Z2_d_varphi, bins=bins, histtype=histtype, label="max d Z2 / d varphi")
+plt.hist(max_d_XY3_d_varphi, bins=bins, histtype=histtype, label="max d XY3 / d varphi")
+plt.legend(loc=0)
+
+plt.figtext(0.5, 0.998, os.path.abspath(filename), ha='center', va='top', fontsize=6)
+plt.figtext(0.5, 0.002, 'Plotted by ' + os.path.abspath(__file__), ha='center', va='bottom', fontsize=6)
 
 plt.tight_layout()
 plt.show()
