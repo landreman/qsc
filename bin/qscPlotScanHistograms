@@ -24,6 +24,7 @@ iota = f.variables['scan_iota'][()]
 eta_bar = f.variables['scan_eta_bar'][()]
 B2c = f.variables['scan_B2c'][()]
 B20_variation = f.variables['scan_B20_variation'][()]
+B20_mean = f.variables['scan_B20_mean'][()]
 r_singularity = f.variables['scan_r_singularity'][()]
 d2_volume_d_psi2 = f.variables['scan_d2_volume_d_psi2'][()]
 L_grad_B = f.variables['scan_min_L_grad_B'][()]
@@ -73,6 +74,7 @@ iota = iota[mask]
 eta_bar = eta_bar[mask]
 B2c = B2c[mask]
 B20_variation = B20_variation[mask]
+B20_mean = B20_mean[mask]
 r_singularity = r_singularity[mask]
 d2_volume_d_psi2 = d2_volume_d_psi2[mask]
 L_grad_B = L_grad_B[mask]
@@ -244,6 +246,10 @@ plt.xlabel('eta_bar')
 plt.subplot(nrows, ncols, jplot); jplot += 1
 plt.hist(B2c, bins=bins)
 plt.xlabel('B2c')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.hist(B20_mean, bins=bins)
+plt.xlabel('B20_mean')
 
 plt.subplot(nrows, ncols, jplot); jplot += 1
 histtype = 'step'
