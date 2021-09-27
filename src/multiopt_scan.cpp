@@ -28,6 +28,12 @@ void MultiOptScan::defaults() {
   min_r_singularity_to_keep = -1.0;
   max_d2_volume_d_psi2_to_keep = 1.0e+30;
   min_DMerc_to_keep = -1.0e+30;
+  max_XY2_to_keep = 1.0e+30;
+  max_Z2_to_keep = 1.0e+30;
+  max_XY3_to_keep = 1.0e+30;
+  max_d_XY2_d_varphi_to_keep = 1.0e+30;
+  max_d_Z2_d_varphi_to_keep = 1.0e+30;
+  max_d_XY3_d_varphi_to_keep = 1.0e+30;
 }
 
 MultiOptScan::MultiOptScan() {
@@ -382,6 +388,42 @@ void MultiOptScan::eval_scan_index(int j_scan) {
       passed_filters = false;	
     } else if (verbose > 1) std::cout << "Passed r_singularity filter." << std::endl;
     
+    if (mo.opts[index].q.grid_max_XY2 > max_XY2_to_keep) {
+      filters_local[REJECTED_DUE_TO_MAX_XY2]++;
+      if (verbose > 1) std::cout << "Rejecting this configuration due to max XY2." << std::endl;
+      passed_filters = false;	
+    } else if (verbose > 1) std::cout << "Passed max XY2 filter." << std::endl;
+    
+    if (mo.opts[index].q.grid_max_Z2 > max_Z2_to_keep) {
+      filters_local[REJECTED_DUE_TO_MAX_Z2]++;
+      if (verbose > 1) std::cout << "Rejecting this configuration due to max Z2." << std::endl;
+      passed_filters = false;	
+    } else if (verbose > 1) std::cout << "Passed max Z2 filter." << std::endl;
+    
+    if (mo.opts[index].q.grid_max_XY3 > max_XY3_to_keep) {
+      filters_local[REJECTED_DUE_TO_MAX_XY3]++;
+      if (verbose > 1) std::cout << "Rejecting this configuration due to max XY3." << std::endl;
+      passed_filters = false;	
+    } else if (verbose > 1) std::cout << "Passed max XY3 filter." << std::endl;
+    
+    if (mo.opts[index].q.grid_max_d_XY2_d_varphi > max_d_XY2_d_varphi_to_keep) {
+      filters_local[REJECTED_DUE_TO_MAX_D_XY2_D_VARPHI]++;
+      if (verbose > 1) std::cout << "Rejecting this configuration due to max d XY2 / d varphi." << std::endl;
+      passed_filters = false;	
+    } else if (verbose > 1) std::cout << "Passed max d XY2 / d varphi filter." << std::endl;
+    
+    if (mo.opts[index].q.grid_max_d_Z2_d_varphi > max_d_Z2_d_varphi_to_keep) {
+      filters_local[REJECTED_DUE_TO_MAX_D_Z2_D_VARPHI]++;
+      if (verbose > 1) std::cout << "Rejecting this configuration due to max d Z2 / d varphi." << std::endl;
+      passed_filters = false;	
+    } else if (verbose > 1) std::cout << "Passed max d Z2 / d varphi filter." << std::endl;
+    
+    if (mo.opts[index].q.grid_max_d_XY3_d_varphi > max_d_XY3_d_varphi_to_keep) {
+      filters_local[REJECTED_DUE_TO_MAX_D_XY3_D_VARPHI]++;
+      if (verbose > 1) std::cout << "Rejecting this configuration due to max d XY3 / d varphi." << std::endl;
+      passed_filters = false;	
+    } else if (verbose > 1) std::cout << "Passed max d XY3 / d varphi filter." << std::endl;
+    
   }
   if (passed_filters) filters_local[KEPT]++;
 
@@ -506,6 +548,18 @@ void MultiOptScan::print_status() {
 	    << " (" << filter_fractions[REJECTED_DUE_TO_DMERC] << ")" << std::endl;
   std::cout << "  Rejected due to r_singularity:     " << std::setw(width) << filters[REJECTED_DUE_TO_R_SINGULARITY]
 	    << " (" << filter_fractions[REJECTED_DUE_TO_R_SINGULARITY] << ")" << std::endl;
+  std::cout << "  Rejected due to max XY2:           " << std::setw(width) << filters[REJECTED_DUE_TO_MAX_XY2]
+	    << " (" << filter_fractions[REJECTED_DUE_TO_MAX_XY2] << ")" << std::endl;
+  std::cout << "  Rejected due to max Z2:            " << std::setw(width) << filters[REJECTED_DUE_TO_MAX_Z2]
+	    << " (" << filter_fractions[REJECTED_DUE_TO_MAX_Z2] << ")" << std::endl;
+  std::cout << "  Rejected due to max XY3:           " << std::setw(width) << filters[REJECTED_DUE_TO_MAX_XY3]
+	    << " (" << filter_fractions[REJECTED_DUE_TO_MAX_XY3] << ")" << std::endl;
+  std::cout << "  Rejected due to max dXY2/dvarphi:  " << std::setw(width) << filters[REJECTED_DUE_TO_MAX_D_XY2_D_VARPHI]
+	    << " (" << filter_fractions[REJECTED_DUE_TO_MAX_D_XY2_D_VARPHI] << ")" << std::endl;
+  std::cout << "  Rejected due to max dZ2/dvarphi:   " << std::setw(width) << filters[REJECTED_DUE_TO_MAX_D_Z2_D_VARPHI]
+	    << " (" << filter_fractions[REJECTED_DUE_TO_MAX_D_Z2_D_VARPHI] << ")" << std::endl;
+  std::cout << "  Rejected due to max dXY3/dvarphi:  " << std::setw(width) << filters[REJECTED_DUE_TO_MAX_D_XY3_D_VARPHI]
+	    << " (" << filter_fractions[REJECTED_DUE_TO_MAX_D_XY3_D_VARPHI] << ")" << std::endl;
   std::cout << std::endl;
 }
 

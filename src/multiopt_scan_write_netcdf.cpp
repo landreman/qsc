@@ -45,6 +45,12 @@ void MultiOptScan::write_netcdf() {
   nc.put("rejected_due_to_d2_volume_d_psi2", filters[REJECTED_DUE_TO_D2_VOLUME_D_PSI2], "Number of configurations in the scan that were rejected due to the max_d2_volume_d_psi2_to_keep filter", "dimensionless");
   nc.put("rejected_due_to_DMerc", filters[REJECTED_DUE_TO_DMERC], "Number of configurations in the scan that were rejected due to the min_DMerc_to_keep filter", "dimensionless");
   nc.put("rejected_due_to_r_singularity", filters[REJECTED_DUE_TO_R_SINGULARITY], "Number of configurations in the scan that were rejected due to the min_r_singularity_to_keep filter", "dimensionless");
+  nc.put("rejected_due_to_max_XY2", filters[REJECTED_DUE_TO_MAX_XY2], "Number of configurations in the scan that were rejected due to the max_XY2_to_keep filter", "dimensionless");
+  nc.put("rejected_due_to_max_Z2", filters[REJECTED_DUE_TO_MAX_Z2], "Number of configurations in the scan that were rejected due to the max_Z2_to_keep filter", "dimensionless");
+  nc.put("rejected_due_to_max_XY3", filters[REJECTED_DUE_TO_MAX_XY3], "Number of configurations in the scan that were rejected due to the max_XY3_to_keep filter", "dimensionless");
+  nc.put("rejected_due_to_max_d_XY2_d_varphi", filters[REJECTED_DUE_TO_MAX_D_XY2_D_VARPHI], "Number of configurations in the scan that were rejected due to the max_d_XY2_d_varphi_to_keep filter", "dimensionless");
+  nc.put("rejected_due_to_max_d_Z2_d_varphi", filters[REJECTED_DUE_TO_MAX_D_Z2_D_VARPHI], "Number of configurations in the scan that were rejected due to the max_d_Z2_d_varphi_to_keep filter", "dimensionless");
+  nc.put("rejected_due_to_max_d_XY3_d_varphi", filters[REJECTED_DUE_TO_MAX_D_XY3_D_VARPHI], "Number of configurations in the scan that were rejected due to the max_d_XY3_d_varphi_to_keep filter", "dimensionless");
 
   nc.put("fraction_kept", filter_fractions[KEPT], "Fraction of the attempted configurations from the scan that were kept and saved in this file", "dimensionless");
   nc.put("fraction_rejected_due_to_R0", filter_fractions[REJECTED_DUE_TO_R0], "Fraction of configurations in the scan that were rejected due to R0 becoming <= 0", "dimensionless");
@@ -56,6 +62,12 @@ void MultiOptScan::write_netcdf() {
   nc.put("fraction_rejected_due_to_d2_volume_d_psi2", filter_fractions[REJECTED_DUE_TO_D2_VOLUME_D_PSI2], "Fraction of configurations in the scan that were rejected due to the max_d2_volume_d_psi2_to_keep filter", "dimensionless");
   nc.put("fraction_rejected_due_to_DMerc", filter_fractions[REJECTED_DUE_TO_DMERC], "Fraction of configurations in the scan that were rejected due to the min_DMerc_to_keep filter", "dimensionless");
   nc.put("fraction_rejected_due_to_r_singularity", filter_fractions[REJECTED_DUE_TO_R_SINGULARITY], "Fraction of configurations in the scan that were rejected due to the min_r_singularity_to_keep filter", "dimensionless");
+  nc.put("fraction_rejected_due_to_max_XY2", filter_fractions[REJECTED_DUE_TO_MAX_XY2], "Fraction of configurations in the scan that were rejected due to the max_XY2_to_keep filter", "dimensionless");
+  nc.put("fraction_rejected_due_to_max_Z2", filter_fractions[REJECTED_DUE_TO_MAX_Z2], "Fraction of configurations in the scan that were rejected due to the max_Z2_to_keep filter", "dimensionless");
+  nc.put("fraction_rejected_due_to_max_XY3", filter_fractions[REJECTED_DUE_TO_MAX_XY3], "Fraction of configurations in the scan that were rejected due to the max_XY3_to_keep filter", "dimensionless");
+  nc.put("fraction_rejected_due_to_max_d_XY2_d_varphi", filter_fractions[REJECTED_DUE_TO_MAX_D_XY2_D_VARPHI], "Fraction of configurations in the scan that were rejected due to the max_d_XY2_d_varphi_to_keep filter", "dimensionless");
+  nc.put("fraction_rejected_due_to_max_d_Z2_d_varphi", filter_fractions[REJECTED_DUE_TO_MAX_D_Z2_D_VARPHI], "Fraction of configurations in the scan that were rejected due to the max_d_Z2_d_varphi_to_keep filter", "dimensionless");
+  nc.put("fraction_rejected_due_to_max_d_XY3_d_varphi", filter_fractions[REJECTED_DUE_TO_MAX_D_XY3_D_VARPHI], "Fraction of configurations in the scan that were rejected due to the max_d_XY3_d_varphi_to_keep filter", "dimensionless");
 
   int keep_all_int = (int) keep_all;
   nc.put("keep_all", keep_all_int, "1 if all configurations from the scan were saved, 0 if some configurations were filtered out", "dimensionless");
@@ -70,6 +82,12 @@ void MultiOptScan::write_netcdf() {
     nc.put("min_r_singularity_to_keep", min_r_singularity_to_keep, "Configurations were kept in the scan only if r_singularity_robust is at least this value. r_singularity_robust is the robust estimate of the minor radius at which the flux surface shapes become singular, r_c, as detailed in section 4.2 of Landreman, J Plasma Physics (2021)", "meter");
     nc.put("max_d2_volume_d_psi2_to_keep", max_d2_volume_d_psi2_to_keep, "Configurations were kept in the scan only if the magnetic well d2_volume_d_psi2 is no more than this value. d2_volume_d_psi2 is the second derivative of flux surface volume with respect to psi, where 2*pi*psi is the toroidal flux.", "Tesla^{-2} meter^{-1}");
     nc.put("min_DMerc_to_keep", min_DMerc_to_keep, "Configurations were kept in the scan only if the Mercier stability criterion DMerc_times_r2 is at least this value. DMerc_times_r2 corresponds to r^2 times the quantity DMerc in Landreman and Jorge, J Plasma Phys (2020).", "Tesla^{-2} meter^{-2}");
+    nc.put("max_XY2_to_keep", max_XY2_to_keep, "Configurations were kept in the scan only if the maximum absolute values of X2 and Y2 are no more than this value", "1/meter");
+    nc.put("max_Z2_to_keep", max_Z2_to_keep, "Configurations were kept in the scan only if the maximum absolute value of Z2 is no more than this value", "1/meter");
+    nc.put("max_XY3_to_keep", max_XY3_to_keep, "Configurations were kept in the scan only if the maximum absolute values of X3 and Y3 are no more than this value", "1/meter^2");
+    nc.put("max_d_XY2_d_varphi_to_keep", max_d_XY2_d_varphi_to_keep, "Configurations were kept in the scan only if the maximum absolute values of the d/dvarphi derivatives of X2 and Y2 are no more than this value", "1/meter");
+    nc.put("max_d_Z2_d_varphi_to_keep", max_d_Z2_d_varphi_to_keep, "Configurations were kept in the scan only if the maximum absolute value of the d/dvarphi derivative of Z2 is no more than this value", "1/meter");
+    nc.put("max_d_XY3_d_varphi_to_keep", max_d_XY3_d_varphi_to_keep, "Configurations were kept in the scan only if the maximum absolute values of the d/dvarphi derivatives of X3 and Y3 are no more than this value", "1/meter^2");
   }
   nc.put("max_newton_iterations", mo_ref.opts[0].q.max_newton_iterations, "Maximum iterations of Newton's method for solving the sigma equation", "dimensionless");
   nc.put("max_linesearch_iterations", mo_ref.opts[0].q.max_linesearch_iterations, "Maximum number of times the step size is reduced in the line search for each iteration of Newton's method when solving the sigma equation", "dimensionless");

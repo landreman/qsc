@@ -28,6 +28,12 @@ namespace qsc {
       REJECTED_DUE_TO_D2_VOLUME_D_PSI2,
       REJECTED_DUE_TO_DMERC,
       REJECTED_DUE_TO_R_SINGULARITY,
+      REJECTED_DUE_TO_MAX_XY2,
+      REJECTED_DUE_TO_MAX_Z2,
+      REJECTED_DUE_TO_MAX_XY3,
+      REJECTED_DUE_TO_MAX_D_XY2_D_VARPHI,
+      REJECTED_DUE_TO_MAX_D_Z2_D_VARPHI,
+      REJECTED_DUE_TO_MAX_D_XY3_D_VARPHI,
       N_FILTERS};
 
     std::chrono::time_point<std::chrono::steady_clock> start_time;
@@ -46,6 +52,8 @@ namespace qsc {
     qscfloat min_L_grad_B_to_keep, min_L_grad_grad_B_to_keep;
     qscfloat max_B20_variation_to_keep, min_r_singularity_to_keep;
     qscfloat max_d2_volume_d_psi2_to_keep, min_DMerc_to_keep;
+    qscfloat max_XY2_to_keep, max_Z2_to_keep, max_XY3_to_keep;
+    qscfloat max_d_XY2_d_varphi_to_keep, max_d_Z2_d_varphi_to_keep, max_d_XY3_d_varphi_to_keep;
     bool keep_all;
     int verbose;
     std::string outfilename;
