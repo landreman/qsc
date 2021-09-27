@@ -54,12 +54,12 @@ r_singularity = np.minimum(r_singularity, np.ones_like(r_singularity))
 
 # Further filter the results:
 mask = max_d_XYZ23_d_varphi < 1e30
-"""
-mask = max_d_XYZ23_d_varphi < 3.6
-mask = np.logical_and(mask, max_XYZ23 < 0.7)
-mask = np.logical_and(mask, B20_variation < 4e-3)
-mask = np.logical_and(mask, r_singularity > 0.5)
-"""
+
+mask = max_d_XYZ23_d_varphi < 4
+mask = np.logical_and(mask, max_XYZ23 < 0.8)
+mask = np.logical_and(mask, B20_variation < 8e-3)
+mask = np.logical_and(mask, r_singularity > 0.52)
+
 
 print('Scan indices that pass the mask:')
 print(np.nonzero(mask)[0])

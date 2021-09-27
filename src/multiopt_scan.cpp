@@ -230,7 +230,7 @@ int MultiOptScan::proc0_recv() {
   }
   attempts_per_proc[proc_that_finished]++;
   if (filters_local[KEPT] > 0) n_solves_kept[proc_that_finished]++;
-  total_cpu_seconds += parameters_single[38];
+  total_cpu_seconds += parameters_single[39];
   
   return proc_that_finished;
 }
@@ -312,6 +312,10 @@ void MultiOptScan::eval_scan_index(int j_scan) {
       } else if (params[j].compare("weight_axis_length") == 0) {
 	mo.opts[stage].weight_axis_length = val;
 	if (verbose > 1) std::cout << "Setting weight_axis_length for opt stage " << stage << " to " << val << std::endl;
+	
+      } else if (params[j].compare("target_axis_length") == 0) {
+	mo.opts[stage].target_axis_length = val;
+	if (verbose > 1) std::cout << "Setting target_axis_length for opt stage " << stage << " to " << val << std::endl;
 	
       } else if (params[j].compare("weight_standard_deviation_of_R") == 0) {
 	mo.opts[stage].weight_standard_deviation_of_R = val;
@@ -473,18 +477,19 @@ void MultiOptScan::eval_scan_index(int j_scan) {
   parameters_single[34] = mo.opts[index].weight_grad_grad_B;
   parameters_single[35] = mo.opts[index].weight_r_singularity;
   parameters_single[36] = mo.opts[index].weight_axis_length;
-  parameters_single[37] = mo.opts[index].weight_standard_deviation_of_R;
+  parameters_single[37] = mo.opts[index].target_axis_length;
+  parameters_single[38] = mo.opts[index].weight_standard_deviation_of_R;
 
   end_time_single = std::chrono::steady_clock::now();
   elapsed = end_time_single - start_time_single;
-  parameters_single[38] = elapsed.count();
+  parameters_single[39] = elapsed.count();
   
-  parameters_single[39] = mo.opts[index].q.grid_max_XY2;
-  parameters_single[40] = mo.opts[index].q.grid_max_Z2;
-  parameters_single[41] = mo.opts[index].q.grid_max_XY3;
-  parameters_single[42] = mo.opts[index].q.grid_max_d_XY2_d_varphi;
-  parameters_single[43] = mo.opts[index].q.grid_max_d_Z2_d_varphi;
-  parameters_single[44] = mo.opts[index].q.grid_max_d_XY3_d_varphi;
+  parameters_single[40] = mo.opts[index].q.grid_max_XY2;
+  parameters_single[41] = mo.opts[index].q.grid_max_Z2;
+  parameters_single[42] = mo.opts[index].q.grid_max_XY3;
+  parameters_single[43] = mo.opts[index].q.grid_max_d_XY2_d_varphi;
+  parameters_single[44] = mo.opts[index].q.grid_max_d_Z2_d_varphi;
+  parameters_single[45] = mo.opts[index].q.grid_max_d_XY3_d_varphi;
 
   for (j = 0; j < axis_nmax_plus_1; j++) {
     parameters_single[j + 0 * axis_nmax_plus_1 + n_parameters_base] = mo.opts[index].q.R0c[j];
@@ -625,6 +630,7 @@ void MultiOptScan::filter_global_arrays() {
   scan_weight_grad_grad_B.resize(n_scan, 0.0);
   scan_weight_r_singularity.resize(n_scan, 0.0);
   scan_weight_axis_length.resize(n_scan, 0.0);
+  scan_target_axis_length.resize(n_scan, 0.0);
   scan_weight_standard_deviation_of_R.resize(n_scan, 0.0);
     
   // Unpack parameters.
@@ -674,14 +680,15 @@ void MultiOptScan::filter_global_arrays() {
     scan_weight_grad_grad_B[j]             = parameters(34, j_global);
     scan_weight_r_singularity[j]           = parameters(35, j_global);
     scan_weight_axis_length[j]             = parameters(36, j_global);
-    scan_weight_standard_deviation_of_R[j] = parameters(37, j_global);
-    // run time is #37
-    scan_max_XY2[j]            = parameters(39, j_global);
-    scan_max_Z2[j]             = parameters(40, j_global);
-    scan_max_XY3[j]            = parameters(41, j_global);
-    scan_max_d_XY2_d_varphi[j] = parameters(42, j_global);
-    scan_max_d_Z2_d_varphi[j]  = parameters(43, j_global);
-    scan_max_d_XY3_d_varphi[j] = parameters(44, j_global);
+    scan_target_axis_length[j]             = parameters(37, j_global);
+    scan_weight_standard_deviation_of_R[j] = parameters(38, j_global);
+    // run time is #39
+    scan_max_XY2[j]            = parameters(40, j_global);
+    scan_max_Z2[j]             = parameters(41, j_global);
+    scan_max_XY3[j]            = parameters(42, j_global);
+    scan_max_d_XY2_d_varphi[j] = parameters(43, j_global);
+    scan_max_d_Z2_d_varphi[j]  = parameters(44, j_global);
+    scan_max_d_XY3_d_varphi[j] = parameters(45, j_global);
     
     for (k = 0; k < axis_nmax_plus_1; k++) {
       scan_R0c(k, j) = parameters(k + 0 * axis_nmax_plus_1 + n_parameters_base, j_global);

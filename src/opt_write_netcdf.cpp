@@ -38,6 +38,7 @@ void Opt::write_netcdf() {
 
   nc.put("target_iota", target_iota, "Target iota for the iota term in the objective function for optimization", "dimensionless");
   nc.put("min_R0", min_R0, "Minimum major radius of the magnetic axis for the associated penalty term in the objective function for optimization", "dimensionless");
+  nc.put("target_axis_length", target_axis_length, "Target length of the magnetic axis for the iota term in the objective function for optimization", "meters");
   
   // 1D Vectors
   nc.put(n_iter_dim, "iter_fourier_refine_step", iter_fourier_refine_step, "Step number with respect to expanding the number of Fourier modes for the axis shape", "dimensionless");

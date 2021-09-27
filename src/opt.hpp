@@ -53,7 +53,7 @@ namespace qsc {
     qscfloat weight_Z2, weight_Z2Prime;
     qscfloat weight_XY3, weight_XY3Prime;
     qscfloat weight_grad_B, weight_grad_grad_B, weight_r_singularity;
-    qscfloat weight_axis_length, weight_standard_deviation_of_R;
+    qscfloat weight_axis_length, target_axis_length, weight_standard_deviation_of_R;
 
     qscfloat objective_function;
     qscfloat B20_term, iota_term;

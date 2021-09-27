@@ -43,6 +43,10 @@ R0c = f.variables['scan_R0c'][()]
 R0s = f.variables['scan_R0s'][()]
 Z0c = f.variables['scan_Z0c'][()]
 Z0s = f.variables['scan_Z0s'][()]
+weight_B20 = f.variables['scan_weight_B20'][()]
+weight_grad_B = f.variables['scan_weight_grad_B'][()]
+weight_grad_grad_B = f.variables['scan_weight_grad_grad_B'][()]
+weight_axis_length = f.variables['scan_weight_axis_length'][()]
 f.close()
 
 print('Scan index {}:'.format(index))
@@ -79,6 +83,11 @@ print('Z0s = [', Z0s[index, 0], end='')
 for j in range(1, nfourier):
    print(', ', Z0s[index, j], end='')
 print(']')
+
+print('weight_B20:', weight_B20[index])
+print('weight_grad_B20:', weight_grad_B[index])
+print('weight_grad_grad_B20:', weight_grad_grad_B[index])
+print('weight_axis_length:', weight_axis_length[index])
 
 single_filename = os.path.abspath(os.path.dirname(filename)) + "/qsc_in" + bare_filename[7:-3] + "_" + str(index)
 print("Writing input file for a single run:", single_filename)

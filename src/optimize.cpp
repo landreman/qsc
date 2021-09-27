@@ -724,7 +724,7 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
     if (weight_r_singularity > 0) residuals[j++] = weight_r_singularity * term;
   }
 
-  term = q.axis_length;
+  term = q.axis_length - target_axis_length;
   axis_length_term = term * term;
   if (weight_axis_length > 0) residuals[j++] = weight_axis_length * term;
 
