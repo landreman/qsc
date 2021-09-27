@@ -32,6 +32,8 @@ L_grad_grad_B = f.variables['scan_min_L_grad_grad_B'][()]
 elongation = f.variables['scan_max_elongation'][()]
 weight_grad_grad_B = f.variables['scan_weight_grad_grad_B'][()]
 weight_B20 = f.variables['scan_weight_B20'][()]
+weight_axis_length = f.variables['scan_weight_axis_length'][()]
+weight_standard_deviation_of_R = f.variables['scan_weight_standard_deviation_of_R'][()]
 max_XY2 = f.variables['scan_max_XY2'][()]
 max_Z2 = f.variables['scan_max_Z2'][()]
 max_XY3 = f.variables['scan_max_XY3'][()]
@@ -46,6 +48,9 @@ Z0s1 = Z0s[:, 1]
 
 max_XYZ23 = np.max(np.array([max_XY2, max_Z2, max_XY3]), axis=0)
 max_d_XYZ23_d_varphi = np.max(np.array([max_d_XY2_d_varphi, max_d_Z2_d_varphi, max_d_XY3_d_varphi]), axis=0)
+
+# For r_singularity, replace 1e30 with 1
+r_singularity = np.minimum(r_singularity, np.ones_like(r_singularity))
 
 # Further filter the results:
 mask = max_d_XYZ23_d_varphi < 1e30
@@ -82,6 +87,8 @@ L_grad_grad_B = L_grad_grad_B[mask]
 elongation = elongation[mask]
 weight_grad_grad_B = weight_grad_grad_B[mask]
 weight_B20 = weight_B20[mask]
+weight_axis_length = weight_axis_length[mask]
+weight_standard_deviation_of_R = weight_standard_deviation_of_R[mask]
 max_XY2 = max_XY2[mask]
 max_Z2 = max_Z2[mask]
 max_XY3 = max_XY3[mask]
@@ -232,7 +239,7 @@ plt.tight_layout()
 fig = plt.figure(figsize=(14,7))
 
 nrows = 2
-ncols = 3
+ncols = 4
 jplot = 1
 
 plt.subplot(nrows, ncols, jplot); jplot += 1
@@ -250,6 +257,16 @@ plt.xlabel('B2c')
 plt.subplot(nrows, ncols, jplot); jplot += 1
 plt.hist(B20_mean, bins=bins)
 plt.xlabel('B20_mean')
+
+if np.max(weight_axis_length) > 0:
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    loghist(weight_axis_length, bins=bins)
+    plt.xlabel('weight_axis_length')
+
+if np.max(weight_standard_deviation_of_R) > 0:
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    loghist(weight_standard_deviation_of_R, bins=bins)
+    plt.xlabel('weight_standard_deviation_of_R')
 
 plt.subplot(nrows, ncols, jplot); jplot += 1
 histtype = 'step'
