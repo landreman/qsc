@@ -50,8 +50,6 @@ void MultiOptScan::init() {
   // Initialize MPI-related variables
   MPI_Comm_rank(mpi_comm, &mpi_rank);
   MPI_Comm_size(mpi_comm, &n_procs);
-  if (n_procs < 2)
-    throw std::runtime_error("For MultiOptScan, the number of MPI processes must be at least 2.");
   proc0 = (mpi_rank == 0);
   MPI_Barrier(mpi_comm);
 
@@ -96,8 +94,6 @@ void MultiOptScan::init() {
   }
   total_cpu_seconds = 0.0;
 
-  if (n_procs - 1 > n_scan_all)
-    throw std::runtime_error("For MultiOptScan, the number of MPI processes cannot exceed n_scan_all + 1.");
 }
 
 void MultiOptScan::scan() {
@@ -106,6 +102,11 @@ void MultiOptScan::scan() {
   int proc_that_finished, j;
   std::chrono::time_point<std::chrono::steady_clock> start_time2, end_time, start_time_print_status, start_time_save;
   std::chrono::duration<double> elapsed;
+  
+  if (n_procs < 2)
+    throw std::runtime_error("For MultiOptScan, the number of MPI processes must be at least 2.");
+  if (n_procs - 1 > n_scan_all)
+    throw std::runtime_error("For MultiOptScan, the number of MPI processes cannot exceed n_scan_all + 1.");
   
   start_time = std::chrono::steady_clock::now();
   start_time_print_status = start_time;
@@ -434,6 +435,13 @@ void MultiOptScan::eval_scan_index(int j_scan) {
   end_time_single = std::chrono::steady_clock::now();
   elapsed = end_time_single - start_time_single;
   parameters_single[37] = elapsed.count();
+  
+  parameters_single[38] = mo.opts[index].q.grid_max_XY2;
+  parameters_single[39] = mo.opts[index].q.grid_max_Z2;
+  parameters_single[40] = mo.opts[index].q.grid_max_XY3;
+  parameters_single[41] = mo.opts[index].q.grid_max_d_XY2_d_varphi;
+  parameters_single[42] = mo.opts[index].q.grid_max_d_Z2_d_varphi;
+  parameters_single[43] = mo.opts[index].q.grid_max_d_XY3_d_varphi;
 
   for (j = 0; j < axis_nmax_plus_1; j++) {
     parameters_single[j + 0 * axis_nmax_plus_1 + n_parameters_base] = mo.opts[index].q.R0c[j];
@@ -463,7 +471,8 @@ void MultiOptScan::print_status() {
   std::cout << "Expected total scan time: " << elapsed.count() / fraction_completed << std::endl;
   std::cout << "CPU seconds for solves: " << total_cpu_seconds
 	    << "  Wallclock time for that should be " << total_cpu_seconds / (n_procs - 1) << " seconds" << std::endl;
-  
+  std::cout << "Avg time per multiopt: " << total_cpu_seconds / filters[ATTEMPTS] << " seconds" << std::endl;
+    
   std::cout << "Attempts on each proc:";
   for (j = 0; j < n_procs; j++) std::cout << " " << attempts_per_proc[j];
   std::cout << std::endl;
@@ -528,6 +537,13 @@ void MultiOptScan::filter_global_arrays() {
   scan_B20_residual.resize(n_scan, 0.0);
   scan_standard_deviation_of_R.resize(n_scan, 0.0);
   scan_standard_deviation_of_Z.resize(n_scan, 0.0);
+  
+  scan_max_XY2.resize(n_scan, 0.0);
+  scan_max_Z2.resize(n_scan, 0.0);
+  scan_max_XY3.resize(n_scan, 0.0);
+  scan_max_d_XY2_d_varphi.resize(n_scan, 0.0);
+  scan_max_d_Z2_d_varphi.resize(n_scan, 0.0);
+  scan_max_d_XY3_d_varphi.resize(n_scan, 0.0);
 
   scan_R0c.resize(axis_nmax_plus_1, n_scan, 0.0);
   scan_R0s.resize(axis_nmax_plus_1, n_scan, 0.0);
@@ -602,6 +618,13 @@ void MultiOptScan::filter_global_arrays() {
     scan_weight_r_singularity[j]           = parameters(34, j_global);
     scan_weight_axis_length[j]             = parameters(35, j_global);
     scan_weight_standard_deviation_of_R[j] = parameters(36, j_global);
+    // run time is #37
+    scan_max_XY2[j]            = parameters(38, j_global);
+    scan_max_Z2[j]             = parameters(39, j_global);
+    scan_max_XY3[j]            = parameters(40, j_global);
+    scan_max_d_XY2_d_varphi[j] = parameters(41, j_global);
+    scan_max_d_Z2_d_varphi[j]  = parameters(42, j_global);
+    scan_max_d_XY3_d_varphi[j] = parameters(43, j_global);
     
     for (k = 0; k < axis_nmax_plus_1; k++) {
       scan_R0c(k, j) = parameters(k + 0 * axis_nmax_plus_1 + n_parameters_base, j_global);

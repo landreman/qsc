@@ -58,7 +58,7 @@ namespace qsc {
     int axis_nmax_plus_1;
     bool quit_after_init;
     
-    const int n_parameters_base = 38;
+    const int n_parameters_base = 44;
     const int n_int_parameters_base = 3;
     const int n_int_parameters = n_int_parameters_base + N_FILTERS;
     int n_parameters;
@@ -78,6 +78,8 @@ namespace qsc {
     Vector scan_d2_volume_d_psi2, scan_DMerc_times_r2;
     Vector scan_standard_deviation_of_R, scan_standard_deviation_of_Z;
     std::valarray<int> scan_helicity;
+    Vector scan_max_XY2, scan_max_Z2, scan_max_XY3;
+    Vector scan_max_d_XY2_d_varphi, scan_max_d_Z2_d_varphi, scan_max_d_XY3_d_varphi;
     
     Vector scan_weight_B20, scan_weight_iota, scan_target_iota;
     Vector scan_weight_elongation, scan_weight_curvature;

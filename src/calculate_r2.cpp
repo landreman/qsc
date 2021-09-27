@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cmath>
 #include <chrono>
 #include "qsc.hpp"
@@ -204,6 +205,46 @@ void Qsc::calculate_r2() {
   work1 = B20_anomaly * B20_anomaly * d_l_d_phi;
   B20_residual = sqrt(work1.sum() * normalizer) / B0;
 
+  work1 = std::abs(X20);
+  grid_max_XY2 = work1.max();
+  work1 = std::abs(X2s);
+  grid_max_XY2 = std::max(grid_max_XY2, work1.max());
+  work1 = std::abs(X2c);
+  grid_max_XY2 = std::max(grid_max_XY2, work1.max());
+  work1 = std::abs(Y20);
+  grid_max_XY2 = std::max(grid_max_XY2, work1.max());
+  work1 = std::abs(Y2s);
+  grid_max_XY2 = std::max(grid_max_XY2, work1.max());
+  work1 = std::abs(Y2c);
+  grid_max_XY2 = std::max(grid_max_XY2, work1.max());
+  
+  work1 = std::abs(Z20);
+  grid_max_Z2 = work1.max();
+  work1 = std::abs(Z2s);
+  grid_max_Z2 = std::max(grid_max_Z2, work1.max());
+  work1 = std::abs(Z2c);
+  grid_max_Z2 = std::max(grid_max_Z2, work1.max());
+
+  work1 = std::abs(d_X20_d_varphi);
+  grid_max_d_XY2_d_varphi = work1.max();
+  work1 = std::abs(d_X2s_d_varphi);
+  grid_max_d_XY2_d_varphi = std::max(grid_max_d_XY2_d_varphi, work1.max());
+  work1 = std::abs(d_X2c_d_varphi);
+  grid_max_d_XY2_d_varphi = std::max(grid_max_d_XY2_d_varphi, work1.max());
+  work1 = std::abs(d_Y20_d_varphi);
+  grid_max_d_XY2_d_varphi = std::max(grid_max_d_XY2_d_varphi, work1.max());
+  work1 = std::abs(d_Y2s_d_varphi);
+  grid_max_d_XY2_d_varphi = std::max(grid_max_d_XY2_d_varphi, work1.max());
+  work1 = std::abs(d_Y2c_d_varphi);
+  grid_max_d_XY2_d_varphi = std::max(grid_max_d_XY2_d_varphi, work1.max());
+  
+  work1 = std::abs(d_Z20_d_varphi);
+  grid_max_d_Z2_d_varphi = work1.max();
+  work1 = std::abs(d_Z2s_d_varphi);
+  grid_max_d_Z2_d_varphi = std::max(grid_max_d_Z2_d_varphi, work1.max());
+  work1 = std::abs(d_Z2c_d_varphi);
+  grid_max_d_Z2_d_varphi = std::max(grid_max_d_Z2_d_varphi, work1.max());
+  
   if (order_r2p1) calculate_r2p1();
   
   ////////////////////////////////////////////////////////////
@@ -263,5 +304,19 @@ void Qsc::calculate_r2p1() {
 
   matrix_vector_product(d_d_varphi, X3c1, d_X3c1_d_varphi);  
   matrix_vector_product(d_d_varphi, Y3c1, d_Y3c1_d_varphi);  
-  matrix_vector_product(d_d_varphi, Y3s1, d_Y3s1_d_varphi);  
+  matrix_vector_product(d_d_varphi, Y3s1, d_Y3s1_d_varphi);
+  
+  work1 = std::abs(X3c1);
+  grid_max_XY3 = work1.max();
+  work1 = std::abs(Y3c1);
+  grid_max_XY3 = std::max(grid_max_XY3, work1.max());
+  work1 = std::abs(Y3s1);
+  grid_max_XY3 = std::max(grid_max_XY3, work1.max());
+
+  work1 = std::abs(d_X3c1_d_varphi);
+  grid_max_d_XY3_d_varphi = work1.max();
+  work1 = std::abs(d_Y3c1_d_varphi);
+  grid_max_d_XY3_d_varphi = std::max(grid_max_d_XY3_d_varphi, work1.max());
+  work1 = std::abs(d_Y3s1_d_varphi);
+  grid_max_d_XY3_d_varphi = std::max(grid_max_d_XY3_d_varphi, work1.max());
 }

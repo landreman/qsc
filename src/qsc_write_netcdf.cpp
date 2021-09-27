@@ -76,6 +76,14 @@ void Qsc::write_netcdf(std::string filename) {
     nc.put("DMerc_times_r2", DMerc_times_r2, "Overall Mercier stability criterion times the square of the effective minor radius r. DMerc (without the r^2) corresponds to the quantity DMerc in VMEC, and to DMerc in Landreman and Jorge, J Plasma Phys (2020).", "Tesla^{-2} meter^{-2}");
     nc.put("grid_min_L_grad_grad_B", grid_min_L_grad_grad_B, "Minimum of L_grad_grad_B over the phi grid points", "meter");
     nc.put("r_singularity_robust", r_singularity_robust, "Robust estimate of the minor radius at which the flux surface shapes become singular, r_c, as detailed in section 4.2 of Landreman, J Plasma Physics (2021)", "meter");
+    nc.put("grid_max_XY2", grid_max_XY2, "Maximum over phi of the absolute values of X20, X2c, X2s, Y20, Y2c, and Y2s", "1/meter");
+    nc.put("grid_max_Z2", grid_max_Z2, "Maximum over phi of the absolute values of Z20, Z2c, and Z2s", "1/meter");
+    nc.put("grid_max_d_XY2_d_varphi", grid_max_d_XY2_d_varphi, "Maximum over phi of the absolute values of the d/dvarphi derivatives of X20, X2c, X2s, Y20, Y2c, and Y2s", "1/meter");
+    nc.put("grid_max_d_Z2_d_varphi", grid_max_d_Z2_d_varphi, "Maximum over phi of the absolute values of the d/dvarphi derivatives of Z20, Z2c, and Z2s", "1/meter");
+  }
+  if (order_r2p1) {
+    nc.put("grid_max_XY3", grid_max_XY3, "Maximum over phi of the absolute values of X3c1, Y3c1, and Y3s1", "1/meter^2");
+    nc.put("grid_max_d_XY3_d_varphi", grid_max_d_XY3_d_varphi, "Maximum over phi of the absolute values of the d/dvarphi derivatives of X3c1, Y3c1, and Y3s1", "1/meter^2");
   }
   /*
   nc.put("", , "", "");

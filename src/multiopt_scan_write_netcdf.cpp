@@ -102,6 +102,13 @@ void MultiOptScan::write_netcdf() {
   nc.put(n_scan_dim, "scan_d2_volume_d_psi2", scan_d2_volume_d_psi2, "For each configuration kept from the scan, the value of magnetic well d2_volume_d_psi2, the second derivative of flux surface volume with respect to psi, where 2*pi*psi is the toroidal flux.", "Tesla^{-2} meter^{-1}");
   nc.put(n_scan_dim, "scan_DMerc_times_r2", scan_DMerc_times_r2, "For each configuration kept from the scan, the overall Mercier stability criterion times the square of the effective minor radius r. This quantity corresponds to DMerc_times_r2 for a single Qsc run. DMerc (without the r^2) corresponds to the quantity DMerc in VMEC, and to DMerc in Landreman and Jorge, J Plasma Phys (2020).", "Tesla^{-2} meter^{-2}");
 
+  nc.put(n_scan_dim, "scan_max_XY2", scan_max_XY2, "Maximum over phi of the absolute values of X20, X2c, X2s, Y20, Y2c, and Y2s", "1/meter");
+  nc.put(n_scan_dim, "scan_max_Z2", scan_max_Z2, "Maximum over phi of the absolute values of Z20, Z2c, and Z2s", "1/meter");
+  nc.put(n_scan_dim, "scan_max_d_XY2_d_varphi", scan_max_d_XY2_d_varphi, "Maximum over phi of the absolute values of the d/dvarphi derivatives of X20, X2c, X2s, Y20, Y2c, and Y2s", "1/meter");
+  nc.put(n_scan_dim, "scan_max_d_Z2_d_varphi", scan_max_d_Z2_d_varphi, "Maximum over phi of the absolute values of the d/dvarphi derivatives of Z20, Z2c, and Z2s", "1/meter");
+  nc.put(n_scan_dim, "scan_max_XY3", scan_max_XY3, "Maximum over phi of the absolute values of X3c1, Y3c1, and Y3s1", "1/meter^2");
+  nc.put(n_scan_dim, "scan_max_d_XY3_d_varphi", scan_max_d_XY3_d_varphi, "Maximum over phi of the absolute values of the d/dvarphi derivatives of X3c1, Y3c1, and Y3s1", "1/meter^2");
+  
   nc.put(n_scan_dim, "scan_weight_B20", scan_weight_B20, " ", "dimensionless");
   nc.put(n_scan_dim, "scan_weight_iota", scan_weight_iota, " ", "dimensionless");
   nc.put(n_scan_dim, "scan_target_iota", scan_target_iota, " ", "dimensionless");

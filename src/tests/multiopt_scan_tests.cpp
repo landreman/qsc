@@ -9,11 +9,6 @@ using doctest::Approx;
 TEST_CASE("Check linear and logarithmic spacing of scan parameters. [multiopt_scan]") {
   if (single) return;
   
-  // MultiOptScan::init() throws an error if there are < 2 or > n_scan_all procs.
-  int n_procs;
-  MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
-  if (n_procs < 2 || n_procs > 12) return;
-  
   MultiOptScan mos;
   mos.mo_ref.opts.resize(1); // mos.init() requires that at least 1 opt be present.
   mos.params = {"R0c1", "weight_B20"};

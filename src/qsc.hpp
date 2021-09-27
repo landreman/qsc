@@ -95,6 +95,8 @@ namespace qsc {
     Vector Z3c1, Z3c3, Z3s1, Z3s3, lambda_for_XY3;
     Vector d_X3c1_d_varphi, d_X3c3_d_varphi, d_X3s1_d_varphi, d_X3s3_d_varphi;
     Vector d_Y3c1_d_varphi, d_Y3c3_d_varphi, d_Y3s1_d_varphi, d_Y3s3_d_varphi;
+    qscfloat grid_max_XY2, grid_max_Z2, grid_max_XY3;
+    qscfloat grid_max_d_XY2_d_varphi, grid_max_d_Z2_d_varphi, grid_max_d_XY3_d_varphi;
     
     Qsc();
     Qsc(std::string);
