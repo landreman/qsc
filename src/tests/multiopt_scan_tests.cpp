@@ -163,6 +163,7 @@ TEST_CASE("Run a small MultiOptScan with keep_all true. [mpi] [multiopt_scan]") 
       CHECK(Approx(q.r_singularity_robust) == mos.scan_r_singularity[j]);
       CHECK(Approx(q.B20_grid_variation) == mos.scan_B20_variation[j]);
       CHECK(Approx(q.B20_residual) == mos.scan_B20_residual[j]);
+      CHECK(Approx(q.B20_mean) == mos.scan_B20_mean[j]);
       CHECK(Approx(q.d2_volume_d_psi2) == mos.scan_d2_volume_d_psi2[j]);
       CHECK(Approx(q.DMerc_times_r2) == mos.scan_DMerc_times_r2[j]);
       CHECK(Approx(q.standard_deviation_of_R) == mos.scan_standard_deviation_of_R[j]);
@@ -306,6 +307,7 @@ TEST_CASE("Run a small MultiOptScan with keep_all false. [mpi] [multiopt_scan]")
       CHECK(Approx(q.r_singularity_robust) == mos.scan_r_singularity[j]);
       CHECK(Approx(q.B20_grid_variation) == mos.scan_B20_variation[j]);
       CHECK(Approx(q.B20_residual) == mos.scan_B20_residual[j]);
+      CHECK(Approx(q.B20_mean) == mos.scan_B20_mean[j]);
       CHECK(Approx(q.d2_volume_d_psi2) == mos.scan_d2_volume_d_psi2[j]);
       CHECK(Approx(q.DMerc_times_r2) == mos.scan_DMerc_times_r2[j]);
       CHECK(Approx(q.standard_deviation_of_R) == mos.scan_standard_deviation_of_R[j]);

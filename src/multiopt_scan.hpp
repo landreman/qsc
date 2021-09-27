@@ -66,7 +66,7 @@ namespace qsc {
     int axis_nmax_plus_1;
     bool quit_after_init;
     
-    const int n_parameters_base = 44;
+    const int n_parameters_base = 45;
     const int n_int_parameters_base = 3;
     const int n_int_parameters = n_int_parameters_base + N_FILTERS;
     int n_parameters;
@@ -82,7 +82,7 @@ namespace qsc {
     Vector scan_min_R0, scan_max_curvature;
     Vector scan_iota, scan_max_elongation;
     Vector scan_min_L_grad_B, scan_min_L_grad_grad_B;
-    Vector scan_r_singularity, scan_B20_variation, scan_B20_residual;
+    Vector scan_r_singularity, scan_B20_variation, scan_B20_residual, scan_B20_mean;
     Vector scan_d2_volume_d_psi2, scan_DMerc_times_r2;
     Vector scan_standard_deviation_of_R, scan_standard_deviation_of_Z;
     std::valarray<int> scan_helicity;
