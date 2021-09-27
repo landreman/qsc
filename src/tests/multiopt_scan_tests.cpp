@@ -124,6 +124,58 @@ TEST_CASE("Run a small MultiOptScan with keep_all true. [mpi] [multiopt_scan]") 
     CHECK(mos.mo.opts[0].q.nphi == 21);
     CHECK(mos.mo.opts[1].q.nphi == 25);
   }
+
+  // For each entry in the scan, run a standalone single QSC and
+  // confirm all the results match.
+  if (mos.proc0) {
+    for (int j = 0; j < mos.n_scan; j++) {
+      CAPTURE(j);
+      
+      Qsc q;
+      q.nfp = mos.mo_ref.opts[0].q.nfp;
+      q.nphi = 25; // Must match value above in this test.
+      q.verbose = 0;
+      q.eta_bar = mos.scan_eta_bar[j];
+      q.sigma0 = mos.scan_sigma0[j];
+      q.B2c = mos.scan_B2c[j];
+      q.B2s = mos.scan_B2s[j];
+      q.order_r_option = "r2.1";
+      q.R0c.resize(mos.axis_nmax_plus_1, 0.0);
+      q.R0s.resize(mos.axis_nmax_plus_1, 0.0);
+      q.Z0c.resize(mos.axis_nmax_plus_1, 0.0);
+      q.Z0s.resize(mos.axis_nmax_plus_1, 0.0);
+      for (int k = 0; k < mos.axis_nmax_plus_1; k++) {
+	q.R0c[k] = mos.scan_R0c(k, j);
+	q.R0s[k] = mos.scan_R0s(k, j);
+	q.Z0c[k] = mos.scan_Z0c(k, j);
+	q.Z0s[k] = mos.scan_Z0s(k, j);
+      }
+
+      q.init();
+      q.calculate();
+
+      CHECK(Approx(q.grid_min_R0) == mos.scan_min_R0[j]);
+      CHECK(Approx(q.grid_max_curvature) == mos.scan_max_curvature[j]);
+      CHECK(Approx(q.iota) == mos.scan_iota[j]);
+      CHECK(Approx(q.grid_max_elongation) == mos.scan_max_elongation[j]);
+      CHECK(Approx(q.grid_min_L_grad_B) == mos.scan_min_L_grad_B[j]);
+      CHECK(Approx(q.grid_min_L_grad_grad_B) == mos.scan_min_L_grad_grad_B[j]);
+      CHECK(Approx(q.r_singularity_robust) == mos.scan_r_singularity[j]);
+      CHECK(Approx(q.B20_grid_variation) == mos.scan_B20_variation[j]);
+      CHECK(Approx(q.B20_residual) == mos.scan_B20_residual[j]);
+      CHECK(Approx(q.d2_volume_d_psi2) == mos.scan_d2_volume_d_psi2[j]);
+      CHECK(Approx(q.DMerc_times_r2) == mos.scan_DMerc_times_r2[j]);
+      CHECK(Approx(q.standard_deviation_of_R) == mos.scan_standard_deviation_of_R[j]);
+      CHECK(Approx(q.standard_deviation_of_Z) == mos.scan_standard_deviation_of_Z[j]);
+      CHECK(q.helicity == mos.scan_helicity[j]);
+      CHECK(Approx(q.grid_max_XY2) == mos.scan_max_XY2[j]);
+      CHECK(Approx(q.grid_max_Z2) == mos.scan_max_Z2[j]);
+      CHECK(Approx(q.grid_max_XY3) == mos.scan_max_XY3[j]);
+      CHECK(Approx(q.grid_max_d_XY2_d_varphi) == mos.scan_max_d_XY2_d_varphi[j]);
+      CHECK(Approx(q.grid_max_d_Z2_d_varphi) == mos.scan_max_d_Z2_d_varphi[j]);
+      CHECK(Approx(q.grid_max_d_XY3_d_varphi) == mos.scan_max_d_XY3_d_varphi[j]);
+    }
+  }
 }
 
 TEST_CASE("Run a small MultiOptScan with keep_all false. [mpi] [multiopt_scan]") {
@@ -214,5 +266,57 @@ TEST_CASE("Run a small MultiOptScan with keep_all false. [mpi] [multiopt_scan]")
     
     CHECK(Approx(mos.scan_R0c(1, 0)) == 0.173039969373242);
     CHECK(Approx(mos.scan_R0c(1, 1)) == 0.175276407386024);
+  }
+  
+  // For each entry in the scan, run a standalone single QSC and
+  // confirm all the results match.
+  if (mos.proc0) {
+    for (int j = 0; j < mos.n_scan; j++) {
+      CAPTURE(j);
+      
+      Qsc q;
+      q.nfp = mos.mo_ref.opts[0].q.nfp;
+      q.nphi = 25; // Must match value above in this test.
+      q.verbose = 0;
+      q.eta_bar = mos.scan_eta_bar[j];
+      q.sigma0 = mos.scan_sigma0[j];
+      q.B2c = mos.scan_B2c[j];
+      q.B2s = mos.scan_B2s[j];
+      q.order_r_option = "r2.1";
+      q.R0c.resize(mos.axis_nmax_plus_1, 0.0);
+      q.R0s.resize(mos.axis_nmax_plus_1, 0.0);
+      q.Z0c.resize(mos.axis_nmax_plus_1, 0.0);
+      q.Z0s.resize(mos.axis_nmax_plus_1, 0.0);
+      for (int k = 0; k < mos.axis_nmax_plus_1; k++) {
+	q.R0c[k] = mos.scan_R0c(k, j);
+	q.R0s[k] = mos.scan_R0s(k, j);
+	q.Z0c[k] = mos.scan_Z0c(k, j);
+	q.Z0s[k] = mos.scan_Z0s(k, j);
+      }
+
+      q.init();
+      q.calculate();
+
+      CHECK(Approx(q.grid_min_R0) == mos.scan_min_R0[j]);
+      CHECK(Approx(q.grid_max_curvature) == mos.scan_max_curvature[j]);
+      CHECK(Approx(q.iota) == mos.scan_iota[j]);
+      CHECK(Approx(q.grid_max_elongation) == mos.scan_max_elongation[j]);
+      CHECK(Approx(q.grid_min_L_grad_B) == mos.scan_min_L_grad_B[j]);
+      CHECK(Approx(q.grid_min_L_grad_grad_B) == mos.scan_min_L_grad_grad_B[j]);
+      CHECK(Approx(q.r_singularity_robust) == mos.scan_r_singularity[j]);
+      CHECK(Approx(q.B20_grid_variation) == mos.scan_B20_variation[j]);
+      CHECK(Approx(q.B20_residual) == mos.scan_B20_residual[j]);
+      CHECK(Approx(q.d2_volume_d_psi2) == mos.scan_d2_volume_d_psi2[j]);
+      CHECK(Approx(q.DMerc_times_r2) == mos.scan_DMerc_times_r2[j]);
+      CHECK(Approx(q.standard_deviation_of_R) == mos.scan_standard_deviation_of_R[j]);
+      CHECK(Approx(q.standard_deviation_of_Z) == mos.scan_standard_deviation_of_Z[j]);
+      CHECK(q.helicity == mos.scan_helicity[j]);
+      CHECK(Approx(q.grid_max_XY2) == mos.scan_max_XY2[j]);
+      CHECK(Approx(q.grid_max_Z2) == mos.scan_max_Z2[j]);
+      CHECK(Approx(q.grid_max_XY3) == mos.scan_max_XY3[j]);
+      CHECK(Approx(q.grid_max_d_XY2_d_varphi) == mos.scan_max_d_XY2_d_varphi[j]);
+      CHECK(Approx(q.grid_max_d_Z2_d_varphi) == mos.scan_max_d_Z2_d_varphi[j]);
+      CHECK(Approx(q.grid_max_d_XY3_d_varphi) == mos.scan_max_d_XY3_d_varphi[j]);
+    }
   }
 }
