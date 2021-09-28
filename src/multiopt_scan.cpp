@@ -81,10 +81,10 @@ void MultiOptScan::init() {
       for (int k = 0; k < params_n[j]; k++)
 	params_vals[j][k] = params_min[j] + (params_max[j] - params_min[j]) * k / (params_n[j] - 1);
     }
-    if (verbose > 0 && proc0)
+    if (verbose > -1 && proc0)
       std::cout << "Values for parameter " << params[j] << ": " << params_vals[j] << std::endl;
   }
-  if (verbose > 0 && proc0) std::cout << "Total number of points in scan: " << n_scan_all << std::endl;
+  if (verbose > -1 && proc0) std::cout << "Total number of points in scan: " << n_scan_all << std::endl;
 
   axis_nmax_plus_1 = mo_ref.opts[0].q.R0c.size();
   for (j = 0; j < mo_ref.opts.size(); j++) axis_nmax_plus_1 += mo_ref.opts[j].fourier_refine;
