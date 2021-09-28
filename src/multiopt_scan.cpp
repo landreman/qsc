@@ -349,6 +349,14 @@ void MultiOptScan::eval_scan_index(int j_scan) {
 	mo.opts[stage].weight_B20_mean = val;
 	if (verbose > 1) std::cout << "Setting weight_B20_mean for opt stage " << stage << " to " << val << std::endl;
 	
+      } else if (params[j].compare("weight_d2_volume_d_psi2") == 0) {
+	mo.opts[stage].weight_d2_volume_d_psi2 = val;
+	if (verbose > 1) std::cout << "Setting weight_d2_volume_d_psi2 for opt stage " << stage << " to " << val << std::endl;
+	
+      } else if (params[j].compare("max_d2_volume_d_psi2") == 0) {
+	mo.opts[stage].max_d2_volume_d_psi2 = val;
+	if (verbose > 1) std::cout << "Setting max_d2_volume_d_psi2 for opt stage " << stage << " to " << val << std::endl;
+	
       } else {
 	std::cout << "Unrecognized entry in params: " << params[j] << std::endl;
 	throw std::runtime_error("Unrecognized entry in params");
