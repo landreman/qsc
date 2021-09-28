@@ -518,6 +518,7 @@ void MultiOptScan::eval_scan_index(int j_scan) {
   parameters_single[44] = mo.opts[index].weight_axis_length;
   parameters_single[45] = mo.opts[index].target_axis_length;
   parameters_single[46] = mo.opts[index].weight_standard_deviation_of_R;
+  parameters_single[47] = mo.opts[index].weight_B20_mean;
 
   for (j = 0; j < axis_nmax_plus_1; j++) {
     parameters_single[j + 0 * axis_nmax_plus_1 + n_parameters_base] = mo.opts[index].q.R0c[j];
@@ -661,6 +662,7 @@ void MultiOptScan::filter_global_arrays() {
   scan_weight_axis_length.resize(n_scan, 0.0);
   scan_target_axis_length.resize(n_scan, 0.0);
   scan_weight_standard_deviation_of_R.resize(n_scan, 0.0);
+  scan_weight_B20_mean.resize(n_scan, 0.0);
     
   // Unpack parameters.
   // The order here must match the order at the end of eval_scan_index()!
@@ -719,6 +721,7 @@ void MultiOptScan::filter_global_arrays() {
     scan_weight_axis_length[j]             = parameters(44, j_global);
     scan_target_axis_length[j]             = parameters(45, j_global);
     scan_weight_standard_deviation_of_R[j] = parameters(46, j_global);
+    scan_weight_B20_mean[j]                = parameters(47, j_global);
     
     for (k = 0; k < axis_nmax_plus_1; k++) {
       scan_R0c(k, j) = parameters(k + 0 * axis_nmax_plus_1 + n_parameters_base, j_global);

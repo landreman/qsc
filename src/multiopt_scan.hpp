@@ -66,7 +66,7 @@ namespace qsc {
     int axis_nmax_plus_1;
     bool quit_after_init;
     
-    const int n_parameters_base = 47;
+    const int n_parameters_base = 48;
     const int n_int_parameters_base = 3;
     const int n_int_parameters = n_int_parameters_base + N_FILTERS;
     int n_parameters;
@@ -99,6 +99,7 @@ namespace qsc {
     Vector scan_weight_XY3, scan_weight_XY3Prime;
     Vector scan_weight_grad_B, scan_weight_grad_grad_B, scan_weight_r_singularity;
     Vector scan_weight_axis_length, scan_target_axis_length, scan_weight_standard_deviation_of_R;
+    Vector scan_weight_B20_mean;
     
     MultiOptScan();
     void run(std::string);
