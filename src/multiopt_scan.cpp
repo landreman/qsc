@@ -321,6 +321,30 @@ void MultiOptScan::eval_scan_index(int j_scan) {
 	mo.opts[stage].weight_standard_deviation_of_R = val;
 	if (verbose > 1) std::cout << "Setting weight_standard_deviation_of_R for opt stage " << stage << " to " << val << std::endl;
 	
+      } else if (params[j].compare("weight_XY2") == 0) {
+	mo.opts[stage].weight_XY2 = val;
+	if (verbose > 1) std::cout << "Setting weight_XY2 for opt stage " << stage << " to " << val << std::endl;
+	
+      } else if (params[j].compare("weight_Z2") == 0) {
+	mo.opts[stage].weight_Z2 = val;
+	if (verbose > 1) std::cout << "Setting weight_Z2 for opt stage " << stage << " to " << val << std::endl;
+	
+      } else if (params[j].compare("weight_XY3") == 0) {
+	mo.opts[stage].weight_XY3 = val;
+	if (verbose > 1) std::cout << "Setting weight_XY3 for opt stage " << stage << " to " << val << std::endl;
+	
+      } else if (params[j].compare("weight_XY2Prime") == 0) {
+	mo.opts[stage].weight_XY2Prime = val;
+	if (verbose > 1) std::cout << "Setting weight_XY2Prime for opt stage " << stage << " to " << val << std::endl;
+	
+      } else if (params[j].compare("weight_Z2Prime") == 0) {
+	mo.opts[stage].weight_Z2Prime = val;
+	if (verbose > 1) std::cout << "Setting weight_Z2Prime for opt stage " << stage << " to " << val << std::endl;
+	
+      } else if (params[j].compare("weight_XY3Prime") == 0) {
+	mo.opts[stage].weight_XY3Prime = val;
+	if (verbose > 1) std::cout << "Setting weight_XY3Prime for opt stage " << stage << " to " << val << std::endl;
+	
       } else {
 	std::cout << "Unrecognized entry in params: " << params[j] << std::endl;
 	throw std::runtime_error("Unrecognized entry in params");
