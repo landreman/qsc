@@ -56,7 +56,8 @@ void Opt::input(std::string filename) {
   toml_read(varlist, indata, "weight_axis_length", weight_axis_length);
   toml_read(varlist, indata, "target_axis_length", target_axis_length);
   toml_read(varlist, indata, "weight_standard_deviation_of_R", weight_standard_deviation_of_R);
-
+  toml_read(varlist, indata, "weight_B20_mean", weight_B20_mean);
+  
   toml_read(varlist, indata, "max_iter", max_iter);
   toml_read(varlist, indata, "verbose", verbose);
   toml_read(varlist, indata, "make_names", make_names);
@@ -157,5 +158,6 @@ void Opt::input(std::string filename) {
     std::cout << "weight_grad_B: " << weight_grad_B << std::endl;
     std::cout << "weight_grad_grad_B: " << weight_grad_grad_B << std::endl;
     std::cout << "weight_r_singularity: " << weight_r_singularity << std::endl;
+    std::cout << "weight_B20_mean: " << weight_B20_mean << std::endl;
   }
 }

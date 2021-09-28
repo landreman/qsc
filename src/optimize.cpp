@@ -406,6 +406,11 @@ void Opt::init_residuals() {
     if (make_names)
       for (j = 0; j < q.nphi; j++) residual_names.push_back("standard_deviation_of_R[" + std::to_string(j) + "]");
   }
+  if (weight_B20_mean > 0) {
+    n_terms += q.nphi;
+    if (make_names)
+      for (j = 0; j < q.nphi; j++) residual_names.push_back("B20_mean[" + std::to_string(j) + "]");
+  }
   
   if (make_names) {
     output_file.open("residual_vector");
@@ -552,6 +557,7 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   r_singularity_term = 0.0;
   axis_length_term = 0.0;
   standard_deviation_of_R_term = 0.0;
+  B20_mean_term = 0.0;
 
   // The order of terms here must match the order in Opt::init_residuals().
   for (k = 0; k < q.nphi; k++) {
@@ -734,15 +740,21 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
     if (weight_standard_deviation_of_R > 0) residuals[j++] = weight_standard_deviation_of_R * term;
   }
 
+  for (k = 0; k < q.nphi; k++) {
+    term = arclength_factor[k] * q.B20[k];
+    B20_mean_term += term * term;
+    if (weight_B20_mean > 0) residuals[j++] = weight_B20_mean * term;
+  }
+
   Vector weights = {weight_B20, weight_iota, weight_elongation, weight_curvature, weight_R0, weight_d2_volume_d_psi2,
     weight_XY2, weight_XY2Prime, weight_Z2, weight_Z2Prime, weight_XY3, weight_XY3Prime,
     weight_grad_B, weight_grad_grad_B, weight_r_singularity,
-    weight_axis_length, weight_standard_deviation_of_R};
+    weight_axis_length, weight_standard_deviation_of_R, weight_B20_mean};
 
   Vector terms = {B20_term, iota_term, elongation_term, curvature_term,
     R0_term, d2_volume_d_psi2_term, XY2_term, XY2Prime_term, Z2_term, Z2Prime_term,
     XY3_term, XY3Prime_term, grad_B_term, grad_grad_B_term, r_singularity_term,
-    axis_length_term, standard_deviation_of_R_term};
+    axis_length_term, standard_deviation_of_R_term, B20_mean_term};
 
   assert (weights.size() == terms.size());
   for (k = 0; k < terms.size(); k++) {
@@ -807,6 +819,7 @@ void gsl_callback(const size_t iter, void *params,
   opt->iter_r_singularity_term[n_iter] = opt->r_singularity_term;
   opt->iter_axis_length_term[n_iter] = opt->axis_length_term;
   opt->iter_standard_deviation_of_R_term[n_iter] = opt->standard_deviation_of_R_term;
+  opt->iter_B20_mean_term[n_iter] = opt->B20_mean_term;
 
   opt->iter_eta_bar[n_iter] = opt->q.eta_bar;
   opt->iter_sigma0[n_iter] = opt->q.sigma0;

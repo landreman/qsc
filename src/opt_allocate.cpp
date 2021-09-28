@@ -26,6 +26,7 @@ void Opt::allocate() {
   iter_r_singularity_term.resize(max_iter, 0.0);
   iter_axis_length_term.resize(max_iter, 0.0);
   iter_standard_deviation_of_R_term.resize(max_iter, 0.0);
+  iter_B20_mean_term.resize(max_iter, 0.0);
   
   iter_eta_bar.resize(max_iter, 0.0);
   iter_sigma0.resize(max_iter, 0.0);

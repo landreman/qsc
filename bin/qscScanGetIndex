@@ -29,6 +29,7 @@ except:
 p2 = f.variables['p2'][()]
 I2 = f.variables['I2'][()]
 iota = f.variables['scan_iota'][()]
+axis_length = f.variables['scan_axis_length'][()]
 B20_variation = f.variables['scan_B20_variation'][()]
 r_singularity = f.variables['scan_r_singularity'][()]
 d2_volume_d_psi2 = f.variables['scan_d2_volume_d_psi2'][()]
@@ -51,6 +52,7 @@ f.close()
 
 print('Scan index {}:'.format(index))
 print('  iota:', iota[index])
+print('  axis_length:', axis_length[index])
 print('  max elongation:', elongation[index])
 print('  r_singularity:', r_singularity[index])
 print('  d^2 volume /d psi^2:', d2_volume_d_psi2[index])

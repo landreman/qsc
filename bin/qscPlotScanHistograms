@@ -5,6 +5,7 @@ import sys
 import numpy as np
 from scipy.io import netcdf
 import matplotlib.pyplot as plt
+import matplotlib
 
 print()
 print("Usage: ", os.path.basename(__file__), ' qsc_out.<extension>.nc')
@@ -21,6 +22,7 @@ if bare_filename[:len(s)] != s or filename[-3:] != '.nc':
 f = netcdf.netcdf_file(filename, 'r', mmap=False)
 n_scan = f.variables['n_scan'][()]
 iota = f.variables['scan_iota'][()]
+axis_length = f.variables['scan_axis_length'][()]
 eta_bar = f.variables['scan_eta_bar'][()]
 B2c = f.variables['scan_B2c'][()]
 B20_variation = f.variables['scan_B20_variation'][()]
@@ -33,6 +35,7 @@ elongation = f.variables['scan_max_elongation'][()]
 weight_grad_grad_B = f.variables['scan_weight_grad_grad_B'][()]
 weight_B20 = f.variables['scan_weight_B20'][()]
 weight_axis_length = f.variables['scan_weight_axis_length'][()]
+target_axis_length = f.variables['scan_target_axis_length'][()]
 weight_standard_deviation_of_R = f.variables['scan_weight_standard_deviation_of_R'][()]
 max_XY2 = f.variables['scan_max_XY2'][()]
 max_Z2 = f.variables['scan_max_Z2'][()]
@@ -53,12 +56,14 @@ max_d_XYZ23_d_varphi = np.max(np.array([max_d_XY2_d_varphi, max_d_Z2_d_varphi, m
 r_singularity = np.minimum(r_singularity, np.ones_like(r_singularity))
 
 # Further filter the results:
-mask = max_d_XYZ23_d_varphi < 1e30
+#mask = max_d_XYZ23_d_varphi < 1e30
+#mask = weight_axis_length >= 10
+mask = axis_length < 12
 
-mask = max_d_XYZ23_d_varphi < 4
+mask = max_d_XYZ23_d_varphi < 3.7
 mask = np.logical_and(mask, max_XYZ23 < 0.8)
-mask = np.logical_and(mask, B20_variation < 8e-3)
-mask = np.logical_and(mask, r_singularity > 0.52)
+mask = np.logical_and(mask, B20_variation < 7e-3)
+mask = np.logical_and(mask, r_singularity > 0.5)
 
 
 print('Scan indices that pass the mask:')
@@ -76,6 +81,7 @@ for field in fields:
    eval(field + " = " + field + "[mask]")
 """
 iota = iota[mask]
+axis_length = axis_length[mask]
 eta_bar = eta_bar[mask]
 B2c = B2c[mask]
 B20_variation = B20_variation[mask]
@@ -88,6 +94,7 @@ elongation = elongation[mask]
 weight_grad_grad_B = weight_grad_grad_B[mask]
 weight_B20 = weight_B20[mask]
 weight_axis_length = weight_axis_length[mask]
+target_axis_length = target_axis_length[mask]
 weight_standard_deviation_of_R = weight_standard_deviation_of_R[mask]
 max_XY2 = max_XY2[mask]
 max_Z2 = max_Z2[mask]
@@ -115,7 +122,7 @@ def loghist(x, bins=10, **kwargs):
 fig = plt.figure(figsize=(14,7))
 plt.rcParams.update({'font.size': 6})
 
-nrows = 3
+nrows = 4
 ncols = 8
 jplot = 1
 bins = 20
@@ -192,6 +199,8 @@ def plot_row(title, logx=False):
     plt.ylabel('max_d_XYZ23_d_varphi')
 
 plot_row('R0c1')
+plot_row('axis_length')
+#plot_row('weight_axis_length', True)
 plot_row('weight_B20', True)
 plot_row('weight_grad_grad_B', True)
 
@@ -238,7 +247,7 @@ plt.tight_layout()
 
 fig = plt.figure(figsize=(14,7))
 
-nrows = 2
+nrows = 3
 ncols = 4
 jplot = 1
 
@@ -258,10 +267,30 @@ plt.subplot(nrows, ncols, jplot); jplot += 1
 plt.hist(B20_mean, bins=bins)
 plt.xlabel('B20_mean')
 
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.hist(axis_length, bins=bins)
+plt.xlabel('axis_length')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.plot(R0c1, axis_length, '.', ms=4)
+plt.ylabel('axis_length')
+plt.xlabel('R0c1')
+
 if np.max(weight_axis_length) > 0:
     plt.subplot(nrows, ncols, jplot); jplot += 1
     loghist(weight_axis_length, bins=bins)
     plt.xlabel('weight_axis_length')
+
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    minval = np.min(target_axis_length)
+    maxval = np.max(target_axis_length)
+    plt.plot([minval, maxval], [minval, maxval], ':k')
+    plt.scatter(target_axis_length, axis_length, c=weight_axis_length, s=4,
+                norm=matplotlib.colors.LogNorm())
+    plt.title('Color = weight_axis_length')
+    plt.xlabel('target axis length')
+    plt.ylabel('actual axis length')
+    plt.colorbar()
 
 if np.max(weight_standard_deviation_of_R) > 0:
     plt.subplot(nrows, ncols, jplot); jplot += 1

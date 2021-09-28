@@ -54,6 +54,7 @@ namespace qsc {
     qscfloat weight_XY3, weight_XY3Prime;
     qscfloat weight_grad_B, weight_grad_grad_B, weight_r_singularity;
     qscfloat weight_axis_length, target_axis_length, weight_standard_deviation_of_R;
+    qscfloat weight_B20_mean;
 
     qscfloat objective_function;
     qscfloat B20_term, iota_term;
@@ -64,6 +65,7 @@ namespace qsc {
     qscfloat XY3_term, XY3Prime_term;
     qscfloat grad_B_term, grad_grad_B_term, r_singularity_term;
     qscfloat axis_length_term, standard_deviation_of_R_term;
+    qscfloat B20_mean_term;
 
     Vector iter_objective_function;
     Vector iter_B20_term, iter_iota_term;
@@ -74,6 +76,7 @@ namespace qsc {
     Vector iter_XY3_term, iter_XY3Prime_term;
     Vector iter_grad_B_term, iter_grad_grad_B_term, iter_r_singularity_term;
     Vector iter_axis_length_term, iter_standard_deviation_of_R_term;
+    Vector iter_B20_mean_term;
     
     Vector iter_eta_bar, iter_sigma0, iter_B2s, iter_B2c;
     Matrix iter_R0c, iter_R0s, iter_Z0c, iter_Z0s;
