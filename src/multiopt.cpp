@@ -9,6 +9,7 @@ using namespace qsc;
 void MultiOpt::defaults() {
   // Set defaults.
   verbose = 0;
+  n_evals = 0;
 }
 
 MultiOpt::MultiOpt() {
@@ -91,12 +92,15 @@ void MultiOpt::optimize() {
     }
     opts[jopt].allocate();
     opts[jopt].optimize();
+    n_evals += opts[jopt].n_evals;
     if (verbose > 0) {
       std::cout << "################################################" << std::endl;
       std::cout << "######## Done with optimization stage " << jopt << " ########" << std::endl;
       std::cout << "################################################" << std::endl;
     }
   }
+
+  if (verbose > 0) std::cout << "Total number of function evaluations: " << n_evals << std::endl;
 }
 
 void MultiOpt::write_netcdf() {

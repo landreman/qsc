@@ -447,6 +447,8 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
       // opt.outfilename = "qsc_out.opt_test.nc";
       // opt.write_netcdf();
 
+      CHECK(opt.n_evals > opt.n_iter);
+
       // Iteration 0 should exactly match the standalone reference q0:
       CHECK(Approx(opt.iter_eta_bar[0]) == q0.eta_bar);
       CHECK(Approx(opt.iter_B2c[0]) == q0.B2c);
@@ -769,6 +771,8 @@ TEST_CASE("1d optimization for iota [opt]") {
       
       opt.allocate();
       opt.optimize();
+
+      CHECK(opt.n_evals > opt.n_iter);
       
       CHECK(Approx(opt.iter_iota[opt.n_iter - 1]) == target_iota);
       switch (j_var) {
@@ -826,6 +830,7 @@ TEST_CASE("Try Fourier refinement. Make sure the vary_R0c etc arrays are extende
     opt.allocate();
     opt.optimize();
 
+    CHECK(opt.n_evals > opt.n_iter);
     CHECK(opt.q.nphi == 31);
     REQUIRE(opt.vary_R0c.size() == 2 + fourier_refine);
     REQUIRE(opt.vary_R0s.size() == 2 + fourier_refine);

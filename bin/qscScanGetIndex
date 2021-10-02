@@ -48,6 +48,9 @@ weight_B20 = f.variables['scan_weight_B20'][()]
 weight_grad_B = f.variables['scan_weight_grad_B'][()]
 weight_grad_grad_B = f.variables['scan_weight_grad_grad_B'][()]
 weight_axis_length = f.variables['scan_weight_axis_length'][()]
+target_axis_length = f.variables['scan_target_axis_length'][()]
+weight_d2_volume_d_psi2 = f.variables['scan_weight_d2_volume_d_psi2'][()]
+max_d2_volume_d_psi2 = f.variables['scan_max_d2_volume_d_psi2'][()]
 f.close()
 
 print('Scan index {}:'.format(index))
@@ -88,8 +91,11 @@ print(']')
 
 print('weight_B20:', weight_B20[index])
 print('weight_grad_B20:', weight_grad_B[index])
-print('weight_grad_grad_B20:', weight_grad_grad_B[index])
+print('weight_grad_grad_B:', weight_grad_grad_B[index])
 print('weight_axis_length:', weight_axis_length[index])
+print('target_axis_length:', target_axis_length[index])
+print('weight_d2_volume_d_psi2:', weight_d2_volume_d_psi2[index])
+print('max_d2_volume_d_psi2:', max_d2_volume_d_psi2[index])
 
 single_filename = os.path.abspath(os.path.dirname(filename)) + "/qsc_in" + bare_filename[7:-3] + "_" + str(index)
 print("Writing input file for a single run:", single_filename)

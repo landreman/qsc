@@ -13,6 +13,7 @@ namespace qsc {
   public:
     std::vector<Opt> opts;
     int verbose;
+    int n_evals;
     
     MultiOpt();
     void run(std::string);

@@ -99,6 +99,7 @@ void MultiOptScan::init() {
     for (j = 0; j < N_FILTERS; j++) filters[j] = 0;
   }
   total_cpu_seconds = 0.0;
+  n_evals = 0;
 
 }
 
@@ -231,6 +232,7 @@ int MultiOptScan::proc0_recv() {
   attempts_per_proc[proc_that_finished]++;
   if (filters_local[KEPT] > 0) n_solves_kept[proc_that_finished]++;
   total_cpu_seconds += parameters_single[0];
+  n_evals += int_parameters_single[2];
   
   return proc_that_finished;
 }
@@ -471,7 +473,8 @@ void MultiOptScan::eval_scan_index(int j_scan) {
   // The order here must match the order in filter_global_arrays().
   int_parameters_single[0] = j_scan;
   int_parameters_single[1] = (int)passed_filters;
-  int_parameters_single[2] = mo.opts[index].q.helicity;
+  int_parameters_single[2] = mo.n_evals;
+  int_parameters_single[3] = mo.opts[index].q.helicity;
   for (j = 0; j < N_FILTERS; j++)
     int_parameters_single[j + n_int_parameters_base] = filters_local[j];
     
@@ -557,6 +560,8 @@ void MultiOptScan::print_status() {
   std::cout << "CPU seconds for solves: " << total_cpu_seconds
 	    << "  Wallclock time for that should be " << total_cpu_seconds / (n_procs - 1) << " seconds" << std::endl;
   std::cout << "Avg time per multiopt: " << total_cpu_seconds / filters[ATTEMPTS] << " seconds" << std::endl;
+  std::cout << "Total number of function evaluations: " << n_evals
+	    << "  Avg time per eval: " << total_cpu_seconds / n_evals << " seconds" << std::endl;
     
   std::cout << "Attempts on each proc:";
   for (j = 0; j < n_procs; j++) std::cout << " " << attempts_per_proc[j];
@@ -616,6 +621,7 @@ void MultiOptScan::filter_global_arrays() {
   n_scan = filters[KEPT];
   
   scan_helicity.resize(n_scan, 0);
+  scan_n_evals.resize(n_scan, 0);
 
   scan_eta_bar.resize(n_scan, 0.0);
   scan_sigma0.resize(n_scan, 0.0);
@@ -679,7 +685,8 @@ void MultiOptScan::filter_global_arrays() {
     if (int_parameters[1 + j_global * n_int_parameters_base] < 1) continue;
     j++;
     
-    scan_helicity[j] = int_parameters[2 + j_global * n_int_parameters_base];
+    scan_n_evals[j]  = int_parameters[2 + j_global * n_int_parameters_base];
+    scan_helicity[j] = int_parameters[3 + j_global * n_int_parameters_base];
       
     // run time is #0
     scan_eta_bar[j]           = parameters( 1, j_global);

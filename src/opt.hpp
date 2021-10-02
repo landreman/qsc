@@ -27,6 +27,7 @@ namespace qsc {
   public:
     Qsc q;
     int max_iter, n_iter;
+    int n_evals;
     int j_fourier_refine;
     int n_parameters, n_terms;
     int verbose;

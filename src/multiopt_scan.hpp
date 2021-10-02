@@ -67,7 +67,7 @@ namespace qsc {
     bool quit_after_init;
     
     const int n_parameters_base = 48;
-    const int n_int_parameters_base = 3;
+    const int n_int_parameters_base = 4;
     const int n_int_parameters = n_int_parameters_base + N_FILTERS;
     int n_parameters;
     Matrix parameters;
@@ -76,6 +76,7 @@ namespace qsc {
     std::valarray<int> int_parameters_single;
     std::valarray<int> n_solves_kept, attempts_per_proc;
     qscfloat total_cpu_seconds;
+    big n_evals;
     
     Vector scan_eta_bar, scan_sigma0, scan_B2s, scan_B2c;
     Matrix scan_R0c, scan_R0s, scan_Z0c, scan_Z0s;
@@ -85,7 +86,7 @@ namespace qsc {
     Vector scan_r_singularity, scan_B20_variation, scan_B20_residual, scan_B20_mean;
     Vector scan_d2_volume_d_psi2, scan_DMerc_times_r2;
     Vector scan_standard_deviation_of_R, scan_standard_deviation_of_Z;
-    std::valarray<int> scan_helicity;
+    std::valarray<int> scan_helicity, scan_n_evals;
     Vector scan_max_XY2, scan_max_Z2, scan_max_XY3;
     Vector scan_max_d_XY2_d_varphi, scan_max_d_Z2_d_varphi, scan_max_d_XY3_d_varphi;
     Vector scan_axis_length;
