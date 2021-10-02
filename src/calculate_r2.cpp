@@ -11,7 +11,7 @@ void Qsc::calculate_r2() {
   std::chrono::time_point<std::chrono::steady_clock> start;
   if (verbose > 0) start = std::chrono::steady_clock::now();
   
-  if (std::abs(iota_N) < 1.0e-8)
+  if (verbose > 0 && std::abs(iota_N) < 1.0e-8)
     std::cerr <<
       "Warning: |iota_N| is very small so O(r^2) solve will be poorly conditioned. iota_N="
 	      << iota_N << std::endl;
