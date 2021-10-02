@@ -37,6 +37,12 @@ weight_B20 = f.variables['scan_weight_B20'][()]
 weight_axis_length = f.variables['scan_weight_axis_length'][()]
 target_axis_length = f.variables['scan_target_axis_length'][()]
 weight_standard_deviation_of_R = f.variables['scan_weight_standard_deviation_of_R'][()]
+try:
+   weight_B20_mean = f.variables['scan_weight_B20_mean'][()]
+except:
+   weight_B20_mean = -np.ones_like(iota)
+weight_d2_volume_d_psi2 = f.variables['scan_weight_d2_volume_d_psi2'][()]
+max_d2_volume_d_psi2 = f.variables['scan_max_d2_volume_d_psi2'][()]
 max_XY2 = f.variables['scan_max_XY2'][()]
 max_Z2 = f.variables['scan_max_Z2'][()]
 max_XY3 = f.variables['scan_max_XY3'][()]
@@ -58,14 +64,18 @@ r_singularity = np.minimum(r_singularity, np.ones_like(r_singularity))
 # Further filter the results:
 #mask = max_d_XYZ23_d_varphi < 1e30
 #mask = weight_axis_length >= 10
-mask = axis_length < 12
+mask = axis_length < 1e30
 
-mask = max_d_XYZ23_d_varphi < 3.7
-mask = np.logical_and(mask, max_XYZ23 < 0.8)
-mask = np.logical_and(mask, B20_variation < 7e-3)
-mask = np.logical_and(mask, r_singularity > 0.5)
-
-
+mask = np.abs(iota) > 0.41
+#mask = d2_volume_d_psi2 < -0.5
+#mask = np.logical_and(mask, B20_mean < 3.5)
+#mask = max_d_XYZ23_d_varphi < 3.7
+mask = np.logical_and(mask, r_singularity > 0.45)
+mask = np.logical_and(mask, B20_variation < 0.01)
+mask = np.logical_and(mask, max_d_XYZ23_d_varphi < 2.5)
+"""
+mask = np.logical_and(mask, max_XYZ23 < 0.5)
+"""
 print('Scan indices that pass the mask:')
 print(np.nonzero(mask)[0])
 #print(np.where(mask)[0])
@@ -96,6 +106,9 @@ weight_B20 = weight_B20[mask]
 weight_axis_length = weight_axis_length[mask]
 target_axis_length = target_axis_length[mask]
 weight_standard_deviation_of_R = weight_standard_deviation_of_R[mask]
+weight_B20_mean = weight_B20_mean[mask]
+weight_d2_volume_d_psi2 = weight_d2_volume_d_psi2[mask]
+max_d2_volume_d_psi2 = max_d2_volume_d_psi2[mask]
 max_XY2 = max_XY2[mask]
 max_Z2 = max_Z2[mask]
 max_XY3 = max_XY3[mask]
@@ -203,6 +216,7 @@ plot_row('axis_length')
 #plot_row('weight_axis_length', True)
 plot_row('weight_B20', True)
 plot_row('weight_grad_grad_B', True)
+#plot_row('weight_d2_volume_d_psi2', True)
 
 """
 plt.subplot(nrows, ncols, jplot); jplot += 1
@@ -297,6 +311,11 @@ if np.max(weight_standard_deviation_of_R) > 0:
     loghist(weight_standard_deviation_of_R, bins=bins)
     plt.xlabel('weight_standard_deviation_of_R')
 
+if np.max(weight_d2_volume_d_psi2) > 0:
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    plt.hist(max_d2_volume_d_psi2, bins=bins)
+    plt.xlabel('max_d2_volume_d_psi2')
+   
 plt.subplot(nrows, ncols, jplot); jplot += 1
 histtype = 'step'
 plt.hist(max_XY2, bins=bins, histtype=histtype, label="max XY2")

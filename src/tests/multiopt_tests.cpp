@@ -127,7 +127,7 @@ TEST_CASE("Running a standalone opt should yield identical results to a 1-stage 
       // Run the optimization:
       opt.allocate();
       opt.optimize();
-
+      
       // Now set up a 1-stage multiopt with the same parameters:
       MultiOpt mo;
       mo.opts.resize(1);
@@ -168,6 +168,10 @@ TEST_CASE("Running a standalone opt should yield identical results to a 1-stage 
 
       // Run the multi-stage optimization:
       mo.optimize();
+
+      REQUIRE(mo.opts[0].n_iter == opt.n_iter);
+      CHECK(mo.n_evals == opt.n_evals);
+      CHECK(mo.opts[0].n_evals == opt.n_evals);
       
       for (j = 0; j < opt.n_iter; j++) {
 	CAPTURE(j);
@@ -375,6 +379,8 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
       opt0.optimize();
       opt1.allocate();
       opt1.optimize();
+
+      CHECK(mo.n_evals == opt0.n_evals + opt1.n_evals);
       
       // Compare stage 0 of the multiopt to the standalone opt:
       for (j = 0; j < opt0.n_iter; j++) {
@@ -612,6 +618,8 @@ TEST_CASE("Check that using a stage-dependent nphi works. [multiopt]") {
       opt0.optimize();
       opt1.allocate();
       opt1.optimize();
+
+      CHECK(mo.n_evals == opt0.n_evals + opt1.n_evals);
       
       // Compare stage 0 of the multiopt to the standalone opt:
       for (j = 0; j < opt0.n_iter; j++) {

@@ -11,6 +11,7 @@ void Opt::defaults() {
   fourier_refine = 0;
   toml_group = "opt";
   diff_method = DIFF_METHOD_FORWARD;
+  n_evals = 0;
 
   vary_eta_bar = true;
   vary_sigma0 = false;

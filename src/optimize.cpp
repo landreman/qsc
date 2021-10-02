@@ -183,12 +183,14 @@ void Opt::optimize() {
     gsl_multifit_nlinear_init(gsl_state_vector, &gsl_optimizer, work);
     gsl_multifit_nlinear_driver(max_iter_for_gsl, xtol, gtol, ftol,
 				gsl_callback, (void*)this, &info, work);
+    n_evals += gsl_optimizer.nevalf;
     
     if (verbose > 0) {
       std::cout << "----- Results from the optimization -----" << std::endl;
       std::cout << "n_iter: " << n_iter << "  niter from GSL: "
 		<< gsl_multifit_nlinear_niter(work) << std::endl;
-      std::cout << "# of function evals: " << gsl_optimizer.nevalf << std::endl;
+      std::cout << "# of function evals: " << gsl_optimizer.nevalf << " for this Fourier level, "
+		<< n_evals << " total so far." << std::endl;
       std::cout << "Final configuration:" << std::endl;
       std::cout << "  eta_bar: " << q.eta_bar << "  sigma0: " << q.sigma0 << std::endl;
       std::cout << "  B2c: " << q.B2c << "  B2s: " << q.B2s << std::endl;

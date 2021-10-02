@@ -125,6 +125,16 @@ TEST_CASE("Run a small MultiOptScan with keep_all true. [mpi] [multiopt_scan]") 
     CHECK(mos.mo.opts[1].q.nphi == 25);
   }
 
+  // The total number of function evals for the scan should match the
+  // sum of the number of function evals for each entry in the scan,
+  // since all points are kept.
+  if (mos.proc0) {
+    int total_n_evals = 0;
+    for (int j = 0; j < mos.n_scan; j++)
+      total_n_evals += mos.scan_n_evals[j];
+    CHECK(total_n_evals == mos.n_evals);
+  }
+  
   // For each entry in the scan, run a standalone single QSC and
   // confirm all the results match.
   if (mos.proc0) {
