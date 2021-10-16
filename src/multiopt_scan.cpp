@@ -303,6 +303,10 @@ void MultiOptScan::eval_scan_index(int j_scan) {
 	mo.opts[stage].target_iota = val;
 	if (verbose > 1) std::cout << "Setting target_iota for opt stage " << stage << " to " << val << std::endl;
 	
+      } else if (params[j].compare("weight_elongation") == 0) {
+	mo.opts[stage].weight_elongation = val;
+	if (verbose > 1) std::cout << "Setting weight_elongation for opt stage " << stage << " to " << val << std::endl;
+	
       } else if (params[j].compare("weight_B20") == 0) {
 	mo.opts[stage].weight_B20 = val;
 	if (verbose > 1) std::cout << "Setting weight_B20 for opt stage " << stage << " to " << val << std::endl;
