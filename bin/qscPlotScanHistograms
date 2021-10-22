@@ -21,7 +21,7 @@ if bare_filename[:len(s)] != s or filename[-3:] != '.nc':
    
 f = netcdf.netcdf_file(filename, 'r', mmap=False)
 n_scan = f.variables['n_scan'][()]
-iota = f.variables['scan_iota'][()]
+iota = np.abs(f.variables['scan_iota'][()])
 axis_length = f.variables['scan_axis_length'][()]
 eta_bar = f.variables['scan_eta_bar'][()]
 B2c = f.variables['scan_B2c'][()]
@@ -32,10 +32,13 @@ d2_volume_d_psi2 = f.variables['scan_d2_volume_d_psi2'][()]
 L_grad_B = f.variables['scan_min_L_grad_B'][()]
 L_grad_grad_B = f.variables['scan_min_L_grad_grad_B'][()]
 elongation = f.variables['scan_max_elongation'][()]
+weight_elongation = f.variables['scan_weight_elongation'][()]
 weight_grad_grad_B = f.variables['scan_weight_grad_grad_B'][()]
 weight_B20 = f.variables['scan_weight_B20'][()]
 weight_axis_length = f.variables['scan_weight_axis_length'][()]
 target_axis_length = f.variables['scan_target_axis_length'][()]
+weight_iota = f.variables['scan_weight_iota'][()]
+target_iota = f.variables['scan_target_iota'][()]
 weight_standard_deviation_of_R = f.variables['scan_weight_standard_deviation_of_R'][()]
 try:
    weight_B20_mean = f.variables['scan_weight_B20_mean'][()]
@@ -51,8 +54,9 @@ max_d_Z2_d_varphi = f.variables['scan_max_d_Z2_d_varphi'][()]
 max_d_XY3_d_varphi = f.variables['scan_max_d_XY3_d_varphi'][()]
 R0c = f.variables['scan_R0c'][()]
 Z0s = f.variables['scan_Z0s'][()]
+helicity = f.variables['scan_helicity'][()]
 print('R0c.shape:', R0c.shape)
-R0c1 = R0c[:, 1]
+R0c1 = np.abs(R0c[:, 1])
 Z0s1 = Z0s[:, 1]
 
 max_XYZ23 = np.max(np.array([max_XY2, max_Z2, max_XY3]), axis=0)
@@ -62,20 +66,30 @@ max_d_XYZ23_d_varphi = np.max(np.array([max_d_XY2_d_varphi, max_d_Z2_d_varphi, m
 r_singularity = np.minimum(r_singularity, np.ones_like(r_singularity))
 
 # Further filter the results:
-#mask = max_d_XYZ23_d_varphi < 1e30
-#mask = weight_axis_length >= 10
-mask = axis_length < 1e30
+mask = max_d_XYZ23_d_varphi < 1e30
+mask = np.logical_and(mask, B20_variation < 0.09)
+mask = np.logical_and(mask, axis_length > 6.28 * 2)
+mask = np.logical_and(mask, axis_length < 6.29 * 2)
+mask = np.logical_and(mask, max_d_XYZ23_d_varphi < 3.5)
+mask = np.logical_and(mask, r_singularity > 0.25)
+mask = np.logical_and(mask, max_XYZ23 < 0.6)
+"""
+#mask = helicity != 0
+mask = d2_volume_d_psi2 < 0
+mask = np.logical_and(mask, np.abs(iota) > 0.41)
+mask = np.logical_and(mask, elongation < 8)
 
-mask = np.abs(iota) > 0.41
-#mask = d2_volume_d_psi2 < -0.5
-#mask = np.logical_and(mask, B20_mean < 3.5)
+mask = np.logical_and(mask, L_grad_grad_B > 0.33)
+mask = np.logical_and(mask, B20_mean < 1)
+
+#mask = weight_axis_length >= 10
+#mask = axis_length < 1e30
+#mask = np.logical_and(mask, np.abs(iota) < 0.46)
+mask = np.logical_and(mask, L_grad_B > 0.572)
+
 #mask = max_d_XYZ23_d_varphi < 3.7
-mask = np.logical_and(mask, r_singularity > 0.45)
-mask = np.logical_and(mask, B20_variation < 0.01)
-mask = np.logical_and(mask, max_d_XYZ23_d_varphi < 2.5)
 """
-mask = np.logical_and(mask, max_XYZ23 < 0.5)
-"""
+
 print('Scan indices that pass the mask:')
 print(np.nonzero(mask)[0])
 #print(np.where(mask)[0])
@@ -92,7 +106,7 @@ for field in fields:
 """
 iota = iota[mask]
 axis_length = axis_length[mask]
-eta_bar = eta_bar[mask]
+eta_bar = np.abs(eta_bar[mask])
 B2c = B2c[mask]
 B20_variation = B20_variation[mask]
 B20_mean = B20_mean[mask]
@@ -101,10 +115,13 @@ d2_volume_d_psi2 = d2_volume_d_psi2[mask]
 L_grad_B = L_grad_B[mask]
 L_grad_grad_B = L_grad_grad_B[mask]
 elongation = elongation[mask]
+weight_elongation = weight_elongation[mask]
 weight_grad_grad_B = weight_grad_grad_B[mask]
 weight_B20 = weight_B20[mask]
 weight_axis_length = weight_axis_length[mask]
 target_axis_length = target_axis_length[mask]
+weight_iota = weight_iota[mask]
+target_iota = target_iota[mask]
 weight_standard_deviation_of_R = weight_standard_deviation_of_R[mask]
 weight_B20_mean = weight_B20_mean[mask]
 weight_d2_volume_d_psi2 = weight_d2_volume_d_psi2[mask]
@@ -115,6 +132,7 @@ max_XY3 = max_XY3[mask]
 max_d_XY2_d_varphi = max_d_XY2_d_varphi[mask]
 max_d_Z2_d_varphi = max_d_Z2_d_varphi[mask]
 max_d_XY3_d_varphi = max_d_XY3_d_varphi[mask]
+helicity = helicity[mask]
 R0c1 = R0c1[mask]
 Z0s1 = Z0s1[mask]
 max_XYZ23 = max_XYZ23[mask]
@@ -122,6 +140,11 @@ max_d_XYZ23_d_varphi = max_d_XYZ23_d_varphi[mask]
 
 n_scan = len(iota)
 print('Number of points passing filters:', n_scan)
+
+print("R0c1:", R0c1)
+print("Z0s1:", Z0s1)
+print("iota:", iota)
+print("B20_variation:", B20_variation)
 
 well = (d2_volume_d_psi2 < 0)
 hill = (d2_volume_d_psi2 >= 0)
@@ -135,7 +158,7 @@ def loghist(x, bins=10, **kwargs):
 fig = plt.figure(figsize=(14,7))
 plt.rcParams.update({'font.size': 6})
 
-nrows = 4
+nrows = 6
 ncols = 8
 jplot = 1
 bins = 20
@@ -211,13 +234,16 @@ def plot_row(title, logx=False):
         plt.xscale('log')
     plt.ylabel('max_d_XYZ23_d_varphi')
 
-plot_row('R0c1')
-plot_row('axis_length')
-#plot_row('weight_axis_length', True)
+#plot_row('R0c1')
+#plot_row('target_iota')
+#plot_row('weight_iota', True)
+plot_row('target_axis_length')
+plot_row('weight_axis_length', True)
 plot_row('weight_B20', True)
 plot_row('weight_grad_grad_B', True)
-#plot_row('weight_d2_volume_d_psi2', True)
-
+#plot_row('weight_elongation', True)
+plot_row('max_d2_volume_d_psi2')
+plot_row('weight_d2_volume_d_psi2', True)
 """
 plt.subplot(nrows, ncols, jplot); jplot += 1
 plt.hist(weight_B20, bins=bins)
@@ -304,6 +330,18 @@ if np.max(weight_axis_length) > 0:
     plt.title('Color = weight_axis_length')
     plt.xlabel('target axis length')
     plt.ylabel('actual axis length')
+    plt.colorbar()
+
+if np.max(weight_iota) > 0:
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    minval = np.min(target_iota)
+    maxval = np.max(target_iota)
+    plt.plot([minval, maxval], [minval, maxval], ':k')
+    plt.scatter(target_iota, iota, c=weight_iota, s=4,
+                norm=matplotlib.colors.LogNorm())
+    plt.title('Color = weight_iota')
+    plt.xlabel('target iota')
+    plt.ylabel('actual iota')
     plt.colorbar()
 
 if np.max(weight_standard_deviation_of_R) > 0:

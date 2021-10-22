@@ -49,8 +49,11 @@ weight_grad_B = f.variables['scan_weight_grad_B'][()]
 weight_grad_grad_B = f.variables['scan_weight_grad_grad_B'][()]
 weight_axis_length = f.variables['scan_weight_axis_length'][()]
 target_axis_length = f.variables['scan_target_axis_length'][()]
+weight_iota = f.variables['scan_weight_iota'][()]
+target_iota = f.variables['scan_target_iota'][()]
 weight_d2_volume_d_psi2 = f.variables['scan_weight_d2_volume_d_psi2'][()]
 max_d2_volume_d_psi2 = f.variables['scan_max_d2_volume_d_psi2'][()]
+weight_elongation = f.variables['scan_weight_elongation'][()]
 f.close()
 
 print('Scan index {}:'.format(index))
@@ -94,8 +97,11 @@ print('weight_grad_B20:', weight_grad_B[index])
 print('weight_grad_grad_B:', weight_grad_grad_B[index])
 print('weight_axis_length:', weight_axis_length[index])
 print('target_axis_length:', target_axis_length[index])
+print('weight_iota:', weight_iota[index])
+print('target_iota:', target_iota[index])
 print('weight_d2_volume_d_psi2:', weight_d2_volume_d_psi2[index])
 print('max_d2_volume_d_psi2:', max_d2_volume_d_psi2[index])
+print('weight_elongation:', weight_elongation[index])
 
 single_filename = os.path.abspath(os.path.dirname(filename)) + "/qsc_in" + bare_filename[7:-3] + "_" + str(index)
 print("Writing input file for a single run:", single_filename)
