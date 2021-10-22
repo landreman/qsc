@@ -185,6 +185,8 @@ TEST_CASE("Run a small MultiOptScan with keep_all true. [mpi] [multiopt_scan]") 
       CHECK(Approx(q.grid_max_d_XY2_d_varphi) == mos.scan_max_d_XY2_d_varphi[j]);
       CHECK(Approx(q.grid_max_d_Z2_d_varphi) == mos.scan_max_d_Z2_d_varphi[j]);
       CHECK(Approx(q.grid_max_d_XY3_d_varphi) == mos.scan_max_d_XY3_d_varphi[j]);
+      CHECK(Approx(q.grid_max_d2_XY2_d_varphi2) == mos.scan_max_d2_XY2_d_varphi2[j]);
+      CHECK(Approx(q.grid_max_d2_XY3_d_varphi2) == mos.scan_max_d2_XY3_d_varphi2[j]);
     }
   }
 }
@@ -329,6 +331,8 @@ TEST_CASE("Run a small MultiOptScan with keep_all false. [mpi] [multiopt_scan]")
       CHECK(Approx(q.grid_max_d_XY2_d_varphi) == mos.scan_max_d_XY2_d_varphi[j]);
       CHECK(Approx(q.grid_max_d_Z2_d_varphi) == mos.scan_max_d_Z2_d_varphi[j]);
       CHECK(Approx(q.grid_max_d_XY3_d_varphi) == mos.scan_max_d_XY3_d_varphi[j]);
+      CHECK(Approx(q.grid_max_d2_XY2_d_varphi2) == mos.scan_max_d2_XY2_d_varphi2[j]);
+      CHECK(Approx(q.grid_max_d2_XY3_d_varphi2) == mos.scan_max_d2_XY3_d_varphi2[j]);
     }
   }
 }

@@ -39,6 +39,10 @@ void Qsc::calculate_r2() {
   matrix_vector_product(d_d_varphi, Z2s, d_Z2s_d_varphi);
   matrix_vector_product(d_d_varphi, Z2c, d_Z2c_d_varphi);
 
+  matrix_vector_product(d_d_varphi, d_Z20_d_varphi, d2_Z20_d_varphi2);
+  matrix_vector_product(d_d_varphi, d_Z2s_d_varphi, d2_Z2s_d_varphi2);
+  matrix_vector_product(d_d_varphi, d_Z2c_d_varphi, d2_Z2c_d_varphi2);
+
   qs = -iota_N * X1c - abs_G0_over_B0 * Y1s * torsion;
   
   matrix_vector_product(d_d_varphi, X1c, qc);
@@ -58,6 +62,8 @@ void Qsc::calculate_r2() {
 
   matrix_vector_product(d_d_varphi, X2s, d_X2s_d_varphi);
   matrix_vector_product(d_d_varphi, X2c, d_X2c_d_varphi);
+  matrix_vector_product(d_d_varphi, d_X2s_d_varphi, d2_X2s_d_varphi2);
+  matrix_vector_product(d_d_varphi, d_X2c_d_varphi, d2_X2c_d_varphi2);
   
   beta_1s = -4 * spsi * sG * mu0 * p2 * eta_bar * abs_G0_over_B0 / (iota_N * B0 * B0);
 
@@ -186,6 +192,11 @@ void Qsc::calculate_r2() {
   matrix_vector_product(d_d_varphi, Y20, d_Y20_d_varphi);
   matrix_vector_product(d_d_varphi, Y2s, d_Y2s_d_varphi);
   matrix_vector_product(d_d_varphi, Y2c, d_Y2c_d_varphi);
+  matrix_vector_product(d_d_varphi, d_X20_d_varphi, d2_X20_d_varphi2);
+  matrix_vector_product(d_d_varphi, d_Y20_d_varphi, d2_Y20_d_varphi2);
+  matrix_vector_product(d_d_varphi, d_Y2s_d_varphi, d2_Y2s_d_varphi2);
+  matrix_vector_product(d_d_varphi, d_Y2c_d_varphi, d2_Y2c_d_varphi2);
+  
   matrix_vector_product(d_d_varphi, d_X1c_d_varphi, d2_X1c_d_varphi2);
   matrix_vector_product(d_d_varphi, d_Y1c_d_varphi, d2_Y1c_d_varphi2);
   matrix_vector_product(d_d_varphi, d_Y1s_d_varphi, d2_Y1s_d_varphi2);
@@ -237,6 +248,19 @@ void Qsc::calculate_r2() {
   grid_max_d_XY2_d_varphi = std::max(grid_max_d_XY2_d_varphi, work1.max());
   work1 = std::abs(d_Y2c_d_varphi);
   grid_max_d_XY2_d_varphi = std::max(grid_max_d_XY2_d_varphi, work1.max());
+
+  work1 = std::abs(d2_X20_d_varphi2);
+  grid_max_d2_XY2_d_varphi2 = work1.max();
+  work1 = std::abs(d2_X2s_d_varphi2);
+  grid_max_d2_XY2_d_varphi2 = std::max(grid_max_d2_XY2_d_varphi2, work1.max());
+  work1 = std::abs(d2_X2c_d_varphi2);
+  grid_max_d2_XY2_d_varphi2 = std::max(grid_max_d2_XY2_d_varphi2, work1.max());
+  work1 = std::abs(d2_Y20_d_varphi2);
+  grid_max_d2_XY2_d_varphi2 = std::max(grid_max_d2_XY2_d_varphi2, work1.max());
+  work1 = std::abs(d2_Y2s_d_varphi2);
+  grid_max_d2_XY2_d_varphi2 = std::max(grid_max_d2_XY2_d_varphi2, work1.max());
+  work1 = std::abs(d2_Y2c_d_varphi2);
+  grid_max_d2_XY2_d_varphi2 = std::max(grid_max_d2_XY2_d_varphi2, work1.max());
   
   work1 = std::abs(d_Z20_d_varphi);
   grid_max_d_Z2_d_varphi = work1.max();
@@ -306,6 +330,10 @@ void Qsc::calculate_r2p1() {
   matrix_vector_product(d_d_varphi, Y3c1, d_Y3c1_d_varphi);  
   matrix_vector_product(d_d_varphi, Y3s1, d_Y3s1_d_varphi);
   
+  matrix_vector_product(d_d_varphi, d_X3c1_d_varphi, d2_X3c1_d_varphi2);  
+  matrix_vector_product(d_d_varphi, d_Y3c1_d_varphi, d2_Y3c1_d_varphi2);  
+  matrix_vector_product(d_d_varphi, d_Y3s1_d_varphi, d2_Y3s1_d_varphi2);
+  
   work1 = std::abs(X3c1);
   grid_max_XY3 = work1.max();
   work1 = std::abs(Y3c1);
@@ -319,4 +347,11 @@ void Qsc::calculate_r2p1() {
   grid_max_d_XY3_d_varphi = std::max(grid_max_d_XY3_d_varphi, work1.max());
   work1 = std::abs(d_Y3s1_d_varphi);
   grid_max_d_XY3_d_varphi = std::max(grid_max_d_XY3_d_varphi, work1.max());
+
+  work1 = std::abs(d2_X3c1_d_varphi2);
+  grid_max_d2_XY3_d_varphi2 = work1.max();
+  work1 = std::abs(d2_Y3c1_d_varphi2);
+  grid_max_d2_XY3_d_varphi2 = std::max(grid_max_d2_XY3_d_varphi2, work1.max());
+  work1 = std::abs(d2_Y3s1_d_varphi2);
+  grid_max_d2_XY3_d_varphi2 = std::max(grid_max_d2_XY3_d_varphi2, work1.max());
 }

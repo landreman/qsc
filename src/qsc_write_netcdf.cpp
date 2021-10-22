@@ -80,10 +80,12 @@ void Qsc::write_netcdf(std::string filename) {
     nc.put("grid_max_Z2", grid_max_Z2, "Maximum over phi of the absolute values of Z20, Z2c, and Z2s", "1/meter");
     nc.put("grid_max_d_XY2_d_varphi", grid_max_d_XY2_d_varphi, "Maximum over phi of the absolute values of the d/dvarphi derivatives of X20, X2c, X2s, Y20, Y2c, and Y2s", "1/meter");
     nc.put("grid_max_d_Z2_d_varphi", grid_max_d_Z2_d_varphi, "Maximum over phi of the absolute values of the d/dvarphi derivatives of Z20, Z2c, and Z2s", "1/meter");
+    nc.put("grid_max_d2_XY2_d_varphi2", grid_max_d2_XY2_d_varphi2, "Maximum over phi of the absolute values of the d^2/dvarphi^2 derivatives of X20, X2c, X2s, Y20, Y2c, and Y2s", "1/meter");
   }
   if (order_r2p1) {
     nc.put("grid_max_XY3", grid_max_XY3, "Maximum over phi of the absolute values of X3c1, Y3c1, and Y3s1", "1/meter^2");
     nc.put("grid_max_d_XY3_d_varphi", grid_max_d_XY3_d_varphi, "Maximum over phi of the absolute values of the d/dvarphi derivatives of X3c1, Y3c1, and Y3s1", "1/meter^2");
+    nc.put("grid_max_d2_XY3_d_varphi2", grid_max_d2_XY3_d_varphi2, "Maximum over phi of the absolute values of the d^2/dvarphi^2 derivatives of X3c1, Y3c1, and Y3s1", "1/meter^2");
   }
   /*
   nc.put("", , "", "");
@@ -141,6 +143,16 @@ void Qsc::write_netcdf(std::string filename) {
     nc.put(nphi_dim, "d_Z20_d_varphi", d_Z20_d_varphi, "Derivative of Z20 with respect to the Boozer toroidal angle varphi", "1/meter");
     nc.put(nphi_dim, "d_Z2s_d_varphi", d_Z2s_d_varphi, "Derivative of Z2s with respect to the Boozer toroidal angle varphi", "1/meter");
     nc.put(nphi_dim, "d_Z2c_d_varphi", d_Z2c_d_varphi, "Derivative of Z2c with respect to the Boozer toroidal angle varphi", "1/meter");
+	   
+    nc.put(nphi_dim, "d2_X20_d_varphi2", d2_X20_d_varphi2, "2nd derivative of X20 with respect to the Boozer toroidal angle varphi", "1/meter");
+    nc.put(nphi_dim, "d2_X2s_d_varphi2", d2_X2s_d_varphi2, "2nd derivative of X2s with respect to the Boozer toroidal angle varphi", "1/meter");
+    nc.put(nphi_dim, "d2_X2c_d_varphi2", d2_X2c_d_varphi2, "2nd derivative of X2c with respect to the Boozer toroidal angle varphi", "1/meter");
+    nc.put(nphi_dim, "d2_Y20_d_varphi2", d2_Y20_d_varphi2, "2nd derivative of Y20 with respect to the Boozer toroidal angle varphi", "1/meter");
+    nc.put(nphi_dim, "d2_Y2s_d_varphi2", d2_Y2s_d_varphi2, "2nd derivative of Y2s with respect to the Boozer toroidal angle varphi", "1/meter");
+    nc.put(nphi_dim, "d2_Y2c_d_varphi2", d2_Y2c_d_varphi2, "2nd derivative of Y2c with respect to the Boozer toroidal angle varphi", "1/meter");
+    nc.put(nphi_dim, "d2_Z20_d_varphi2", d2_Z20_d_varphi2, "2nd derivative of Z20 with respect to the Boozer toroidal angle varphi", "1/meter");
+    nc.put(nphi_dim, "d2_Z2s_d_varphi2", d2_Z2s_d_varphi2, "2nd derivative of Z2s with respect to the Boozer toroidal angle varphi", "1/meter");
+    nc.put(nphi_dim, "d2_Z2c_d_varphi2", d2_Z2c_d_varphi2, "2nd derivative of Z2c with respect to the Boozer toroidal angle varphi", "1/meter");
     
     nc.put(nphi_dim, "L_grad_grad_B", L_grad_grad_B, "Scale length associated with second derivatives of the magnetic field, eq (3.2) in Landreman J Plasma Physics (2021)", "meter");
     nc.put(nphi_dim, "L_grad_grad_B_inverse", L_grad_grad_B_inverse, "1 / L_grad_grad_B", "1/meter");
@@ -176,6 +188,16 @@ void Qsc::write_netcdf(std::string filename) {
     nc.put(nphi_dim, "d_Y3s3_d_varphi", d_Y3s3_d_varphi, "Derivative of Y3s3 with respect to the toroidal Boozer angle varphi", "1/meter^2");
     nc.put(nphi_dim, "d_Y3c1_d_varphi", d_Y3c1_d_varphi, "Derivative of Y3c1 with respect to the toroidal Boozer angle varphi", "1/meter^2");
     nc.put(nphi_dim, "d_Y3c3_d_varphi", d_Y3c3_d_varphi, "Derivative of Y3c3 with respect to the toroidal Boozer angle varphi", "1/meter^2");
+
+    nc.put(nphi_dim, "d2_X3s1_d_varphi2", d2_X3s1_d_varphi2, "2nd derivative of X3s1 with respect to the toroidal Boozer angle varphi", "1/meter^2");
+    nc.put(nphi_dim, "d2_X3s3_d_varphi2", d2_X3s3_d_varphi2, "2nd derivative of X3s3 with respect to the toroidal Boozer angle varphi", "1/meter^2");
+    nc.put(nphi_dim, "d2_X3c1_d_varphi2", d2_X3c1_d_varphi2, "2nd derivative of X3c1 with respect to the toroidal Boozer angle varphi", "1/meter^2");
+    nc.put(nphi_dim, "d2_X3c3_d_varphi2", d2_X3c3_d_varphi2, "2nd derivative of X3c3 with respect to the toroidal Boozer angle varphi", "1/meter^2");
+
+    nc.put(nphi_dim, "d2_Y3s1_d_varphi2", d2_Y3s1_d_varphi2, "2nd derivative of Y3s1 with respect to the toroidal Boozer angle varphi", "1/meter^2");
+    nc.put(nphi_dim, "d2_Y3s3_d_varphi2", d2_Y3s3_d_varphi2, "2nd derivative of Y3s3 with respect to the toroidal Boozer angle varphi", "1/meter^2");
+    nc.put(nphi_dim, "d2_Y3c1_d_varphi2", d2_Y3c1_d_varphi2, "2nd derivative of Y3c1 with respect to the toroidal Boozer angle varphi", "1/meter^2");
+    nc.put(nphi_dim, "d2_Y3c3_d_varphi2", d2_Y3c3_d_varphi2, "2nd derivative of Y3c3 with respect to the toroidal Boozer angle varphi", "1/meter^2");
 
   }
   /*

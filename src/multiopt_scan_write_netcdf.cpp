@@ -126,9 +126,11 @@ void MultiOptScan::write_netcdf() {
   nc.put(n_scan_dim, "scan_max_XY2", scan_max_XY2, "Maximum over phi of the absolute values of X20, X2c, X2s, Y20, Y2c, and Y2s", "1/meter");
   nc.put(n_scan_dim, "scan_max_Z2", scan_max_Z2, "Maximum over phi of the absolute values of Z20, Z2c, and Z2s", "1/meter");
   nc.put(n_scan_dim, "scan_max_d_XY2_d_varphi", scan_max_d_XY2_d_varphi, "Maximum over phi of the absolute values of the d/dvarphi derivatives of X20, X2c, X2s, Y20, Y2c, and Y2s", "1/meter");
+  nc.put(n_scan_dim, "scan_max_d2_XY2_d_varphi2", scan_max_d2_XY2_d_varphi2, "Maximum over phi of the absolute values of the d^2/dvarphi^2 derivatives of X20, X2c, X2s, Y20, Y2c, and Y2s", "1/meter");
   nc.put(n_scan_dim, "scan_max_d_Z2_d_varphi", scan_max_d_Z2_d_varphi, "Maximum over phi of the absolute values of the d/dvarphi derivatives of Z20, Z2c, and Z2s", "1/meter");
   nc.put(n_scan_dim, "scan_max_XY3", scan_max_XY3, "Maximum over phi of the absolute values of X3c1, Y3c1, and Y3s1", "1/meter^2");
   nc.put(n_scan_dim, "scan_max_d_XY3_d_varphi", scan_max_d_XY3_d_varphi, "Maximum over phi of the absolute values of the d/dvarphi derivatives of X3c1, Y3c1, and Y3s1", "1/meter^2");
+  nc.put(n_scan_dim, "scan_max_d2_XY3_d_varphi2", scan_max_d2_XY3_d_varphi2, "Maximum over phi of the absolute values of the d^2/dvarphi^2 derivatives of X3c1, Y3c1, and Y3s1", "1/meter^2");
   nc.put(n_scan_dim, "scan_axis_length", scan_axis_length, "Actual length of the magnetic axis", "meters");
   
   nc.put(n_scan_dim, "scan_weight_B20", scan_weight_B20, " ", "dimensionless");

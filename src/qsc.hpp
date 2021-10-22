@@ -87,6 +87,9 @@ namespace qsc {
     Vector d_Y20_d_varphi, d_Y2s_d_varphi, d_Y2c_d_varphi;
     Vector d_Z20_d_varphi, d_Z2s_d_varphi, d_Z2c_d_varphi;
     Vector d2_X1c_d_varphi2, d2_Y1c_d_varphi2, d2_Y1s_d_varphi2;
+    Vector d2_X20_d_varphi2, d2_X2s_d_varphi2, d2_X2c_d_varphi2;
+    Vector d2_Y20_d_varphi2, d2_Y2s_d_varphi2, d2_Y2c_d_varphi2;
+    Vector d2_Z20_d_varphi2, d2_Z2s_d_varphi2, d2_Z2c_d_varphi2;
     qscfloat d2_volume_d_psi2, DGeod_times_r2, DWell_times_r2, DMerc_times_r2;
     qscfloat r_singularity_robust;
     Vector r_hat_singularity_robust;
@@ -95,8 +98,11 @@ namespace qsc {
     Vector Z3c1, Z3c3, Z3s1, Z3s3, lambda_for_XY3;
     Vector d_X3c1_d_varphi, d_X3c3_d_varphi, d_X3s1_d_varphi, d_X3s3_d_varphi;
     Vector d_Y3c1_d_varphi, d_Y3c3_d_varphi, d_Y3s1_d_varphi, d_Y3s3_d_varphi;
+    Vector d2_X3c1_d_varphi2, d2_X3c3_d_varphi2, d2_X3s1_d_varphi2, d2_X3s3_d_varphi2;
+    Vector d2_Y3c1_d_varphi2, d2_Y3c3_d_varphi2, d2_Y3s1_d_varphi2, d2_Y3s3_d_varphi2;
     qscfloat grid_max_XY2, grid_max_Z2, grid_max_XY3;
     qscfloat grid_max_d_XY2_d_varphi, grid_max_d_Z2_d_varphi, grid_max_d_XY3_d_varphi;
+    qscfloat grid_max_d2_XY2_d_varphi2, grid_max_d2_XY3_d_varphi2;
     
     Qsc();
     Qsc(std::string);
