@@ -30,10 +30,12 @@ TEST_CASE("The objective function should equal 1/2 * sum(residuals^2) [opt]") {
       opt.weight_d2_volume_d_psi2 = 5.0;
       opt.weight_XY2 = 6.0;
       opt.weight_XY2Prime = 7.0;
+      opt.weight_XY2PrimePrime = 7.2;
       opt.weight_Z2 = 6.5;
       opt.weight_Z2Prime = 7.5;
       opt.weight_XY3 = 8.0;
       opt.weight_XY3Prime = 9.0;
+      opt.weight_XY3PrimePrime = 9.5;
       opt.weight_grad_B = 10.0;
       opt.weight_grad_grad_B = 11.0;
       opt.weight_r_singularity = 12.0;
@@ -155,6 +157,21 @@ TEST_CASE("Compute each optimization term a different way and make sure we get t
     temp = opt.q.d_Y2s_d_varphi * opt.q.d_Y2s_d_varphi * opt.q.d_l_d_phi;
     term += temp.sum() / denominator;
     CHECK(Approx(term) == opt.XY2Prime_term);
+    
+    term = 0.0;
+    temp = opt.q.d2_X20_d_varphi2 * opt.q.d2_X20_d_varphi2 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d2_X2c_d_varphi2 * opt.q.d2_X2c_d_varphi2 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d2_X2s_d_varphi2 * opt.q.d2_X2s_d_varphi2 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d2_Y20_d_varphi2 * opt.q.d2_Y20_d_varphi2 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d2_Y2c_d_varphi2 * opt.q.d2_Y2c_d_varphi2 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d2_Y2s_d_varphi2 * opt.q.d2_Y2s_d_varphi2 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    CHECK(Approx(term) == opt.XY2PrimePrime_term);
 
     term = 0.0;
     temp = opt.q.Z20 * opt.q.Z20 * opt.q.d_l_d_phi;
@@ -191,6 +208,15 @@ TEST_CASE("Compute each optimization term a different way and make sure we get t
     temp = opt.q.d_Y3s1_d_varphi * opt.q.d_Y3s1_d_varphi * opt.q.d_l_d_phi;
     term += temp.sum() / denominator;
     CHECK(Approx(term) == opt.XY3Prime_term);
+    
+    term = 0.0;
+    temp = opt.q.d2_X3c1_d_varphi2 * opt.q.d2_X3c1_d_varphi2 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d2_Y3c1_d_varphi2 * opt.q.d2_Y3c1_d_varphi2 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d2_Y3s1_d_varphi2 * opt.q.d2_Y3s1_d_varphi2 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    CHECK(Approx(term) == opt.XY3PrimePrime_term);
 
     term = 0.0;
     for (int j2 = 0; j2 < 3; j2++) {
@@ -253,10 +279,12 @@ TEST_CASE("Each term in the objective function should be approximately independe
   o1.weight_d2_volume_d_psi2 = 5.0;
   o1.weight_XY2 = 6.0;
   o1.weight_XY2Prime = 7.0;
+  o1.weight_XY2PrimePrime = 7.2;
   o1.weight_Z2 = 6.5;
   o1.weight_Z2Prime = 7.5;
   o1.weight_XY3 = 8.0;
   o1.weight_XY3Prime = 9.0;
+  o1.weight_XY3PrimePrime = 9.5;
   o1.weight_grad_B = 10.0;
   o1.weight_grad_grad_B = 11.0;
   o1.weight_r_singularity = 12.0;
@@ -273,10 +301,12 @@ TEST_CASE("Each term in the objective function should be approximately independe
   o2.weight_d2_volume_d_psi2 = 5.0;
   o2.weight_XY2 = 6.0;
   o2.weight_XY2Prime = 7.0;
+  o2.weight_XY2PrimePrime = 7.2;
   o2.weight_Z2 = 6.5;
   o2.weight_Z2Prime = 7.5;
   o2.weight_XY3 = 8.0;
   o2.weight_XY3Prime = 9.0;
+  o2.weight_XY3PrimePrime = 9.5;
   o2.weight_grad_B = 10.0;
   o2.weight_grad_grad_B = 11.0;
   o2.weight_r_singularity = 12.0;
@@ -304,10 +334,12 @@ TEST_CASE("Each term in the objective function should be approximately independe
   CHECK(Approx(o1.d2_volume_d_psi2_term).epsilon(tol) == o2.d2_volume_d_psi2_term);
   CHECK(Approx(o1.XY2_term).epsilon(tol) == o2.XY2_term);
   CHECK(Approx(o1.XY2Prime_term).epsilon(tol) == o2.XY2Prime_term);
+  CHECK(Approx(o1.XY2PrimePrime_term).epsilon(tol) == o2.XY2PrimePrime_term);
   CHECK(Approx(o1.Z2_term).epsilon(tol) == o2.Z2_term);
   CHECK(Approx(o1.Z2Prime_term).epsilon(tol) == o2.Z2Prime_term);
   CHECK(Approx(o1.XY3_term).epsilon(tol) == o2.XY3_term);
   CHECK(Approx(o1.XY3Prime_term).epsilon(tol) == o2.XY3Prime_term);
+  CHECK(Approx(o1.XY3PrimePrime_term).epsilon(tol) == o2.XY3PrimePrime_term);
   CHECK(Approx(o1.grad_B_term).epsilon(tol) == o2.grad_B_term);
   CHECK(Approx(o1.grad_grad_B_term).epsilon(tol) == o2.grad_grad_B_term);
   CHECK(Approx(o1.r_singularity_term).epsilon(tol) == o2.r_singularity_term);
@@ -350,10 +382,12 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
       opt.weight_d2_volume_d_psi2 = 5.0;
       opt.weight_XY2 = 6.0;
       opt.weight_XY2Prime = 7.0;
+      opt.weight_XY2PrimePrime = 7.2;
       opt.weight_Z2 = 6.5;
       opt.weight_Z2Prime = 7.5;
       opt.weight_XY3 = 8.0;
       opt.weight_XY3Prime = 9.0;
+      opt.weight_XY3PrimePrime = 9.5;
       opt.weight_grad_B = 10.0;
       opt.weight_grad_grad_B = 11.0;
       opt.weight_r_singularity = 12.0;

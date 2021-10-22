@@ -364,6 +364,11 @@ void Opt::init_residuals() {
     if (make_names)
       for (j = 0; j < q.nphi * 6; j++) residual_names.push_back("XY2Prime[" + std::to_string(j) + "]");
   }
+  if (weight_XY2PrimePrime > 0) {
+    n_terms += q.nphi * 6;
+    if (make_names)
+      for (j = 0; j < q.nphi * 6; j++) residual_names.push_back("XY2PrimePrime[" + std::to_string(j) + "]");
+  }
   if (weight_Z2 > 0) {
     n_terms += q.nphi * 3;
     if (make_names)
@@ -383,6 +388,11 @@ void Opt::init_residuals() {
     n_terms += q.nphi * 3;
     if (make_names)
       for (j = 0; j < q.nphi * 3; j++) residual_names.push_back("XY3Prime[" + std::to_string(j) + "]");
+  }
+  if (weight_XY3PrimePrime > 0) {
+    n_terms += q.nphi * 3;
+    if (make_names)
+      for (j = 0; j < q.nphi * 3; j++) residual_names.push_back("XY3PrimePrime[" + std::to_string(j) + "]");
   }
   if (weight_grad_B > 0) {
     n_terms += q.nphi * 9;
@@ -550,10 +560,12 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   d2_volume_d_psi2_term = 0.0;
   XY2_term = 0.0;
   XY2Prime_term = 0.0;
+  XY2PrimePrime_term = 0.0;
   Z2_term = 0.0;
   Z2Prime_term = 0.0;
   XY3_term = 0.0;
   XY3Prime_term = 0.0;
+  XY3PrimePrime_term = 0.0;
   grad_B_term = 0.0;
   grad_grad_B_term = 0.0;
   r_singularity_term = 0.0;
@@ -655,6 +667,32 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   }
 
   for (k = 0; k < q.nphi; k++) {
+    term = arclength_factor[k] * q.d2_X20_d_varphi2[k];
+    XY2PrimePrime_term += term * term;
+    if (weight_XY2PrimePrime > 0) residuals[j++] = weight_XY2PrimePrime * term;
+    
+    term = arclength_factor[k] * q.d2_X2s_d_varphi2[k];
+    XY2PrimePrime_term += term * term;
+    if (weight_XY2PrimePrime > 0) residuals[j++] = weight_XY2PrimePrime * term;
+    
+    term = arclength_factor[k] * q.d2_X2c_d_varphi2[k];
+    XY2PrimePrime_term += term * term;
+    if (weight_XY2PrimePrime > 0) residuals[j++] = weight_XY2PrimePrime * term;
+    
+    term = arclength_factor[k] * q.d2_Y20_d_varphi2[k];
+    XY2PrimePrime_term += term * term;
+    if (weight_XY2PrimePrime > 0) residuals[j++] = weight_XY2PrimePrime * term;
+    
+    term = arclength_factor[k] * q.d2_Y2s_d_varphi2[k];
+    XY2PrimePrime_term += term * term;
+    if (weight_XY2PrimePrime > 0) residuals[j++] = weight_XY2PrimePrime * term;
+    
+    term = arclength_factor[k] * q.d2_Y2c_d_varphi2[k];
+    XY2PrimePrime_term += term * term;
+    if (weight_XY2PrimePrime > 0) residuals[j++] = weight_XY2PrimePrime * term;
+  }
+
+  for (k = 0; k < q.nphi; k++) {
     term = arclength_factor[k] * q.Z20[k];
     Z2_term += term * term;
     if (weight_Z2 > 0) residuals[j++] = weight_Z2 * term;
@@ -711,6 +749,20 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   }
   
   for (k = 0; k < q.nphi; k++) {
+    term = arclength_factor[k] * q.d2_X3c1_d_varphi2[k];
+    XY3PrimePrime_term += term * term;
+    if (weight_XY3PrimePrime > 0) residuals[j++] = weight_XY3PrimePrime * term;
+      
+    term = arclength_factor[k] * q.d2_Y3c1_d_varphi2[k];
+    XY3PrimePrime_term += term * term;
+    if (weight_XY3PrimePrime > 0) residuals[j++] = weight_XY3PrimePrime * term;
+      
+    term = arclength_factor[k] * q.d2_Y3s1_d_varphi2[k];
+    XY3PrimePrime_term += term * term;
+    if (weight_XY3PrimePrime > 0) residuals[j++] = weight_XY3PrimePrime * term;
+  }
+  
+  for (k = 0; k < q.nphi; k++) {
     for (int j2 = 0; j2 < 9; j2++) {
       term = arclength_factor[k] * q.grad_B_tensor[k + q.nphi * j2];
       grad_B_term += term * term;
@@ -749,13 +801,13 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   }
 
   Vector weights = {weight_B20, weight_iota, weight_elongation, weight_curvature, weight_R0, weight_d2_volume_d_psi2,
-    weight_XY2, weight_XY2Prime, weight_Z2, weight_Z2Prime, weight_XY3, weight_XY3Prime,
+    weight_XY2, weight_XY2Prime, weight_XY2PrimePrime, weight_Z2, weight_Z2Prime, weight_XY3, weight_XY3Prime, weight_XY3PrimePrime,
     weight_grad_B, weight_grad_grad_B, weight_r_singularity,
     weight_axis_length, weight_standard_deviation_of_R, weight_B20_mean};
 
   Vector terms = {B20_term, iota_term, elongation_term, curvature_term,
-    R0_term, d2_volume_d_psi2_term, XY2_term, XY2Prime_term, Z2_term, Z2Prime_term,
-    XY3_term, XY3Prime_term, grad_B_term, grad_grad_B_term, r_singularity_term,
+    R0_term, d2_volume_d_psi2_term, XY2_term, XY2Prime_term, XY2PrimePrime_term, Z2_term, Z2Prime_term,
+    XY3_term, XY3Prime_term, XY3PrimePrime_term, grad_B_term, grad_grad_B_term, r_singularity_term,
     axis_length_term, standard_deviation_of_R_term, B20_mean_term};
 
   assert (weights.size() == terms.size());
@@ -812,10 +864,12 @@ void gsl_callback(const size_t iter, void *params,
   opt->iter_d2_volume_d_psi2_term[n_iter] = opt->d2_volume_d_psi2_term;
   opt->iter_XY2_term[n_iter] = opt->XY2_term;
   opt->iter_XY2Prime_term[n_iter] = opt->XY2Prime_term;
+  opt->iter_XY2PrimePrime_term[n_iter] = opt->XY2PrimePrime_term;
   opt->iter_Z2_term[n_iter] = opt->Z2_term;
   opt->iter_Z2Prime_term[n_iter] = opt->Z2Prime_term;
   opt->iter_XY3_term[n_iter] = opt->XY3_term;
   opt->iter_XY3Prime_term[n_iter] = opt->XY3Prime_term;
+  opt->iter_XY3PrimePrime_term[n_iter] = opt->XY3PrimePrime_term;
   opt->iter_grad_B_term[n_iter] = opt->grad_B_term;
   opt->iter_grad_grad_B_term[n_iter] = opt->grad_grad_B_term;
   opt->iter_r_singularity_term[n_iter] = opt->r_singularity_term;

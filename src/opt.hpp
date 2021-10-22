@@ -50,9 +50,9 @@ namespace qsc {
     qscfloat weight_elongation, weight_curvature;
     qscfloat weight_R0, min_R0;
     qscfloat weight_d2_volume_d_psi2, max_d2_volume_d_psi2;
-    qscfloat weight_XY2, weight_XY2Prime;
+    qscfloat weight_XY2, weight_XY2Prime, weight_XY2PrimePrime;
     qscfloat weight_Z2, weight_Z2Prime;
-    qscfloat weight_XY3, weight_XY3Prime;
+    qscfloat weight_XY3, weight_XY3Prime, weight_XY3PrimePrime;
     qscfloat weight_grad_B, weight_grad_grad_B, weight_r_singularity;
     qscfloat weight_axis_length, target_axis_length, weight_standard_deviation_of_R;
     qscfloat weight_B20_mean;
@@ -61,9 +61,9 @@ namespace qsc {
     qscfloat B20_term, iota_term;
     qscfloat elongation_term, curvature_term;
     qscfloat R0_term, d2_volume_d_psi2_term;
-    qscfloat XY2_term, XY2Prime_term;
+    qscfloat XY2_term, XY2Prime_term, XY2PrimePrime_term;
     qscfloat Z2_term, Z2Prime_term;
-    qscfloat XY3_term, XY3Prime_term;
+    qscfloat XY3_term, XY3Prime_term, XY3PrimePrime_term;
     qscfloat grad_B_term, grad_grad_B_term, r_singularity_term;
     qscfloat axis_length_term, standard_deviation_of_R_term;
     qscfloat B20_mean_term;
@@ -72,9 +72,9 @@ namespace qsc {
     Vector iter_B20_term, iter_iota_term;
     Vector iter_elongation_term, iter_curvature_term;
     Vector iter_R0_term, iter_d2_volume_d_psi2_term;
-    Vector iter_XY2_term, iter_XY2Prime_term;
+    Vector iter_XY2_term, iter_XY2Prime_term, iter_XY2PrimePrime_term;
     Vector iter_Z2_term, iter_Z2Prime_term;
-    Vector iter_XY3_term, iter_XY3Prime_term;
+    Vector iter_XY3_term, iter_XY3Prime_term, iter_XY3PrimePrime_term;
     Vector iter_grad_B_term, iter_grad_grad_B_term, iter_r_singularity_term;
     Vector iter_axis_length_term, iter_standard_deviation_of_R_term;
     Vector iter_B20_mean_term;

@@ -27,10 +27,12 @@ void Opt::write_netcdf() {
   nc.put("weight_d2_volume_d_psi2", weight_d2_volume_d_psi2, "Weight for the magnetic well term in the objective function for optimization", "dimensionless");
   nc.put("weight_XY2", weight_XY2, "Weight for the (X2,Y2) term in the objective function for optimization", "dimensionless");
   nc.put("weight_XY2Prime", weight_XY2Prime, "Weight for the (X2',Y2') term in the objective function for optimization", "dimensionless");
+  nc.put("weight_XY2PrimePrime", weight_XY2PrimePrime, "Weight for the (X2'',Y2'') term in the objective function for optimization", "dimensionless");
   nc.put("weight_Z2", weight_Z2, "Weight for the Z2 term in the objective function for optimization", "dimensionless");
   nc.put("weight_Z2Prime", weight_Z2Prime, "Weight for the Z2' term in the objective function for optimization", "dimensionless");
   nc.put("weight_XY3", weight_XY3, "Weight for the (X3,Y3) term in the objective function for optimization", "dimensionless");
   nc.put("weight_XY3Prime", weight_XY3Prime, "Weight for the (X3',Y3') term in the objective function for optimization", "dimensionless");
+  nc.put("weight_XY3PrimePrime", weight_XY3PrimePrime, "Weight for the (X3'',Y3'') term in the objective function for optimization", "dimensionless");
   nc.put("weight_grad_B", weight_grad_B, "Weight for the ||grad B|| term in the objective function for optimization", "dimensionless");
   nc.put("weight_grad_grad_B", weight_grad_grad_B, "Weight for the ||grad grad B|| term in the objective function for optimization", "dimensionless");
   nc.put("weight_r_singularity", weight_r_singularity, "Weight for the r_singularity term in the objective function for optimization", "dimensionless");
@@ -53,10 +55,12 @@ void Opt::write_netcdf() {
   nc.put(n_iter_dim, "iter_d2_volume_d_psi2_term", iter_d2_volume_d_psi2_term, "Magnetic well term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_XY2_term", iter_XY2_term, "(X2,Y2) term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_XY2Prime_term", iter_XY2Prime_term, "(d_X2_d_varphi, d_Y2_d_varphi) term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_XY2PrimePrime_term", iter_XY2PrimePrime_term, "(d2_X2_d_varphi2, d2_Y2_d_varphi2) term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_Z2_term", iter_Z2_term, "Z2 term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_Z2Prime_term", iter_Z2Prime_term, "d_Z2_d_varphi term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_XY3_term", iter_XY3_term, "(X3,Y3) term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_XY3Prime_term", iter_XY3Prime_term, "(d_X3_d_varphi, d_Y3_d_varphi) term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_XY3PrimePrime_term", iter_XY3PrimePrime_term, "(d2_X3_d_varphi2, d2_Y3_d_varphi2) term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_grad_B_term", iter_grad_B_term, "grad B term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_grad_grad_B_term", iter_grad_grad_B_term, "grad grad B term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_r_singularity_term", iter_r_singularity_term, "r_singularity term in the objective function at each iteration", "dimensionless");

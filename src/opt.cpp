@@ -37,10 +37,12 @@ void Opt::defaults() {
   max_d2_volume_d_psi2 = 0.0;
   weight_XY2 = -1.0;
   weight_XY2Prime = -1.0;
+  weight_XY2PrimePrime = -1.0;
   weight_Z2 = -1.0;
   weight_Z2Prime = -1.0;
   weight_XY3 = -1.0;
   weight_XY3Prime = -1.0;
+  weight_XY3PrimePrime = -1.0;
   weight_grad_B = -1.0;
   weight_grad_grad_B = -1.0;
   weight_r_singularity = -1.0;
