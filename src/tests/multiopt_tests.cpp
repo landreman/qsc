@@ -33,10 +33,12 @@ TEST_CASE("Running a standalone opt should yield identical results to a 1-stage 
       opt.weight_d2_volume_d_psi2 = 5.0;
       opt.weight_XY2 = 6.0;
       opt.weight_XY2Prime = 7.0;
+      opt.weight_XY2PrimePrime = 7.2;
       opt.weight_Z2 = 6.5;
       opt.weight_Z2Prime = 7.5;
       opt.weight_XY3 = 8.0;
       opt.weight_XY3Prime = 9.0;
+      opt.weight_XY3PrimePrime = 9.5;
       opt.weight_grad_B = 10.0;
       opt.weight_grad_grad_B = 11.0;
       opt.weight_r_singularity = 12.0;
@@ -146,10 +148,12 @@ TEST_CASE("Running a standalone opt should yield identical results to a 1-stage 
       mo.opts[0].weight_d2_volume_d_psi2 = opt.weight_d2_volume_d_psi2;
       mo.opts[0].weight_XY2 = opt.weight_XY2;
       mo.opts[0].weight_XY2Prime = opt.weight_XY2Prime;
+      mo.opts[0].weight_XY2PrimePrime = opt.weight_XY2PrimePrime;
       mo.opts[0].weight_Z2 = opt.weight_Z2;
       mo.opts[0].weight_Z2Prime = opt.weight_Z2Prime;
       mo.opts[0].weight_XY3 = opt.weight_XY3;
       mo.opts[0].weight_XY3Prime = opt.weight_XY3Prime;
+      mo.opts[0].weight_XY3PrimePrime = opt.weight_XY3PrimePrime;
       mo.opts[0].weight_grad_B = opt.weight_grad_B;
       mo.opts[0].weight_grad_grad_B = opt.weight_grad_grad_B;
       mo.opts[0].weight_r_singularity = opt.weight_r_singularity;

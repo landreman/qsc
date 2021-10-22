@@ -144,10 +144,12 @@ void MultiOptScan::write_netcdf() {
   nc.put(n_scan_dim, "scan_max_d2_volume_d_psi2", scan_max_d2_volume_d_psi2, " ", "dimensionless");
   nc.put(n_scan_dim, "scan_weight_XY2", scan_weight_XY2, " ", "dimensionless");
   nc.put(n_scan_dim, "scan_weight_XY2Prime", scan_weight_XY2Prime, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_weight_XY2PrimePrime", scan_weight_XY2PrimePrime, " ", "dimensionless");
   nc.put(n_scan_dim, "scan_weight_Z2", scan_weight_Z2, " ", "dimensionless");
   nc.put(n_scan_dim, "scan_weight_Z2Prime", scan_weight_Z2Prime, " ", "dimensionless");
   nc.put(n_scan_dim, "scan_weight_XY3", scan_weight_XY3, " ", "dimensionless");
   nc.put(n_scan_dim, "scan_weight_XY3Prime", scan_weight_XY3Prime, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_weight_XY3PrimePrime", scan_weight_XY3PrimePrime, " ", "dimensionless");
   nc.put(n_scan_dim, "scan_weight_grad_B", scan_weight_grad_B, " ", "dimensionless");
   nc.put(n_scan_dim, "scan_weight_grad_grad_B", scan_weight_grad_grad_B, " ", "dimensionless");
   nc.put(n_scan_dim, "scan_weight_r_singularity", scan_weight_r_singularity, " ", "dimensionless");

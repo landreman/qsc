@@ -46,10 +46,12 @@ void Opt::input(std::string filename) {
   toml_read(varlist, indata, "max_d2_volume_d_psi2", max_d2_volume_d_psi2);
   toml_read(varlist, indata, "weight_XY2", weight_XY2);
   toml_read(varlist, indata, "weight_XY2Prime", weight_XY2Prime);
+  toml_read(varlist, indata, "weight_XY2PrimePrime", weight_XY2PrimePrime);
   toml_read(varlist, indata, "weight_Z2", weight_Z2);
   toml_read(varlist, indata, "weight_Z2Prime", weight_Z2Prime);
   toml_read(varlist, indata, "weight_XY3", weight_XY3);
   toml_read(varlist, indata, "weight_XY3Prime", weight_XY3Prime);
+  toml_read(varlist, indata, "weight_XY3PrimePrime", weight_XY3PrimePrime);
   toml_read(varlist, indata, "weight_grad_B", weight_grad_B);
   toml_read(varlist, indata, "weight_grad_grad_B", weight_grad_grad_B);
   toml_read(varlist, indata, "weight_r_singularity", weight_r_singularity);
