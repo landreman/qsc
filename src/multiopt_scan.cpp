@@ -315,6 +315,10 @@ void MultiOptScan::eval_scan_index(int j_scan) {
 	mo.opts[stage].weight_r_singularity = val;
 	if (verbose > 1) std::cout << "Setting weight_r_singularity for opt stage " << stage << " to " << val << std::endl;
 	
+      } else if (params[j].compare("weight_grad_B") == 0) {
+	mo.opts[stage].weight_grad_B = val;
+	if (verbose > 1) std::cout << "Setting weight_grad_B for opt stage " << stage << " to " << val << std::endl;
+	
       } else if (params[j].compare("weight_grad_grad_B") == 0) {
 	mo.opts[stage].weight_grad_grad_B = val;
 	if (verbose > 1) std::cout << "Setting weight_grad_grad_B for opt stage " << stage << " to " << val << std::endl;
