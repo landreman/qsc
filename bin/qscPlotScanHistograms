@@ -1,0 +1,375 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import numpy as np
+from scipy.io import netcdf
+import matplotlib.pyplot as plt
+import matplotlib
+
+print()
+print("Usage: ", os.path.basename(__file__), ' qsc_out.<extension>.nc')
+
+if len(sys.argv) != 2:
+   raise RuntimeError("A qsc_out.*.nc file must be provided as an argument")
+
+filename = sys.argv[1]
+bare_filename = os.path.basename(filename)
+s = 'qsc_out.'
+if bare_filename[:len(s)] != s or filename[-3:] != '.nc':
+   raise RuntimeError("A qsc_out.*.nc file must be provided as an argument")
+   
+f = netcdf.netcdf_file(filename, 'r', mmap=False)
+n_scan = f.variables['n_scan'][()]
+iota = np.abs(f.variables['scan_iota'][()])
+axis_length = f.variables['scan_axis_length'][()]
+eta_bar = f.variables['scan_eta_bar'][()]
+B2c = f.variables['scan_B2c'][()]
+B20_variation = f.variables['scan_B20_variation'][()]
+B20_mean = f.variables['scan_B20_mean'][()]
+r_singularity = f.variables['scan_r_singularity'][()]
+d2_volume_d_psi2 = f.variables['scan_d2_volume_d_psi2'][()]
+L_grad_B = f.variables['scan_min_L_grad_B'][()]
+L_grad_grad_B = f.variables['scan_min_L_grad_grad_B'][()]
+elongation = f.variables['scan_max_elongation'][()]
+weight_elongation = f.variables['scan_weight_elongation'][()]
+weight_grad_grad_B = f.variables['scan_weight_grad_grad_B'][()]
+weight_B20 = f.variables['scan_weight_B20'][()]
+weight_axis_length = f.variables['scan_weight_axis_length'][()]
+target_axis_length = f.variables['scan_target_axis_length'][()]
+weight_iota = f.variables['scan_weight_iota'][()]
+target_iota = f.variables['scan_target_iota'][()]
+weight_standard_deviation_of_R = f.variables['scan_weight_standard_deviation_of_R'][()]
+try:
+   weight_B20_mean = f.variables['scan_weight_B20_mean'][()]
+except:
+   weight_B20_mean = -np.ones_like(iota)
+weight_d2_volume_d_psi2 = f.variables['scan_weight_d2_volume_d_psi2'][()]
+max_d2_volume_d_psi2 = f.variables['scan_max_d2_volume_d_psi2'][()]
+max_XY2 = f.variables['scan_max_XY2'][()]
+max_Z2 = f.variables['scan_max_Z2'][()]
+max_XY3 = f.variables['scan_max_XY3'][()]
+max_d_XY2_d_varphi = f.variables['scan_max_d_XY2_d_varphi'][()]
+max_d_Z2_d_varphi = f.variables['scan_max_d_Z2_d_varphi'][()]
+max_d_XY3_d_varphi = f.variables['scan_max_d_XY3_d_varphi'][()]
+R0c = f.variables['scan_R0c'][()]
+Z0s = f.variables['scan_Z0s'][()]
+helicity = f.variables['scan_helicity'][()]
+print('R0c.shape:', R0c.shape)
+R0c1 = np.abs(R0c[:, 1])
+Z0s1 = Z0s[:, 1]
+
+max_XYZ23 = np.max(np.array([max_XY2, max_Z2, max_XY3]), axis=0)
+max_d_XYZ23_d_varphi = np.max(np.array([max_d_XY2_d_varphi, max_d_Z2_d_varphi, max_d_XY3_d_varphi]), axis=0)
+
+# For r_singularity, replace 1e30 with 1
+r_singularity = np.minimum(r_singularity, np.ones_like(r_singularity))
+
+# Further filter the results:
+mask = max_d_XYZ23_d_varphi < 1e30
+mask = np.logical_and(mask, B20_variation < 0.09)
+mask = np.logical_and(mask, axis_length > 6.28 * 2)
+mask = np.logical_and(mask, axis_length < 6.29 * 2)
+mask = np.logical_and(mask, max_d_XYZ23_d_varphi < 3.5)
+mask = np.logical_and(mask, r_singularity > 0.25)
+mask = np.logical_and(mask, max_XYZ23 < 0.6)
+"""
+#mask = helicity != 0
+mask = d2_volume_d_psi2 < 0
+mask = np.logical_and(mask, np.abs(iota) > 0.41)
+mask = np.logical_and(mask, elongation < 8)
+
+mask = np.logical_and(mask, L_grad_grad_B > 0.33)
+mask = np.logical_and(mask, B20_mean < 1)
+
+#mask = weight_axis_length >= 10
+#mask = axis_length < 1e30
+#mask = np.logical_and(mask, np.abs(iota) < 0.46)
+mask = np.logical_and(mask, L_grad_B > 0.572)
+
+#mask = max_d_XYZ23_d_varphi < 3.7
+"""
+
+print('Scan indices that pass the mask:')
+print(np.nonzero(mask)[0])
+#print(np.where(mask)[0])
+#exit(0)
+
+"""
+fields = ['iota', 'eta_bar', 'B2c', 'B20_variation', 'r_singularity', 'd2_volume_d_psi2',
+          'L_grad_B', 'L_grad_grad_B', 'elongation', 'weight_grad_grad_B', 'weight_B20',
+          'max_XY2', 'max_Z2', 'max_XY3', 'max_d_XY2_d_varphi', 'max_d_Z2_d_varphi', 'max_d_XY3_d_varphi',
+          'R0c1', 'Z0s1']
+
+for field in fields:
+   eval(field + " = " + field + "[mask]")
+"""
+iota = iota[mask]
+axis_length = axis_length[mask]
+eta_bar = np.abs(eta_bar[mask])
+B2c = B2c[mask]
+B20_variation = B20_variation[mask]
+B20_mean = B20_mean[mask]
+r_singularity = r_singularity[mask]
+d2_volume_d_psi2 = d2_volume_d_psi2[mask]
+L_grad_B = L_grad_B[mask]
+L_grad_grad_B = L_grad_grad_B[mask]
+elongation = elongation[mask]
+weight_elongation = weight_elongation[mask]
+weight_grad_grad_B = weight_grad_grad_B[mask]
+weight_B20 = weight_B20[mask]
+weight_axis_length = weight_axis_length[mask]
+target_axis_length = target_axis_length[mask]
+weight_iota = weight_iota[mask]
+target_iota = target_iota[mask]
+weight_standard_deviation_of_R = weight_standard_deviation_of_R[mask]
+weight_B20_mean = weight_B20_mean[mask]
+weight_d2_volume_d_psi2 = weight_d2_volume_d_psi2[mask]
+max_d2_volume_d_psi2 = max_d2_volume_d_psi2[mask]
+max_XY2 = max_XY2[mask]
+max_Z2 = max_Z2[mask]
+max_XY3 = max_XY3[mask]
+max_d_XY2_d_varphi = max_d_XY2_d_varphi[mask]
+max_d_Z2_d_varphi = max_d_Z2_d_varphi[mask]
+max_d_XY3_d_varphi = max_d_XY3_d_varphi[mask]
+helicity = helicity[mask]
+R0c1 = R0c1[mask]
+Z0s1 = Z0s1[mask]
+max_XYZ23 = max_XYZ23[mask]
+max_d_XYZ23_d_varphi = max_d_XYZ23_d_varphi[mask]
+
+n_scan = len(iota)
+print('Number of points passing filters:', n_scan)
+
+print("R0c1:", R0c1)
+print("Z0s1:", Z0s1)
+print("iota:", iota)
+print("B20_variation:", B20_variation)
+
+well = (d2_volume_d_psi2 < 0)
+hill = (d2_volume_d_psi2 >= 0)
+
+def loghist(x, bins=10, **kwargs):
+  hist, bins = np.histogram(x, bins=bins)
+  logbins = np.logspace(np.log10(bins[0]), np.log10(bins[-1]), len(bins))
+  plt.hist(x, bins=logbins, **kwargs)
+  plt.xscale('log')
+  
+fig = plt.figure(figsize=(14,7))
+plt.rcParams.update({'font.size': 6})
+
+nrows = 6
+ncols = 8
+jplot = 1
+bins = 20
+
+def plot_row(title, logx=False):
+    global jplot
+    x = eval(title)
+    
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    if logx:
+        loghist(x, bins=bins)
+    else:
+        plt.hist(x, bins=bins)
+    plt.xlabel(title)
+
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    plt.scatter(x, B20_variation, c=r_singularity, s=4)
+    plt.xlabel(title)
+    if logx:
+        plt.xscale('log')
+    plt.ylabel('B20_variation')
+    plt.yscale('log')
+    plt.title('color = r_singularity')
+    plt.colorbar()
+
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    plt.scatter(x, r_singularity, c=B20_variation, s=4)
+    plt.xlabel(title)
+    if logx:
+        plt.xscale('log')
+    plt.ylabel('r_singularity')
+    plt.title('color = B20_variation')
+    plt.colorbar()
+
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    plt.scatter(x, L_grad_B, c=L_grad_grad_B, s=4)
+    plt.xlabel(title)
+    if logx:
+        plt.xscale('log')
+    plt.ylabel('L_grad_B')
+    plt.title('color = L_grad_grad_B')
+    plt.colorbar()
+
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    plt.scatter(x, L_grad_grad_B, c=L_grad_B, s=4)
+    plt.xlabel(title)
+    if logx:
+        plt.xscale('log')
+    plt.ylabel('L_grad_grad_B')
+    plt.title('color = L_grad_B')
+    plt.colorbar()
+
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    plt.scatter(x, d2_volume_d_psi2, c=r_singularity, s=4)
+    plt.xlabel(title)
+    if logx:
+        plt.xscale('log')
+    plt.ylabel('d2_volume_d_psi2')
+    plt.title('color = r_singularity')
+    plt.colorbar()
+
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    plt.scatter(x, max_XYZ23, s=4)
+    plt.xlabel(title)
+    if logx:
+        plt.xscale('log')
+    plt.ylabel('max_XYZ23')
+
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    plt.scatter(x, max_d_XYZ23_d_varphi, s=4)
+    plt.xlabel(title)
+    if logx:
+        plt.xscale('log')
+    plt.ylabel('max_d_XYZ23_d_varphi')
+
+#plot_row('R0c1')
+#plot_row('target_iota')
+#plot_row('weight_iota', True)
+plot_row('target_axis_length')
+plot_row('weight_axis_length', True)
+plot_row('weight_B20', True)
+plot_row('weight_grad_grad_B', True)
+#plot_row('weight_elongation', True)
+plot_row('max_d2_volume_d_psi2')
+plot_row('weight_d2_volume_d_psi2', True)
+"""
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.hist(weight_B20, bins=bins)
+plt.xlabel('weight_B20')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+loghist(weight_B20, bins=bins)
+plt.xlabel('weight_B20')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.scatter(weight_B20, B20_variation, c=r_singularity, s=4)
+plt.xlabel('weight_B20')
+plt.ylabel('B20_variation')
+plt.xscale('log')
+plt.yscale('log')
+plt.title('color = r_singularity')
+plt.colorbar()
+
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.hist(weight_grad_grad_B, bins=bins)
+plt.xlabel('weight_grad_grad_B')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+loghist(weight_grad_grad_B, bins=bins)
+plt.xlabel('weight_grad_grad_B')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.scatter(weight_grad_grad_B, r_singularity, c=B20_variation, s=4)
+plt.xlabel('weight_grad_grad_B')
+plt.ylabel('r_singularity')
+plt.xscale('log')
+plt.yscale('log')
+plt.title('color = B20_variation')
+plt.colorbar()
+"""
+
+plt.figtext(0.5, 0.998, os.path.abspath(filename), ha='center', va='top', fontsize=6)
+plt.figtext(0.5, 0.002, 'Plotted by ' + os.path.abspath(__file__), ha='center', va='bottom', fontsize=6)
+plt.tight_layout()
+
+fig = plt.figure(figsize=(14,7))
+
+nrows = 3
+ncols = 4
+jplot = 1
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.hist(iota, bins=bins)
+plt.xlabel('iota')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.hist(eta_bar, bins=bins)
+plt.xlabel('eta_bar')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.hist(B2c, bins=bins)
+plt.xlabel('B2c')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.hist(B20_mean, bins=bins)
+plt.xlabel('B20_mean')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.hist(axis_length, bins=bins)
+plt.xlabel('axis_length')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.plot(R0c1, axis_length, '.', ms=4)
+plt.ylabel('axis_length')
+plt.xlabel('R0c1')
+
+if np.max(weight_axis_length) > 0:
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    loghist(weight_axis_length, bins=bins)
+    plt.xlabel('weight_axis_length')
+
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    minval = np.min(target_axis_length)
+    maxval = np.max(target_axis_length)
+    plt.plot([minval, maxval], [minval, maxval], ':k')
+    plt.scatter(target_axis_length, axis_length, c=weight_axis_length, s=4,
+                norm=matplotlib.colors.LogNorm())
+    plt.title('Color = weight_axis_length')
+    plt.xlabel('target axis length')
+    plt.ylabel('actual axis length')
+    plt.colorbar()
+
+if np.max(weight_iota) > 0:
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    minval = np.min(target_iota)
+    maxval = np.max(target_iota)
+    plt.plot([minval, maxval], [minval, maxval], ':k')
+    plt.scatter(target_iota, iota, c=weight_iota, s=4,
+                norm=matplotlib.colors.LogNorm())
+    plt.title('Color = weight_iota')
+    plt.xlabel('target iota')
+    plt.ylabel('actual iota')
+    plt.colorbar()
+
+if np.max(weight_standard_deviation_of_R) > 0:
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    loghist(weight_standard_deviation_of_R, bins=bins)
+    plt.xlabel('weight_standard_deviation_of_R')
+
+if np.max(weight_d2_volume_d_psi2) > 0:
+    plt.subplot(nrows, ncols, jplot); jplot += 1
+    plt.hist(max_d2_volume_d_psi2, bins=bins)
+    plt.xlabel('max_d2_volume_d_psi2')
+   
+plt.subplot(nrows, ncols, jplot); jplot += 1
+histtype = 'step'
+plt.hist(max_XY2, bins=bins, histtype=histtype, label="max XY2")
+plt.hist(max_Z2, bins=bins, histtype=histtype, label="max Z2")
+plt.hist(max_XY3, bins=bins, histtype=histtype, label="max XY3")
+plt.legend(loc=0)
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+histtype = 'step'
+plt.hist(max_d_XY2_d_varphi, bins=bins, histtype=histtype, label="max d XY2 / d varphi")
+plt.hist(max_d_Z2_d_varphi, bins=bins, histtype=histtype, label="max d Z2 / d varphi")
+plt.hist(max_d_XY3_d_varphi, bins=bins, histtype=histtype, label="max d XY3 / d varphi")
+plt.legend(loc=0)
+
+plt.figtext(0.5, 0.998, os.path.abspath(filename), ha='center', va='top', fontsize=6)
+plt.figtext(0.5, 0.002, 'Plotted by ' + os.path.abspath(__file__), ha='center', va='bottom', fontsize=6)
+
+plt.tight_layout()
+plt.show()

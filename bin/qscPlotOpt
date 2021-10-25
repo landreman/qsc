@@ -47,6 +47,8 @@ weight_XY3Prime = max(0, f.variables['weight_XY3Prime'][()])
 weight_grad_B = max(0, f.variables['weight_grad_B'][()])
 weight_grad_grad_B = max(0, f.variables['weight_grad_grad_B'][()])
 weight_r_singularity = max(0, f.variables['weight_r_singularity'][()])
+weight_axis_length = max(0, f.variables['weight_axis_length'][()])
+weight_standard_deviation_of_R = max(0, f.variables['weight_standard_deviation_of_R'][()])
 
 objective_function = f.variables['iter_objective_function'][()]
 B20_term = f.variables['iter_B20_term'][()]
@@ -64,6 +66,8 @@ XY3Prime_term = f.variables['iter_XY3Prime_term'][()]
 grad_B_term = f.variables['iter_grad_B_term'][()]
 grad_grad_B_term = f.variables['iter_grad_grad_B_term'][()]
 r_singularity_term = f.variables['iter_r_singularity_term'][()]
+axis_length_term = f.variables['iter_axis_length_term'][()]
+standard_deviation_of_R_term = f.variables['iter_standard_deviation_of_R_term'][()]
 
 axis_nmax_plus_1 = R0c.shape[1]
 print("R0c.shape: ", R0c.shape)
@@ -153,6 +157,8 @@ plt.plot(iteration, 0.5 * weight_XY3Prime**2 * XY3Prime_term, '^--', label='XY3P
 plt.plot(iteration, 0.5 * weight_grad_B**2 * grad_B_term, '^--', label='grad_B term', ms=markersize)
 plt.plot(iteration, 0.5 * weight_grad_grad_B**2 * grad_grad_B_term, '^--', label='grad_grad_B term', ms=markersize)
 plt.plot(iteration, 0.5 * weight_r_singularity**2 * r_singularity_term, '^--', label='r_singularity term', ms=markersize)
+plt.plot(iteration, 0.5 * weight_axis_length**2 * axis_length_term, '^--', label='axis_length term', ms=markersize)
+plt.plot(iteration, 0.5 * weight_standard_deviation_of_R**2 * standard_deviation_of_R_term, '^--', label='standard_deviation_of_R term', ms=markersize)
 plt.semilogy(iteration, objective_function, ':k', label='total')
 plt.xlabel('iteration', labelpad=labelpad)
 plt.legend(loc='upper left', fontsize=6, bbox_to_anchor=(1.01, 1))
@@ -174,6 +180,8 @@ plt.plot(iteration, XY3Prime_term, '^--', label='XY3Prime term', ms=markersize)
 plt.plot(iteration, grad_B_term, '^--', label='grad_B term', ms=markersize)
 plt.plot(iteration, grad_grad_B_term, '^--', label='grad_grad_B term', ms=markersize)
 plt.plot(iteration, r_singularity_term, '^--', label='r_singularity term', ms=markersize)
+plt.plot(iteration, axis_length_term, '^--', label='axis_length term', ms=markersize)
+plt.plot(iteration, standard_deviation_of_R_term, '^--', label='standard_deviation_of_R term', ms=markersize)
 plt.xlabel('iteration', labelpad=labelpad)
 plt.title('Unweighted objective terms')
 

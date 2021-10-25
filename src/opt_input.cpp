@@ -22,7 +22,7 @@ void Opt::input(std::string filename) {
   vary_Z0s[0] = false;
     
   auto toml_file = toml::parse(filename);
-  auto indata = toml::find(toml_file, "opt");
+  auto indata = toml::find(toml_file, toml_group);
   
   std::vector<std::string> varlist;
 
@@ -34,10 +34,6 @@ void Opt::input(std::string filename) {
   toml_read(varlist, indata, "vary_R0s", vary_R0s);
   toml_read(varlist, indata, "vary_Z0c", vary_Z0c);
   toml_read(varlist, indata, "vary_Z0s", vary_Z0s);
-  if (vary_R0c.size() != q.R0c.size()) throw std::runtime_error("Size of vary_R0c is incorrect");
-  if (vary_R0s.size() != q.R0s.size()) throw std::runtime_error("Size of vary_R0s is incorrect");
-  if (vary_Z0c.size() != q.Z0c.size()) throw std::runtime_error("Size of vary_Z0c is incorrect");
-  if (vary_Z0s.size() != q.Z0s.size()) throw std::runtime_error("Size of vary_Z0s is incorrect");
   
   toml_read(varlist, indata, "weight_B20", weight_B20);
   toml_read(varlist, indata, "weight_iota", weight_iota);
@@ -50,18 +46,27 @@ void Opt::input(std::string filename) {
   toml_read(varlist, indata, "max_d2_volume_d_psi2", max_d2_volume_d_psi2);
   toml_read(varlist, indata, "weight_XY2", weight_XY2);
   toml_read(varlist, indata, "weight_XY2Prime", weight_XY2Prime);
+  toml_read(varlist, indata, "weight_XY2PrimePrime", weight_XY2PrimePrime);
   toml_read(varlist, indata, "weight_Z2", weight_Z2);
   toml_read(varlist, indata, "weight_Z2Prime", weight_Z2Prime);
   toml_read(varlist, indata, "weight_XY3", weight_XY3);
   toml_read(varlist, indata, "weight_XY3Prime", weight_XY3Prime);
+  toml_read(varlist, indata, "weight_XY3PrimePrime", weight_XY3PrimePrime);
   toml_read(varlist, indata, "weight_grad_B", weight_grad_B);
   toml_read(varlist, indata, "weight_grad_grad_B", weight_grad_grad_B);
   toml_read(varlist, indata, "weight_r_singularity", weight_r_singularity);
-
+  toml_read(varlist, indata, "weight_axis_length", weight_axis_length);
+  toml_read(varlist, indata, "target_axis_length", target_axis_length);
+  toml_read(varlist, indata, "weight_standard_deviation_of_R", weight_standard_deviation_of_R);
+  toml_read(varlist, indata, "weight_B20_mean", weight_B20_mean);
+  
   toml_read(varlist, indata, "max_iter", max_iter);
   toml_read(varlist, indata, "verbose", verbose);
   toml_read(varlist, indata, "make_names", make_names);
   toml_read(varlist, indata, "fourier_refine", fourier_refine);
+  toml_read(varlist, indata, "nphi", nphi);
+  if (nphi.size() > 0 && nphi.size() != fourier_refine + 1)
+    throw std::runtime_error("Size of the multiopt nphi array does not match fourier_refine + 1");
 
   std::string algorithm_str = "";
   toml_read(varlist, indata, "algorithm", algorithm_str);
@@ -77,6 +82,18 @@ void Opt::input(std::string filename) {
     // Stick with the default
   } else {
     throw std::runtime_error("Unrecognized algorithm");
+  }
+
+  std::string diff_method_str = "";
+  toml_read(varlist, indata, "diff_method", diff_method_str);
+  if (diff_method_str.compare("forward") == 0) {
+    diff_method = DIFF_METHOD_FORWARD;
+  } else if (diff_method_str.compare("centered") == 0) {
+    diff_method = DIFF_METHOD_CENTERED;
+  } else if (diff_method_str.compare("") == 0) {
+    // Stick with the default
+  } else {
+    throw std::runtime_error("Unrecognized diff_method");
   }
   
   toml_unused(varlist, indata);
@@ -143,5 +160,6 @@ void Opt::input(std::string filename) {
     std::cout << "weight_grad_B: " << weight_grad_B << std::endl;
     std::cout << "weight_grad_grad_B: " << weight_grad_grad_B << std::endl;
     std::cout << "weight_r_singularity: " << weight_r_singularity << std::endl;
+    std::cout << "weight_B20_mean: " << weight_B20_mean << std::endl;
   }
 }

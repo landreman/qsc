@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# This script runs the examples using single precision. It is used in the Github Actions continuous integration.
+
+set -ex
+
+XQSC=../bin/xqsc_single
+
+$XQSC qsc_in.single_LandremanSenguptaPlunk_section5.1
+$XQSC qsc_in.single_LandremanSengupta2019_section5.1
+$XQSC qsc_in.single_LandremanSengupta2019_section5.2
+
+# Opt presently only works with double precision
+# $XQSC qsc_in.opt_QH_nfp4
+
+$XQSC qsc_in.random_scan_small
+$XQSC qsc_in.random_scan_realistic
+mpiexec -n 2 $XQSC qsc_in.random_scan_small
+mpiexec -n 2 $XQSC qsc_in.random_scan_realistic

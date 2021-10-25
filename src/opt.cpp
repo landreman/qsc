@@ -1,4 +1,3 @@
-#include <mpi.h>
 #include "opt.hpp"
 
 using namespace qsc;
@@ -10,6 +9,9 @@ void Opt::defaults() {
   make_names = true;
   algorithm = GSL_LM;
   fourier_refine = 0;
+  toml_group = "opt";
+  diff_method = DIFF_METHOD_FORWARD;
+  n_evals = 0;
 
   vary_eta_bar = true;
   vary_sigma0 = false;
@@ -33,15 +35,21 @@ void Opt::defaults() {
   min_R0 = 0.3;
   weight_d2_volume_d_psi2 = -1.0;
   max_d2_volume_d_psi2 = 0.0;
-  weight_XY2 = 1.0;
-  weight_XY2Prime = 1.0;
+  weight_XY2 = -1.0;
+  weight_XY2Prime = -1.0;
+  weight_XY2PrimePrime = -1.0;
   weight_Z2 = -1.0;
   weight_Z2Prime = -1.0;
   weight_XY3 = -1.0;
   weight_XY3Prime = -1.0;
+  weight_XY3PrimePrime = -1.0;
   weight_grad_B = -1.0;
   weight_grad_grad_B = -1.0;
   weight_r_singularity = -1.0;
+  weight_axis_length = -1.0;
+  target_axis_length = 0.0;
+  weight_standard_deviation_of_R = -1.0;
+  weight_B20_mean = -1.0;
 }
 
 Opt::Opt() {

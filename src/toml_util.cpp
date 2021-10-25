@@ -80,9 +80,30 @@ void qsc::toml_read(std::vector<std::string>& varlist, toml::value indata, std::
 void qsc::toml_read(std::vector<std::string>& varlist, toml::value indata, std::string varname, std::valarray<bool>& var) {
   if (indata.contains(varname)) {
     auto indata_vector = toml::find<std::vector<bool>>(indata, varname);
-    // Convert the std::vector<bool> to a Vector:
+    // Convert the std::vector<bool> to a std::valarrary<bool>:
     var.resize(indata_vector.size(), true);
     for (int j = 0; j < indata_vector.size(); j++) var[j] = indata_vector[j];
+  }
+  varlist.push_back(varname);
+}
+
+/** Handle valarray<int>
+ */
+void qsc::toml_read(std::vector<std::string>& varlist, toml::value indata, std::string varname, std::valarray<int>& var) {
+  if (indata.contains(varname)) {
+    auto indata_vector = toml::find<std::vector<int>>(indata, varname);
+    // Convert the std::vector<bool> to a std::valarray<int>:
+    var.resize(indata_vector.size(), 1);
+    for (int j = 0; j < indata_vector.size(); j++) var[j] = indata_vector[j];
+  }
+  varlist.push_back(varname);
+}
+
+/** Handle vector<string>
+ */
+void qsc::toml_read(std::vector<std::string>& varlist, toml::value indata, std::string varname, std::vector<std::string>& var) {
+  if (indata.contains(varname)) {
+    var = toml::find<std::vector<std::string>>(indata, varname);
   }
   varlist.push_back(varname);
 }

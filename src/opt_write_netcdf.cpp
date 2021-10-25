@@ -17,6 +17,7 @@ void Opt::write_netcdf() {
 
   // Scalars
   nc.put("n_iter", n_iter, "Number of optimization iterations saved", "dimensionless");
+  nc.put("n_evals", n_evals, "Number of evaluations of the objective function", "dimensionless");
   
   nc.put("weight_B20", weight_B20, "Weight for the B20 term in the objective function for optimization", "dimensionless");
   nc.put("weight_iota", weight_iota, "Weight for the iota term in the objective function for optimization", "dimensionless");
@@ -26,16 +27,22 @@ void Opt::write_netcdf() {
   nc.put("weight_d2_volume_d_psi2", weight_d2_volume_d_psi2, "Weight for the magnetic well term in the objective function for optimization", "dimensionless");
   nc.put("weight_XY2", weight_XY2, "Weight for the (X2,Y2) term in the objective function for optimization", "dimensionless");
   nc.put("weight_XY2Prime", weight_XY2Prime, "Weight for the (X2',Y2') term in the objective function for optimization", "dimensionless");
+  nc.put("weight_XY2PrimePrime", weight_XY2PrimePrime, "Weight for the (X2'',Y2'') term in the objective function for optimization", "dimensionless");
   nc.put("weight_Z2", weight_Z2, "Weight for the Z2 term in the objective function for optimization", "dimensionless");
   nc.put("weight_Z2Prime", weight_Z2Prime, "Weight for the Z2' term in the objective function for optimization", "dimensionless");
   nc.put("weight_XY3", weight_XY3, "Weight for the (X3,Y3) term in the objective function for optimization", "dimensionless");
   nc.put("weight_XY3Prime", weight_XY3Prime, "Weight for the (X3',Y3') term in the objective function for optimization", "dimensionless");
+  nc.put("weight_XY3PrimePrime", weight_XY3PrimePrime, "Weight for the (X3'',Y3'') term in the objective function for optimization", "dimensionless");
   nc.put("weight_grad_B", weight_grad_B, "Weight for the ||grad B|| term in the objective function for optimization", "dimensionless");
   nc.put("weight_grad_grad_B", weight_grad_grad_B, "Weight for the ||grad grad B|| term in the objective function for optimization", "dimensionless");
   nc.put("weight_r_singularity", weight_r_singularity, "Weight for the r_singularity term in the objective function for optimization", "dimensionless");
+  nc.put("weight_axis_length", weight_axis_length, "Weight for the axis_length term in the objective function for optimization", "dimensionless");
+  nc.put("weight_standard_deviation_of_R", weight_standard_deviation_of_R, "Weight for the standard_deviation_of_R term in the objective function for optimization", "dimensionless");
+  nc.put("weight_B20_mean", weight_B20_mean, "Weight for the B20_mean term in the objective function for optimization", "dimensionless");
 
   nc.put("target_iota", target_iota, "Target iota for the iota term in the objective function for optimization", "dimensionless");
   nc.put("min_R0", min_R0, "Minimum major radius of the magnetic axis for the associated penalty term in the objective function for optimization", "dimensionless");
+  nc.put("target_axis_length", target_axis_length, "Target length of the magnetic axis for the iota term in the objective function for optimization", "meters");
   
   // 1D Vectors
   nc.put(n_iter_dim, "iter_fourier_refine_step", iter_fourier_refine_step, "Step number with respect to expanding the number of Fourier modes for the axis shape", "dimensionless");
@@ -48,13 +55,18 @@ void Opt::write_netcdf() {
   nc.put(n_iter_dim, "iter_d2_volume_d_psi2_term", iter_d2_volume_d_psi2_term, "Magnetic well term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_XY2_term", iter_XY2_term, "(X2,Y2) term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_XY2Prime_term", iter_XY2Prime_term, "(d_X2_d_varphi, d_Y2_d_varphi) term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_XY2PrimePrime_term", iter_XY2PrimePrime_term, "(d2_X2_d_varphi2, d2_Y2_d_varphi2) term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_Z2_term", iter_Z2_term, "Z2 term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_Z2Prime_term", iter_Z2Prime_term, "d_Z2_d_varphi term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_XY3_term", iter_XY3_term, "(X3,Y3) term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_XY3Prime_term", iter_XY3Prime_term, "(d_X3_d_varphi, d_Y3_d_varphi) term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_XY3PrimePrime_term", iter_XY3PrimePrime_term, "(d2_X3_d_varphi2, d2_Y3_d_varphi2) term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_grad_B_term", iter_grad_B_term, "grad B term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_grad_grad_B_term", iter_grad_grad_B_term, "grad grad B term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_r_singularity_term", iter_r_singularity_term, "r_singularity term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_axis_length_term", iter_axis_length_term, "axis_length term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_standard_deviation_of_R_term", iter_standard_deviation_of_R_term, "standard_deviation_of_R term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_B20_mean_term", iter_B20_mean_term, "B20_mean term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_eta_bar", iter_eta_bar, "eta_bar at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_sigma0", iter_sigma0, "sigma0 at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_B2c", iter_B2c, "B2c at each iteration", "dimensionless");
@@ -72,6 +84,8 @@ void Opt::write_netcdf() {
   nc.put(n_iter_dim, "iter_DMerc_times_r2", iter_DMerc_times_r2, "DMerc_times_r2 at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_standard_deviation_of_R", iter_standard_deviation_of_R, "standard_deviation_of_R at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_standard_deviation_of_Z", iter_standard_deviation_of_Z, "standard_deviation_of_Z at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_axis_length", iter_axis_length, "Length of the magnetic axis at each iteration", "meters");
+  
   /*
   std::string general_option = "random";
   nc.put("general_option", general_option, "Whether this job was a single configuration vs a scan");

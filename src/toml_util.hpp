@@ -29,6 +29,14 @@ namespace qsc {
    */
   void toml_read(std::vector<std::string>& varlist, toml::value indata, std::string varname, std::valarray<bool>& var);
   
+  /** Handle valarray<int>
+   */
+  void toml_read(std::vector<std::string>& varlist, toml::value indata, std::string varname, std::valarray<int>& var);
+  
+  /** Handle vector<string>
+   */
+  void toml_read(std::vector<std::string>& varlist, toml::value indata, std::string varname, std::vector<std::string>& var);
+  
   /** Expand a Vector to a longer size, padding with zeros.
    */
   void pad_vector(Vector& v, std::size_t newsize);

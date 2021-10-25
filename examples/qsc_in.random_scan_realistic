@@ -1,22 +1,17 @@
-# This is a sample input file
+# This is a sample input file for a random scan.
 
 general_option = 'random'
 
 [qsc]
+
 nfp = 4
-# I can put comments here
 nphi = 51
-eta_bar = -1.1
-#R0c = [1.0, 0.3, 0.09]
-
 verbose = 0
-
 order_r_option = "r2"
 
-#R0c = [1.0]
-#Z0s = [0.0]
- R0c = [1.0, 0.04, 0.002]
- Z0s = [0.0, 0.03]
+eta_bar = -1.1
+R0c = [1.0, 0.04, 0.002]
+Z0s = [0.0, 0.03]
 
 [scan]
 
@@ -36,10 +31,10 @@ B2c_min = 0.01
 B2c_max = 3
 B2c_scan_option = "2 sided log"
 
-
 keep_all = false
 
-max_seconds = 3600
+# Increase max_seconds for a serious scan
+max_seconds = 10
 save_period = 3
 # max_attempts_per_proc = 100000
 max_keep_per_proc = 10000

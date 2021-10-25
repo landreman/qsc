@@ -1,0 +1,69 @@
+# This input file runs an optimization to produce a nice QH configuration.
+
+general_option = 'multiopt_scan'
+
+[multiopt_scan]
+
+verbose = 2
+
+keep_all = 1
+min_R0_to_keep = 0.5
+max_elongation_to_keep = 3.0
+
+params = ["R0c1", "weight_B20"]
+params_min = [0.15, 0.1]
+params_max = [0.2, 1.0]
+params_n   = [ 2,   2]
+params_log = [false, true]
+params_stage = [-1, 1]
+
+quit_after_init = 0
+
+[qsc]
+nfp = 4
+nphi = 25
+verbose = 0
+order_r_option = "r2.1"
+
+# Initial conditions:
+R0c = [1.0, 0.17]
+Z0s = [0.0, 0.17]
+eta_bar = 1.0
+B2c = 0.0
+
+[multiopt]
+verbose = 0
+nopts = 2
+
+[opt0]
+verbose = 0
+max_iter = 1000
+fourier_refine = 2
+
+vary_eta_bar = 1
+vary_B2c = 1
+vary_R0c = [false, false]
+vary_Z0s = [false, true]
+
+weight_grad_B = 1.0
+weight_B20 = 1.0
+
+[opt1]
+verbose = 0
+max_iter = 1000
+fourier_refine = 0
+
+vary_eta_bar = 1
+vary_B2c = 1
+vary_R0c = [false, false, true, true]
+vary_Z0s = [false, true, true, true]
+vary_R0s = [false, false, false, false]
+vary_Z0c = [false, false, false, false]
+
+weight_grad_B = 1.0
+weight_B20 = 2.0
+weight_grad_grad_B = 0.01
+
+# algorithm = 'ddogleg'
+# algorithm = 'subspace2d'
+

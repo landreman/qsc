@@ -1,3 +1,4 @@
+
 #include <fstream>
 #include <string>
 #include <stdexcept>
@@ -20,6 +21,11 @@ void Opt::optimize() {
     return;
   }
 
+  if (vary_R0c.size() != q.R0c.size()) throw std::runtime_error("Size of vary_R0c is incorrect");
+  if (vary_R0s.size() != q.R0s.size()) throw std::runtime_error("Size of vary_R0s is incorrect");
+  if (vary_Z0c.size() != q.Z0c.size()) throw std::runtime_error("Size of vary_Z0c is incorrect");
+  if (vary_Z0s.size() != q.Z0s.size()) throw std::runtime_error("Size of vary_Z0s is incorrect");
+  
   // Add fourier_refine modes to the end of input arrays:
   Vector axis_arr;
   std::valarray<bool> bool_arr;
@@ -76,9 +82,9 @@ void Opt::optimize() {
   }
 
 
-  std::cout << "optimizing..." << std::endl;
+  if (verbose > 0) std::cout << "optimizing..." << std::endl;
   
-  init_residuals();
+  // init_residuals();
   n_iter = 0;
   for (j_fourier_refine = 0; j_fourier_refine <= fourier_refine; j_fourier_refine++) {
     if (n_iter >= max_iter - 1) {
@@ -90,6 +96,17 @@ void Opt::optimize() {
       vary_Z0s[oldsize + j_fourier_refine - 1] = true;
       // For non-stellarator-symmetry, could also modify vary_R0s and vary_Z0c here.
     }
+    // If the opt nphi vector is empty, nphi from the original qsc object will be used.
+    if (nphi.size() > 0) {
+      q.nphi = nphi[j_fourier_refine];
+      q.allocate();
+      // Changing nphi means the residuals may change size, hence call init_residuals:
+      init_residuals();
+    } else if (j_fourier_refine == 0) {
+      // Make sure init_residuals is always called when j_fourier_refine = 0.
+      init_residuals();
+    }
+    
     if (verbose > 0) {
       std::cout << "`````````````````````````````````````````````````" << std::endl;
       std::cout << "Beginning optimization with j_fourier_refine = " << j_fourier_refine << std::endl;
@@ -101,6 +118,7 @@ void Opt::optimize() {
       std::cout << vary_Z0c << std::endl;
       std::cout << "vary_Z0s: ";
       std::cout << vary_Z0s << std::endl;
+      std::cout << "nphi: " << q.nphi << std::endl;
     }
     init_parameters();
     q.init();
@@ -139,6 +157,16 @@ void Opt::optimize() {
     // For the above option, there is a trade-off between speed vs
     // robustness when the problem may be rank-deficient. Other options
     // are described in the GSL documentation.
+    switch (diff_method) {
+    case DIFF_METHOD_FORWARD:
+      gsl_optimizer_params.fdtype = GSL_MULTIFIT_NLINEAR_FWDIFF;
+      break;
+    case DIFF_METHOD_CENTERED:
+      gsl_optimizer_params.fdtype = GSL_MULTIFIT_NLINEAR_CTRDIFF;
+      break;
+    default:
+      throw std::runtime_error("Unrecognized diff_method.");
+    }
     const gsl_multifit_nlinear_type *T = gsl_multifit_nlinear_trust;
     const double xtol = 1.0e-8;
     const double gtol = 1.0e-8;
@@ -155,12 +183,14 @@ void Opt::optimize() {
     gsl_multifit_nlinear_init(gsl_state_vector, &gsl_optimizer, work);
     gsl_multifit_nlinear_driver(max_iter_for_gsl, xtol, gtol, ftol,
 				gsl_callback, (void*)this, &info, work);
+    n_evals += gsl_optimizer.nevalf;
     
     if (verbose > 0) {
       std::cout << "----- Results from the optimization -----" << std::endl;
       std::cout << "n_iter: " << n_iter << "  niter from GSL: "
 		<< gsl_multifit_nlinear_niter(work) << std::endl;
-      std::cout << "# of function evals: " << gsl_optimizer.nevalf << std::endl;
+      std::cout << "# of function evals: " << gsl_optimizer.nevalf << " for this Fourier level, "
+		<< n_evals << " total so far." << std::endl;
       std::cout << "Final configuration:" << std::endl;
       std::cout << "  eta_bar: " << q.eta_bar << "  sigma0: " << q.sigma0 << std::endl;
       std::cout << "  B2c: " << q.B2c << "  B2s: " << q.B2s << std::endl;
@@ -170,8 +200,9 @@ void Opt::optimize() {
       std::cout << "  Z0s: " << q.Z0s << std::endl;
       std::cout << "  iota: " << q.iota << "  r_singularity: " << q.r_singularity_robust << std::endl;
       std::cout << "  L grad B: " << q.grid_min_L_grad_B << "  L grad grad B: " << q.grid_min_L_grad_grad_B << std::endl;
-      std::cout << "  B20 variation: " << q.B20_grid_variation << std::endl;
+      std::cout << "  B20 variation: " << q.B20_grid_variation << "  min(R0): " << q.grid_min_R0 << std::endl;
       std::cout << "  d2 volume / d psi2: " << q.d2_volume_d_psi2 << std::endl;
+      std::cout << "  axis_length: " << q.axis_length << "  stddev(R): " << q.standard_deviation_of_R << std::endl;
     }
     
     gsl_multifit_nlinear_free(work);
@@ -272,7 +303,7 @@ void Opt::init_parameters() {
   }
 
   if (verbose > 0 && make_names) {
-    std::cout << "State vector:" << std::endl;
+    std::cout << "State vector names:" << std::endl;
     for (j = 0; j < n_parameters; j++)
       std::cout << "  " << j << ", " << state_vector_names[j] << std::endl;
   }
@@ -333,6 +364,11 @@ void Opt::init_residuals() {
     if (make_names)
       for (j = 0; j < q.nphi * 6; j++) residual_names.push_back("XY2Prime[" + std::to_string(j) + "]");
   }
+  if (weight_XY2PrimePrime > 0) {
+    n_terms += q.nphi * 6;
+    if (make_names)
+      for (j = 0; j < q.nphi * 6; j++) residual_names.push_back("XY2PrimePrime[" + std::to_string(j) + "]");
+  }
   if (weight_Z2 > 0) {
     n_terms += q.nphi * 3;
     if (make_names)
@@ -353,6 +389,11 @@ void Opt::init_residuals() {
     if (make_names)
       for (j = 0; j < q.nphi * 3; j++) residual_names.push_back("XY3Prime[" + std::to_string(j) + "]");
   }
+  if (weight_XY3PrimePrime > 0) {
+    n_terms += q.nphi * 3;
+    if (make_names)
+      for (j = 0; j < q.nphi * 3; j++) residual_names.push_back("XY3PrimePrime[" + std::to_string(j) + "]");
+  }
   if (weight_grad_B > 0) {
     n_terms += q.nphi * 9;
     if (make_names)
@@ -367,6 +408,20 @@ void Opt::init_residuals() {
     n_terms += q.nphi;
     if (make_names)
       for (j = 0; j < q.nphi; j++) residual_names.push_back("r_singularity[" + std::to_string(j) + "]");
+  }
+  if (weight_axis_length > 0) {
+    n_terms += 1;
+    if (make_names) residual_names.push_back("axis_length");
+  }
+  if (weight_standard_deviation_of_R > 0) {
+    n_terms += q.nphi;
+    if (make_names)
+      for (j = 0; j < q.nphi; j++) residual_names.push_back("standard_deviation_of_R[" + std::to_string(j) + "]");
+  }
+  if (weight_B20_mean > 0) {
+    n_terms += q.nphi;
+    if (make_names)
+      for (j = 0; j < q.nphi; j++) residual_names.push_back("B20_mean[" + std::to_string(j) + "]");
   }
   
   if (make_names) {
@@ -485,6 +540,7 @@ void Opt::unpack_state_vector(qscfloat *state_vector) {
     }
   }
   assert (j == n_parameters);
+
 }
 
 /** Set the vector of residuals using values from the Qsc object.
@@ -494,7 +550,7 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   j = 0;
   qscfloat term;
   arclength_factor = sqrt(q.d_l_d_phi * (q.d_phi * q.nfp / q.axis_length));
-
+  
   objective_function = 0.0;
   B20_term = 0.0;
   iota_term = 0.0;
@@ -504,15 +560,20 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   d2_volume_d_psi2_term = 0.0;
   XY2_term = 0.0;
   XY2Prime_term = 0.0;
+  XY2PrimePrime_term = 0.0;
   Z2_term = 0.0;
   Z2Prime_term = 0.0;
   XY3_term = 0.0;
   XY3Prime_term = 0.0;
+  XY3PrimePrime_term = 0.0;
   grad_B_term = 0.0;
   grad_grad_B_term = 0.0;
   r_singularity_term = 0.0;
+  axis_length_term = 0.0;
+  standard_deviation_of_R_term = 0.0;
+  B20_mean_term = 0.0;
 
-  // The order of terms here must match the order in Opt::init().
+  // The order of terms here must match the order in Opt::init_residuals().
   for (k = 0; k < q.nphi; k++) {
     term = arclength_factor[k] * q.B20_anomaly[k];
     B20_term += term * term;
@@ -606,6 +667,32 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   }
 
   for (k = 0; k < q.nphi; k++) {
+    term = arclength_factor[k] * q.d2_X20_d_varphi2[k];
+    XY2PrimePrime_term += term * term;
+    if (weight_XY2PrimePrime > 0) residuals[j++] = weight_XY2PrimePrime * term;
+    
+    term = arclength_factor[k] * q.d2_X2s_d_varphi2[k];
+    XY2PrimePrime_term += term * term;
+    if (weight_XY2PrimePrime > 0) residuals[j++] = weight_XY2PrimePrime * term;
+    
+    term = arclength_factor[k] * q.d2_X2c_d_varphi2[k];
+    XY2PrimePrime_term += term * term;
+    if (weight_XY2PrimePrime > 0) residuals[j++] = weight_XY2PrimePrime * term;
+    
+    term = arclength_factor[k] * q.d2_Y20_d_varphi2[k];
+    XY2PrimePrime_term += term * term;
+    if (weight_XY2PrimePrime > 0) residuals[j++] = weight_XY2PrimePrime * term;
+    
+    term = arclength_factor[k] * q.d2_Y2s_d_varphi2[k];
+    XY2PrimePrime_term += term * term;
+    if (weight_XY2PrimePrime > 0) residuals[j++] = weight_XY2PrimePrime * term;
+    
+    term = arclength_factor[k] * q.d2_Y2c_d_varphi2[k];
+    XY2PrimePrime_term += term * term;
+    if (weight_XY2PrimePrime > 0) residuals[j++] = weight_XY2PrimePrime * term;
+  }
+
+  for (k = 0; k < q.nphi; k++) {
     term = arclength_factor[k] * q.Z20[k];
     Z2_term += term * term;
     if (weight_Z2 > 0) residuals[j++] = weight_Z2 * term;
@@ -662,6 +749,20 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   }
   
   for (k = 0; k < q.nphi; k++) {
+    term = arclength_factor[k] * q.d2_X3c1_d_varphi2[k];
+    XY3PrimePrime_term += term * term;
+    if (weight_XY3PrimePrime > 0) residuals[j++] = weight_XY3PrimePrime * term;
+      
+    term = arclength_factor[k] * q.d2_Y3c1_d_varphi2[k];
+    XY3PrimePrime_term += term * term;
+    if (weight_XY3PrimePrime > 0) residuals[j++] = weight_XY3PrimePrime * term;
+      
+    term = arclength_factor[k] * q.d2_Y3s1_d_varphi2[k];
+    XY3PrimePrime_term += term * term;
+    if (weight_XY3PrimePrime > 0) residuals[j++] = weight_XY3PrimePrime * term;
+  }
+  
+  for (k = 0; k < q.nphi; k++) {
     for (int j2 = 0; j2 < 9; j2++) {
       term = arclength_factor[k] * q.grad_B_tensor[k + q.nphi * j2];
       grad_B_term += term * term;
@@ -683,13 +784,31 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
     if (weight_r_singularity > 0) residuals[j++] = weight_r_singularity * term;
   }
 
+  term = q.axis_length - target_axis_length;
+  axis_length_term = term * term;
+  if (weight_axis_length > 0) residuals[j++] = weight_axis_length * term;
+
+  for (k = 0; k < q.nphi; k++) {
+    term = arclength_factor[k] * (q.R0[k] - q.mean_R);
+    standard_deviation_of_R_term += term * term;
+    if (weight_standard_deviation_of_R > 0) residuals[j++] = weight_standard_deviation_of_R * term;
+  }
+
+  for (k = 0; k < q.nphi; k++) {
+    term = arclength_factor[k] * q.B20[k];
+    B20_mean_term += term * term;
+    if (weight_B20_mean > 0) residuals[j++] = weight_B20_mean * term;
+  }
+
   Vector weights = {weight_B20, weight_iota, weight_elongation, weight_curvature, weight_R0, weight_d2_volume_d_psi2,
-    weight_XY2, weight_XY2Prime, weight_Z2, weight_Z2Prime, weight_XY3, weight_XY3Prime,
-    weight_grad_B, weight_grad_grad_B, weight_r_singularity};
+    weight_XY2, weight_XY2Prime, weight_XY2PrimePrime, weight_Z2, weight_Z2Prime, weight_XY3, weight_XY3Prime, weight_XY3PrimePrime,
+    weight_grad_B, weight_grad_grad_B, weight_r_singularity,
+    weight_axis_length, weight_standard_deviation_of_R, weight_B20_mean};
 
   Vector terms = {B20_term, iota_term, elongation_term, curvature_term,
-    R0_term, d2_volume_d_psi2_term, XY2_term, XY2Prime_term, Z2_term, Z2Prime_term,
-    XY3_term, XY3Prime_term, grad_B_term, grad_grad_B_term, r_singularity_term};
+    R0_term, d2_volume_d_psi2_term, XY2_term, XY2Prime_term, XY2PrimePrime_term, Z2_term, Z2Prime_term,
+    XY3_term, XY3Prime_term, XY3PrimePrime_term, grad_B_term, grad_grad_B_term, r_singularity_term,
+    axis_length_term, standard_deviation_of_R_term, B20_mean_term};
 
   assert (weights.size() == terms.size());
   for (k = 0; k < terms.size(); k++) {
@@ -745,13 +864,18 @@ void gsl_callback(const size_t iter, void *params,
   opt->iter_d2_volume_d_psi2_term[n_iter] = opt->d2_volume_d_psi2_term;
   opt->iter_XY2_term[n_iter] = opt->XY2_term;
   opt->iter_XY2Prime_term[n_iter] = opt->XY2Prime_term;
+  opt->iter_XY2PrimePrime_term[n_iter] = opt->XY2PrimePrime_term;
   opt->iter_Z2_term[n_iter] = opt->Z2_term;
   opt->iter_Z2Prime_term[n_iter] = opt->Z2Prime_term;
   opt->iter_XY3_term[n_iter] = opt->XY3_term;
   opt->iter_XY3Prime_term[n_iter] = opt->XY3Prime_term;
+  opt->iter_XY3PrimePrime_term[n_iter] = opt->XY3PrimePrime_term;
   opt->iter_grad_B_term[n_iter] = opt->grad_B_term;
   opt->iter_grad_grad_B_term[n_iter] = opt->grad_grad_B_term;
   opt->iter_r_singularity_term[n_iter] = opt->r_singularity_term;
+  opt->iter_axis_length_term[n_iter] = opt->axis_length_term;
+  opt->iter_standard_deviation_of_R_term[n_iter] = opt->standard_deviation_of_R_term;
+  opt->iter_B20_mean_term[n_iter] = opt->B20_mean_term;
 
   opt->iter_eta_bar[n_iter] = opt->q.eta_bar;
   opt->iter_sigma0[n_iter] = opt->q.sigma0;
@@ -770,6 +894,7 @@ void gsl_callback(const size_t iter, void *params,
   opt->iter_DMerc_times_r2[n_iter] = opt->q.DMerc_times_r2;
   opt->iter_standard_deviation_of_R[n_iter] = opt->q.standard_deviation_of_R;
   opt->iter_standard_deviation_of_Z[n_iter] = opt->q.standard_deviation_of_Z;
+  opt->iter_axis_length[n_iter] = opt->q.axis_length;
   for (j = 0; j < opt->q.R0c.size(); j++) {
     opt->iter_R0c(j, n_iter) = opt->q.R0c[j];
     opt->iter_R0s(j, n_iter) = opt->q.R0s[j];

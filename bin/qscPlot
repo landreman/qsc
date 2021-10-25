@@ -27,6 +27,6 @@ q.plot(show=False)
 plt.figtext(0.5, 0.005, os.path.abspath(filename), ha='center', va='bottom', fontsize=6)
 
 if r > 0:
-    q.plot_boundary(r=r)
+    q.plot_boundary(r=r, nsections=4)
 
 plt.show()

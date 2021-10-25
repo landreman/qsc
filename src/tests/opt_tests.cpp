@@ -30,13 +30,18 @@ TEST_CASE("The objective function should equal 1/2 * sum(residuals^2) [opt]") {
       opt.weight_d2_volume_d_psi2 = 5.0;
       opt.weight_XY2 = 6.0;
       opt.weight_XY2Prime = 7.0;
+      opt.weight_XY2PrimePrime = 7.2;
       opt.weight_Z2 = 6.5;
       opt.weight_Z2Prime = 7.5;
       opt.weight_XY3 = 8.0;
       opt.weight_XY3Prime = 9.0;
+      opt.weight_XY3PrimePrime = 9.5;
       opt.weight_grad_B = 10.0;
       opt.weight_grad_grad_B = 11.0;
       opt.weight_r_singularity = 12.0;
+      opt.weight_axis_length = 13.0;
+      opt.weight_standard_deviation_of_R = 14.0;
+      opt.weight_B20_mean = 15.0;
       break;
     case 1:
       // Most residual terms off. At least 1 must be on though or qsc will raise an error.
@@ -84,6 +89,7 @@ TEST_CASE("Compute each optimization term a different way and make sure we get t
     opt.q.init();
     opt.q.calculate();
 
+    opt.weight_grad_B = 1.0; // Need at least one residual term.
     opt.init_residuals();
     gsl_vector *gsl_residual = gsl_vector_alloc(opt.n_terms);
     opt.set_residuals(gsl_residual);
@@ -151,6 +157,21 @@ TEST_CASE("Compute each optimization term a different way and make sure we get t
     temp = opt.q.d_Y2s_d_varphi * opt.q.d_Y2s_d_varphi * opt.q.d_l_d_phi;
     term += temp.sum() / denominator;
     CHECK(Approx(term) == opt.XY2Prime_term);
+    
+    term = 0.0;
+    temp = opt.q.d2_X20_d_varphi2 * opt.q.d2_X20_d_varphi2 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d2_X2c_d_varphi2 * opt.q.d2_X2c_d_varphi2 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d2_X2s_d_varphi2 * opt.q.d2_X2s_d_varphi2 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d2_Y20_d_varphi2 * opt.q.d2_Y20_d_varphi2 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d2_Y2c_d_varphi2 * opt.q.d2_Y2c_d_varphi2 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d2_Y2s_d_varphi2 * opt.q.d2_Y2s_d_varphi2 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    CHECK(Approx(term) == opt.XY2PrimePrime_term);
 
     term = 0.0;
     temp = opt.q.Z20 * opt.q.Z20 * opt.q.d_l_d_phi;
@@ -187,6 +208,15 @@ TEST_CASE("Compute each optimization term a different way and make sure we get t
     temp = opt.q.d_Y3s1_d_varphi * opt.q.d_Y3s1_d_varphi * opt.q.d_l_d_phi;
     term += temp.sum() / denominator;
     CHECK(Approx(term) == opt.XY3Prime_term);
+    
+    term = 0.0;
+    temp = opt.q.d2_X3c1_d_varphi2 * opt.q.d2_X3c1_d_varphi2 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d2_Y3c1_d_varphi2 * opt.q.d2_Y3c1_d_varphi2 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    temp = opt.q.d2_Y3s1_d_varphi2 * opt.q.d2_Y3s1_d_varphi2 * opt.q.d_l_d_phi;
+    term += temp.sum() / denominator;
+    CHECK(Approx(term) == opt.XY3PrimePrime_term);
 
     term = 0.0;
     for (int j2 = 0; j2 < 3; j2++) {
@@ -212,6 +242,14 @@ TEST_CASE("Compute each optimization term a different way and make sure we get t
 
     temp = opt.q.d_l_d_phi / (opt.q.r_hat_singularity_robust * opt.q.r_hat_singularity_robust);
     CHECK(Approx(temp.sum() / denominator) == opt.r_singularity_term);
+
+    CHECK(Approx(opt.q.axis_length * opt.q.axis_length) == opt.axis_length_term);
+
+    temp = opt.q.d_l_d_phi * (opt.q.R0 - opt.q.mean_R) * (opt.q.R0 - opt.q.mean_R);
+    CHECK(Approx(temp.sum() / denominator) == opt.standard_deviation_of_R_term);
+
+    temp = opt.q.d_l_d_phi * opt.q.B20 * opt.q.B20;
+    CHECK(Approx(temp.sum() / denominator) == opt.B20_mean_term);
   }
 }
 
@@ -241,13 +279,18 @@ TEST_CASE("Each term in the objective function should be approximately independe
   o1.weight_d2_volume_d_psi2 = 5.0;
   o1.weight_XY2 = 6.0;
   o1.weight_XY2Prime = 7.0;
+  o1.weight_XY2PrimePrime = 7.2;
   o1.weight_Z2 = 6.5;
   o1.weight_Z2Prime = 7.5;
   o1.weight_XY3 = 8.0;
   o1.weight_XY3Prime = 9.0;
+  o1.weight_XY3PrimePrime = 9.5;
   o1.weight_grad_B = 10.0;
   o1.weight_grad_grad_B = 11.0;
   o1.weight_r_singularity = 12.0;
+  o1.weight_axis_length = 13.0;
+  o1.weight_standard_deviation_of_R = 14.0;
+  o1.weight_B20_mean = 15.0;
   
   o2.weight_B20 = 2.0;
   o2.weight_iota = 3.0;
@@ -258,13 +301,18 @@ TEST_CASE("Each term in the objective function should be approximately independe
   o2.weight_d2_volume_d_psi2 = 5.0;
   o2.weight_XY2 = 6.0;
   o2.weight_XY2Prime = 7.0;
+  o2.weight_XY2PrimePrime = 7.2;
   o2.weight_Z2 = 6.5;
   o2.weight_Z2Prime = 7.5;
   o2.weight_XY3 = 8.0;
   o2.weight_XY3Prime = 9.0;
+  o2.weight_XY3PrimePrime = 9.5;
   o2.weight_grad_B = 10.0;
   o2.weight_grad_grad_B = 11.0;
   o2.weight_r_singularity = 12.0;
+  o2.weight_axis_length = 13.0;
+  o2.weight_standard_deviation_of_R = 14.0;
+  o2.weight_B20_mean = 15.0;
 
   o1.init_parameters();
   o1.init_residuals();
@@ -286,13 +334,18 @@ TEST_CASE("Each term in the objective function should be approximately independe
   CHECK(Approx(o1.d2_volume_d_psi2_term).epsilon(tol) == o2.d2_volume_d_psi2_term);
   CHECK(Approx(o1.XY2_term).epsilon(tol) == o2.XY2_term);
   CHECK(Approx(o1.XY2Prime_term).epsilon(tol) == o2.XY2Prime_term);
+  CHECK(Approx(o1.XY2PrimePrime_term).epsilon(tol) == o2.XY2PrimePrime_term);
   CHECK(Approx(o1.Z2_term).epsilon(tol) == o2.Z2_term);
   CHECK(Approx(o1.Z2Prime_term).epsilon(tol) == o2.Z2Prime_term);
   CHECK(Approx(o1.XY3_term).epsilon(tol) == o2.XY3_term);
   CHECK(Approx(o1.XY3Prime_term).epsilon(tol) == o2.XY3Prime_term);
+  CHECK(Approx(o1.XY3PrimePrime_term).epsilon(tol) == o2.XY3PrimePrime_term);
   CHECK(Approx(o1.grad_B_term).epsilon(tol) == o2.grad_B_term);
   CHECK(Approx(o1.grad_grad_B_term).epsilon(tol) == o2.grad_grad_B_term);
   CHECK(Approx(o1.r_singularity_term).epsilon(tol) == o2.r_singularity_term);
+  CHECK(Approx(o1.axis_length_term).epsilon(tol) == o2.axis_length_term);
+  CHECK(Approx(o1.standard_deviation_of_R_term).epsilon(tol) == o2.standard_deviation_of_R_term);
+  CHECK(Approx(o1.B20_mean_term).epsilon(tol) == o2.B20_mean_term);
 
 }
 
@@ -314,7 +367,7 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
       
       Opt opt;
       opt.q = Qsc(config);
-      opt.max_iter = 60;
+      opt.max_iter = 15;
 
       opt.q.nphi = q0.nphi;
       opt.q.verbose = 0;
@@ -329,13 +382,18 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
       opt.weight_d2_volume_d_psi2 = 5.0;
       opt.weight_XY2 = 6.0;
       opt.weight_XY2Prime = 7.0;
+      opt.weight_XY2PrimePrime = 7.2;
       opt.weight_Z2 = 6.5;
       opt.weight_Z2Prime = 7.5;
       opt.weight_XY3 = 8.0;
       opt.weight_XY3Prime = 9.0;
+      opt.weight_XY3PrimePrime = 9.5;
       opt.weight_grad_B = 10.0;
       opt.weight_grad_grad_B = 11.0;
       opt.weight_r_singularity = 12.0;
+      opt.weight_axis_length = 13.0;
+      opt.weight_standard_deviation_of_R = 14.0;
+      opt.weight_B20_mean = 15.0;
       
       switch (vary_axis_option) {
       case 0:
@@ -351,6 +409,7 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
 	opt.vary_R0s = {false, true};
 	opt.vary_Z0c = {false, true};
 	opt.vary_Z0s = {false, true};
+	opt.diff_method = DIFF_METHOD_CENTERED;
 	break;
       case 2:
 	// Vary only selected Fourier modes
@@ -358,6 +417,7 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
 	opt.vary_R0s = {false, true};
 	opt.vary_Z0c = {false, true};
 	opt.vary_Z0s = {false, true};
+	opt.diff_method = DIFF_METHOD_FORWARD;
 	break;
       default:
 	CHECK(false); // Should not get here
@@ -421,6 +481,8 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
       // opt.outfilename = "qsc_out.opt_test.nc";
       // opt.write_netcdf();
 
+      CHECK(opt.n_evals > opt.n_iter);
+
       // Iteration 0 should exactly match the standalone reference q0:
       CHECK(Approx(opt.iter_eta_bar[0]) == q0.eta_bar);
       CHECK(Approx(opt.iter_B2c[0]) == q0.B2c);
@@ -445,6 +507,7 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
       CHECK(Approx(q0.DMerc_times_r2) == opt.iter_DMerc_times_r2[0]);
       CHECK(Approx(q0.standard_deviation_of_R) == opt.iter_standard_deviation_of_R[0]);
       CHECK(Approx(q0.standard_deviation_of_Z) == opt.iter_standard_deviation_of_Z[0]);
+      CHECK(Approx(q0.axis_length) == opt.iter_axis_length[0]);
 
       // Now set up a standalone QSC to check each iteration
       Qsc q;
@@ -490,7 +553,7 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
 	CHECK(Approx(q.DMerc_times_r2) == opt.iter_DMerc_times_r2[j]);
 	CHECK(Approx(q.standard_deviation_of_R) == opt.iter_standard_deviation_of_R[j]);
 	CHECK(Approx(q.standard_deviation_of_Z) == opt.iter_standard_deviation_of_Z[j]);
-
+	CHECK(Approx(q.axis_length) == opt.iter_axis_length[j]);
       
 	// Check if things were fixed that were supposed to be fixed,
 	// and things were varied that were supposed to be varied:
@@ -498,6 +561,7 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
 	CHECK(Approx(opt.iter_R0s(0, j)) == q0.R0s[0]);
 	CHECK(Approx(opt.iter_Z0c(0, j)) == q0.Z0c[0]);
 	CHECK(Approx(opt.iter_Z0s(0, j)) == q0.Z0s[0]);
+	qscfloat eps = 1.0e-13;
 	switch (vary_axis_option) {
 	case 0:
 	  // Do not vary the axis
@@ -508,17 +572,17 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
 	  break;
 	case 1:
 	  // Do vary the axis, except for the major radius
-	  if (j > 0) CHECK(Approx(opt.iter_R0c(1, j)) != q0.R0c[1]);
-	  if (j > 0) CHECK(Approx(opt.iter_R0s(1, j)) != q0.R0s[1]);
-	  if (j > 0) CHECK(Approx(opt.iter_Z0c(1, j)) != q0.Z0c[1]);
-	  if (j > 0) CHECK(Approx(opt.iter_Z0s(1, j)) != q0.Z0s[1]);
+	  if (j > 0) CHECK(Approx(opt.iter_R0c(1, j)).epsilon(eps) != q0.R0c[1]);
+	  if (j > 0) CHECK(Approx(opt.iter_R0s(1, j)).epsilon(eps) != q0.R0s[1]);
+	  if (j > 0) CHECK(Approx(opt.iter_Z0c(1, j)).epsilon(eps) != q0.Z0c[1]);
+	  if (j > 0) CHECK(Approx(opt.iter_Z0s(1, j)).epsilon(eps) != q0.Z0s[1]);
 	  break;
 	case 2:
 	  // Vary only selected Fourier modes
 	  CHECK(Approx(opt.iter_R0c(1, j)) == q0.R0c[1]);
-	  if (j > 0) CHECK(Approx(opt.iter_R0s(1, j)) != q0.R0s[1]);
-	  if (j > 0) CHECK(Approx(opt.iter_Z0c(1, j)) != q0.Z0c[1]);
-	  if (j > 0) CHECK(Approx(opt.iter_Z0s(1, j)) != q0.Z0s[1]);
+	  if (j > 0) CHECK(Approx(opt.iter_R0s(1, j)).epsilon(eps) != q0.R0s[1]);
+	  if (j > 0) CHECK(Approx(opt.iter_Z0c(1, j)).epsilon(eps) != q0.Z0c[1]);
+	  if (j > 0) CHECK(Approx(opt.iter_Z0s(1, j)).epsilon(eps) != q0.Z0s[1]);
 	  break;
 	default:
 	  CHECK(false); // Should not get here
@@ -597,6 +661,7 @@ TEST_CASE("Check Opt::unpack_state_vector() and Opt::set_state_vector() [opt]") 
   opt.vary_R0s.resize(n_fourier, false);
   opt.vary_Z0c.resize(n_fourier, false);
   opt.vary_Z0s.resize(n_fourier, false);
+  opt.weight_grad_B = 1.0; // Need at least 1 residual term.
   // opt.q = Qsc(config);
   std::cout << "max fourier_index:" << (1 << (4 * (n_fourier - 1))) << std::endl;
 
@@ -716,12 +781,14 @@ TEST_CASE("1d optimization for iota [opt]") {
 	opt.vary_eta_bar = false;
 	opt.vary_R0c = {false, true};
 	opt.vary_Z0s = {false, false};
+	opt.diff_method = DIFF_METHOD_CENTERED;
 	break;
       case 2:
 	// Vary eta_bar
 	opt.vary_eta_bar = true;
 	opt.vary_R0c = {false, false};
 	opt.vary_Z0s = {false, false};
+	opt.diff_method = DIFF_METHOD_FORWARD;
 	break;
       default:
 	CHECK(false); // Should not get here.
@@ -738,6 +805,8 @@ TEST_CASE("1d optimization for iota [opt]") {
       
       opt.allocate();
       opt.optimize();
+
+      CHECK(opt.n_evals > opt.n_iter);
       
       CHECK(Approx(opt.iter_iota[opt.n_iter - 1]) == target_iota);
       switch (j_var) {
@@ -771,6 +840,8 @@ TEST_CASE("Try Fourier refinement. Make sure the vary_R0c etc arrays are extende
     opt.q.order_r_option = "r2.1";
     opt.q.R0c = {1.0, 0.05};
     opt.q.Z0s = {0.0, -0.05};
+    opt.q.R0s = {0.0, 0.0};
+    opt.q.Z0c = {0.0, 0.0};
     opt.q.eta_bar = 1.0;
     opt.q.B2c = 0.0;
     opt.vary_eta_bar = true;
@@ -788,10 +859,13 @@ TEST_CASE("Try Fourier refinement. Make sure the vary_R0c etc arrays are extende
     opt.weight_XY3Prime = 1.0;
     opt.weight_B20 = 300.0;
     opt.max_iter = 1000;
+    opt.diff_method = DIFF_METHOD_FORWARD;
 
     opt.allocate();
     opt.optimize();
 
+    CHECK(opt.n_evals > opt.n_iter);
+    CHECK(opt.q.nphi == 31);
     REQUIRE(opt.vary_R0c.size() == 2 + fourier_refine);
     REQUIRE(opt.vary_R0s.size() == 2 + fourier_refine);
     REQUIRE(opt.vary_Z0c.size() == 2 + fourier_refine);
@@ -824,6 +898,8 @@ TEST_CASE("Verify that Fourier refinement works gracefully if the max_iter limit
     opt.q.order_r_option = "r2.1";
     opt.q.R0c = {1.0, 0.05};
     opt.q.Z0s = {0.0, -0.05};
+    opt.q.R0s = {0.0, 0.0};
+    opt.q.Z0c = {0.0, 0.0};
     opt.q.eta_bar = 1.0;
     opt.q.B2c = 0.0;
     opt.vary_eta_bar = true;
@@ -841,6 +917,7 @@ TEST_CASE("Verify that Fourier refinement works gracefully if the max_iter limit
     opt.weight_XY3Prime = 1.0;
     opt.weight_B20 = 300.0;
     opt.max_iter = 5;
+    opt.diff_method = DIFF_METHOD_CENTERED;
 
     opt.allocate();
     opt.optimize();
@@ -851,3 +928,60 @@ TEST_CASE("Verify that Fourier refinement works gracefully if the max_iter limit
     REQUIRE(opt.vary_Z0s.size() == 2 + fourier_refine);
   }
 }
+
+TEST_CASE("Try changing nphi at each stage of Fourier refinement. [opt]") {
+  if (single) return;
+
+  int fourier_refine = 2;
+  Opt opt;
+  // Set up a realistic optimization for QH:
+  opt.q.nfp = 4;
+  opt.q.nphi = 61; // This value will be over-written by the values in opt.nphi.
+  opt.q.verbose = 0;
+  opt.q.order_r_option = "r2.1";
+  opt.q.R0c = {1.0, 0.17};
+  opt.q.Z0s = {0.0, 0.17};
+  opt.q.R0s = {0.0, 0.0};
+  opt.q.Z0c = {0.0, 0.0};
+  opt.q.eta_bar = 1.0;
+  opt.q.B2c = 0.0;
+  opt.vary_eta_bar = true;
+  opt.vary_B2c = true;
+  opt.vary_R0c = {false, false};
+  opt.vary_R0s = {false, false};
+  opt.vary_Z0c = {false, false};
+  opt.vary_Z0s = {false, true};
+  opt.fourier_refine = fourier_refine;
+  opt.nphi = {19, 25, 31};
+  opt.weight_grad_B = 1.0;
+  opt.weight_B20 = 1.0;
+
+  opt.allocate();
+  opt.optimize();
+
+  CHECK(opt.q.nphi == 31);
+  REQUIRE(opt.vary_R0c.size() == 2 + fourier_refine);
+  REQUIRE(opt.vary_R0s.size() == 2 + fourier_refine);
+  REQUIRE(opt.vary_Z0c.size() == 2 + fourier_refine);
+  REQUIRE(opt.vary_Z0s.size() == 2 + fourier_refine);
+  CHECK_FALSE(opt.vary_R0c[0]);
+  CHECK_FALSE(opt.vary_R0s[0]);
+  CHECK_FALSE(opt.vary_Z0c[0]);
+  CHECK_FALSE(opt.vary_Z0s[0]);
+  
+  CHECK_FALSE(opt.vary_R0c[1]);
+  CHECK_FALSE(opt.vary_R0s[1]);
+  CHECK_FALSE(opt.vary_Z0c[1]);
+  CHECK(opt.vary_Z0s[1]);
+    
+  CHECK(opt.vary_R0c[2]);
+  CHECK_FALSE(opt.vary_R0s[2]);
+  CHECK_FALSE(opt.vary_Z0c[2]);
+  CHECK(opt.vary_Z0s[2]);
+    
+  CHECK(opt.vary_R0c[3]);
+  CHECK_FALSE(opt.vary_R0s[3]);
+  CHECK_FALSE(opt.vary_Z0c[3]);
+  CHECK(opt.vary_Z0s[3]);
+}
+
