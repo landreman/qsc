@@ -161,10 +161,3 @@ else()
   endif()
 endif()
 
-
-#message("GSL_FOUND = ${GSL_FOUND}")
-#if(GSL_FOUND)
-#  message("Found GSL")
-#else()
-#  message("Could not find GSL")
-#endif()
