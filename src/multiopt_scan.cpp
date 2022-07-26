@@ -422,7 +422,7 @@ void MultiOptScan::eval_scan_index(int j_scan) {
     
     if (mo.opts[index].q.B20_grid_variation > max_B20_variation_to_keep) {
       filters_local[REJECTED_DUE_TO_B20_VARIATION]++;
-      if (verbose > 1) std::cout << "Rejecting this configuration due to B20 variation." << std::endl;
+      if (verbose > 1) std::cout << "Rejecting this configuration due to B20 variation. " << mo.opts[index].q.B20_grid_variation << std::endl;
       passed_filters = false;	
     } else if (verbose > 1) std::cout << "Passed B20 variation filter." << std::endl;
     

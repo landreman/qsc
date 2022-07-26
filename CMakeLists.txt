@@ -144,21 +144,33 @@ add_custom_target(test COMMAND ./runTests WORKING_DIRECTORY tests DEPENDS ${QSC_
 # Copy some files from the source to the build locations
 message("CMAKE_CURRENT_SOURCE_DIR is ${CMAKE_CURRENT_SOURCE_DIR}")
 message("CMAKE_CURRENT_BINARY_DIR is ${CMAKE_CURRENT_BINARY_DIR}")
+set(TEST_FILES
+  runTests
+  runMPIUnitTests
+  quasisymmetry_out.LandremanSengupta2019_section5.1.nc
+  quasisymmetry_out.LandremanSengupta2019_section5.2.nc
+  quasisymmetry_out.LandremanSengupta2019_section5.3.nc
+  quasisymmetry_out.LandremanSengupta2019_section5.4.nc
+  quasisymmetry_out.LandremanSengupta2019_section5.5.nc
+  quasisymmetry_out.LandremanSenguptaPlunk_section5.1_order_r1_finite_r_linear.nc
+  quasisymmetry_out.LandremanSenguptaPlunk_section5.2_order_r1_finite_r_nonlinear.nc
+  quasisymmetry_out.LandremanSenguptaPlunk_section5.3_order_r1_finite_r_linear.nc
+)
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR)
   message("Building in root directory, so not copying files from source to build location.")
 else()
-  message("Copying files from source to build location.")
   message("CMake version: ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}")
-  # It is preferable to create links, but CMake only introduced links in version 3.14
-  if ((CMAKE_MAJOR_VERSION GREATER 3) OR (CMAKE_MINOR_VERSION GREATER 13))
-    message("  using links")
-    file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTests ${CMAKE_CURRENT_BINARY_DIR}/tests/runTests COPY_ON_ERROR SYMBOLIC)
-    file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/tests/runMPIUnitTests ${CMAKE_CURRENT_BINARY_DIR}/tests/runMPIUnitTests COPY_ON_ERROR SYMBOLIC)
-  else()
-    message("  using copy")
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tests/runTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/tests)
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tests/runMPIUnitTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/tests)
-  endif()
+  message("Copying files from source to build location.")
+  foreach(TEST_FILE ${TEST_FILES})
+    # It is preferable to create links, but CMake only introduced links in version 3.14
+    if ((CMAKE_MAJOR_VERSION GREATER 3) OR (CMAKE_MINOR_VERSION GREATER 13))
+      message("  linking ${TEST_FILE}")
+      file(CREATE_LINK ${CMAKE_CURRENT_SOURCE_DIR}/tests/${TEST_FILE} ${CMAKE_CURRENT_BINARY_DIR}/tests/${TEST_FILE} COPY_ON_ERROR SYMBOLIC)
+    else()
+      message("  copying ${TEST_FILE}")
+      file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tests/${TEST_FILE} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/tests)
+    endif()
+  endforeach()
 endif()
 
 
