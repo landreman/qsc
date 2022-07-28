@@ -212,8 +212,8 @@ TEST_CASE("Run a small MultiOptScan with keep_all false. [mpi] [multiopt_scan]")
   mos.max_B20_variation_to_keep = 0.04;
 
   mos.params       = {"weight_B20", "weight_iota"};
-  mos.params_min   = {       0.001,          10.0};
-  mos.params_max   = {        10.0,          20.0};
+  mos.params_min   = {       0.001,           8.0};
+  mos.params_max   = {        12.0,          10.0};
   mos.params_n     = {           2,             2};
   mos.params_log   = {        true,          true};
   mos.params_stage = {           1,            -1};
@@ -269,13 +269,13 @@ TEST_CASE("Run a small MultiOptScan with keep_all false. [mpi] [multiopt_scan]")
   if (mos.proc0) {
     CHECK(mos.n_scan == 2);
 
-    CHECK(Approx(mos.scan_weight_iota[0]) == 10.0);
-    CHECK(Approx(mos.scan_weight_iota[1]) == 20.0);
-    CHECK(Approx(mos.scan_weight_B20[0]) == 10.0);
-    CHECK(Approx(mos.scan_weight_B20[1]) == 10.0);
+    CHECK(Approx(mos.scan_weight_iota[0]) == 8.0);
+    CHECK(Approx(mos.scan_weight_iota[1]) == 10.0);
+    CHECK(Approx(mos.scan_weight_B20[0]) == 12.0);
+    CHECK(Approx(mos.scan_weight_B20[1]) == 12.0);
     
-    CHECK(Approx(mos.scan_R0c(1, 0)) == 0.170733951535488);
-    CHECK(Approx(mos.scan_R0c(1, 1)) == 0.172536139943431);
+    CHECK(Approx(mos.scan_R0c(1, 0)) == 0.169146335266187);
+    CHECK(Approx(mos.scan_R0c(1, 1)) == 0.17054382023578);
   }
   
   // For each entry in the scan, run a standalone single QSC and
