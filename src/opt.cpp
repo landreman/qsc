@@ -35,6 +35,8 @@ void Opt::defaults() {
   min_R0 = 0.3;
   weight_d2_volume_d_psi2 = -1.0;
   max_d2_volume_d_psi2 = 0.0;
+  weight_DMerc_times_r2 = -1.0;
+  min_DMerc_times_r2 = 0.0;
   weight_XY2 = -1.0;
   weight_XY2Prime = -1.0;
   weight_XY2PrimePrime = -1.0;

@@ -25,6 +25,9 @@ void Opt::write_netcdf() {
   nc.put("weight_curvature", weight_curvature, "Weight for the curvature term in the objective function for optimization", "dimensionless");
   nc.put("weight_R0", weight_R0, "Weight for the min(R0) term in the objective function for optimization", "dimensionless");
   nc.put("weight_d2_volume_d_psi2", weight_d2_volume_d_psi2, "Weight for the magnetic well term in the objective function for optimization", "dimensionless");
+  nc.put("max_d2_volume_d_psi2", max_d2_volume_d_psi2, "Target for the magnetic well term in the objective function for optimization", "dimensionless");
+  nc.put("weight_DMerc_times_r2", weight_DMerc_times_r2, "Weight for the Mercier stability term in the objective function for optimization", "dimensionless");
+  nc.put("min_DMerc_times_r2", min_DMerc_times_r2, "Target for the Mercier stability term in the objective function for optimization", "dimensionless");
   nc.put("weight_XY2", weight_XY2, "Weight for the (X2,Y2) term in the objective function for optimization", "dimensionless");
   nc.put("weight_XY2Prime", weight_XY2Prime, "Weight for the (X2',Y2') term in the objective function for optimization", "dimensionless");
   nc.put("weight_XY2PrimePrime", weight_XY2PrimePrime, "Weight for the (X2'',Y2'') term in the objective function for optimization", "dimensionless");
@@ -53,6 +56,7 @@ void Opt::write_netcdf() {
   nc.put(n_iter_dim, "iter_curvature_term", iter_elongation_term, "Curvature term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_R0_term", iter_R0_term, "R0 term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_d2_volume_d_psi2_term", iter_d2_volume_d_psi2_term, "Magnetic well term in the objective function at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_DMerc_times_r2_term", iter_DMerc_times_r2_term, "Mercier stability term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_XY2_term", iter_XY2_term, "(X2,Y2) term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_XY2Prime_term", iter_XY2Prime_term, "(d_X2_d_varphi, d_Y2_d_varphi) term in the objective function at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_XY2PrimePrime_term", iter_XY2PrimePrime_term, "(d2_X2_d_varphi2, d2_Y2_d_varphi2) term in the objective function at each iteration", "dimensionless");

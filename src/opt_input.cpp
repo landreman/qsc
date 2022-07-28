@@ -44,6 +44,8 @@ void Opt::input(std::string filename) {
   toml_read(varlist, indata, "min_R0", min_R0);
   toml_read(varlist, indata, "weight_d2_volume_d_psi2", weight_d2_volume_d_psi2);
   toml_read(varlist, indata, "max_d2_volume_d_psi2", max_d2_volume_d_psi2);
+  toml_read(varlist, indata, "weight_DMerc_times_r2", weight_DMerc_times_r2);
+  toml_read(varlist, indata, "min_DMerc_times_r2", min_DMerc_times_r2);
   toml_read(varlist, indata, "weight_XY2", weight_XY2);
   toml_read(varlist, indata, "weight_XY2Prime", weight_XY2Prime);
   toml_read(varlist, indata, "weight_XY2PrimePrime", weight_XY2PrimePrime);
@@ -151,6 +153,8 @@ void Opt::input(std::string filename) {
     std::cout << "min_R0: " << min_R0 << std::endl;
     std::cout << "weight_d2_volume_d_psi2: " << weight_d2_volume_d_psi2 << std::endl;
     std::cout << "max_d2_volume_d_psi2: " << max_d2_volume_d_psi2 << std::endl;
+    std::cout << "weight_DMerc_times_r2: " << weight_DMerc_times_r2 << std::endl;
+    std::cout << "min_DMerc_times_r2: " << min_DMerc_times_r2 << std::endl;
     std::cout << "weight_XY2: " << weight_XY2 << std::endl;
     std::cout << "weight_XY2Prime: " << weight_XY2Prime << std::endl;
     std::cout << "weight_Z2: " << weight_Z2 << std::endl;

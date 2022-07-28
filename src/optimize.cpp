@@ -202,6 +202,7 @@ void Opt::optimize() {
       std::cout << "  L grad B: " << q.grid_min_L_grad_B << "  L grad grad B: " << q.grid_min_L_grad_grad_B << std::endl;
       std::cout << "  B20 variation: " << q.B20_grid_variation << "  min(R0): " << q.grid_min_R0 << std::endl;
       std::cout << "  d2 volume / d psi2: " << q.d2_volume_d_psi2 << std::endl;
+      std::cout << "  DMerc_times_r2: " << q.DMerc_times_r2 << std::endl;
       std::cout << "  axis_length: " << q.axis_length << "  stddev(R): " << q.standard_deviation_of_R << std::endl;
     }
     
@@ -353,6 +354,10 @@ void Opt::init_residuals() {
   if (weight_d2_volume_d_psi2 > 0) {
     n_terms++;
     if (make_names) residual_names.push_back("d2_volume_d_psi2");
+  }
+  if (weight_DMerc_times_r2 > 0) {
+    n_terms++;
+    if (make_names) residual_names.push_back("DMerc_times_r2");
   }
   if (weight_XY2 > 0) {
     n_terms += q.nphi * 6;
@@ -558,6 +563,7 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   curvature_term = 0.0;
   R0_term = 0.0;
   d2_volume_d_psi2_term = 0.0;
+  DMerc_times_r2_term = 0.0;
   XY2_term = 0.0;
   XY2Prime_term = 0.0;
   XY2PrimePrime_term = 0.0;
@@ -613,6 +619,14 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   }
   if (weight_d2_volume_d_psi2 > 0) residuals[j++] = weight_d2_volume_d_psi2 * term;
   d2_volume_d_psi2_term = term * term;
+
+  if (q.DMerc_times_r2 < min_DMerc_times_r2) {
+    term = min_DMerc_times_r2 - q.DMerc_times_r2;
+  } else {
+    term = 0.0;
+  }
+  if (weight_DMerc_times_r2 > 0) residuals[j++] = weight_DMerc_times_r2 * term;
+  DMerc_times_r2_term = term * term;
 
   for (k = 0; k < q.nphi; k++) {
     term = arclength_factor[k] * q.X20[k];
@@ -800,13 +814,14 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
     if (weight_B20_mean > 0) residuals[j++] = weight_B20_mean * term;
   }
 
-  Vector weights = {weight_B20, weight_iota, weight_elongation, weight_curvature, weight_R0, weight_d2_volume_d_psi2,
+  Vector weights = {weight_B20, weight_iota, weight_elongation, weight_curvature, weight_R0,
+    weight_d2_volume_d_psi2, weight_DMerc_times_r2,
     weight_XY2, weight_XY2Prime, weight_XY2PrimePrime, weight_Z2, weight_Z2Prime, weight_XY3, weight_XY3Prime, weight_XY3PrimePrime,
     weight_grad_B, weight_grad_grad_B, weight_r_singularity,
     weight_axis_length, weight_standard_deviation_of_R, weight_B20_mean};
 
   Vector terms = {B20_term, iota_term, elongation_term, curvature_term,
-    R0_term, d2_volume_d_psi2_term, XY2_term, XY2Prime_term, XY2PrimePrime_term, Z2_term, Z2Prime_term,
+		  R0_term, d2_volume_d_psi2_term, DMerc_times_r2_term, XY2_term, XY2Prime_term, XY2PrimePrime_term, Z2_term, Z2Prime_term,
     XY3_term, XY3Prime_term, XY3PrimePrime_term, grad_B_term, grad_grad_B_term, r_singularity_term,
     axis_length_term, standard_deviation_of_R_term, B20_mean_term};
 
@@ -862,6 +877,7 @@ void gsl_callback(const size_t iter, void *params,
   opt->iter_curvature_term[n_iter] = opt->curvature_term;
   opt->iter_R0_term[n_iter] = opt->R0_term;
   opt->iter_d2_volume_d_psi2_term[n_iter] = opt->d2_volume_d_psi2_term;
+  opt->iter_DMerc_times_r2_term[n_iter] = opt->DMerc_times_r2_term;
   opt->iter_XY2_term[n_iter] = opt->XY2_term;
   opt->iter_XY2Prime_term[n_iter] = opt->XY2Prime_term;
   opt->iter_XY2PrimePrime_term[n_iter] = opt->XY2PrimePrime_term;
