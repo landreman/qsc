@@ -69,7 +69,7 @@ void Scan::write_netcdf() {
   nc.put("rejected_due_to_B20_variation", filters[REJECTED_DUE_TO_B20_VARIATION], "Number of configurations in the scan that were rejected due to the max_B20_variation_to_keep filter", "dimensionless");
   nc.put("rejected_due_to_L_grad_grad_B", filters[REJECTED_DUE_TO_L_GRAD_GRAD_B], "Number of configurations in the scan that were rejected due to the min_L_grad_grad_B_to_keep filter", "dimensionless");
   nc.put("rejected_due_to_d2_volume_d_psi2", filters[REJECTED_DUE_TO_D2_VOLUME_D_PSI2], "Number of configurations in the scan that were rejected due to the max_d2_volume_d_psi2_to_keep filter", "dimensionless");
-  nc.put("rejected_due_to_DMerc", filters[REJECTED_DUE_TO_DMERC], "Number of configurations in the scan that were rejected due to the min_DMerc_to_keep filter", "dimensionless");
+  nc.put("rejected_due_to_DMerc", filters[REJECTED_DUE_TO_DMERC], "Number of configurations in the scan that were rejected due to the min_DMerc_times_r2_to_keep filter", "dimensionless");
   nc.put("rejected_due_to_r_singularity", filters[REJECTED_DUE_TO_R_SINGULARITY], "Number of configurations in the scan that were rejected due to the min_r_singularity_to_keep filter", "dimensionless");
 
   nc.put("fraction_kept", filter_fractions[KEPT], "Fraction of the attempted configurations from the scan that were kept and saved in this file", "dimensionless");
@@ -84,7 +84,7 @@ void Scan::write_netcdf() {
   nc.put("fraction_rejected_due_to_B20_variation", filter_fractions[REJECTED_DUE_TO_B20_VARIATION], "Fraction of configurations in the scan that were rejected due to the max_B20_variation_to_keep filter", "dimensionless");
   nc.put("fraction_rejected_due_to_L_grad_grad_B", filter_fractions[REJECTED_DUE_TO_L_GRAD_GRAD_B], "Fraction of configurations in the scan that were rejected due to the min_L_grad_grad_B_to_keep filter", "dimensionless");
   nc.put("fraction_rejected_due_to_d2_volume_d_psi2", filter_fractions[REJECTED_DUE_TO_D2_VOLUME_D_PSI2], "Fraction of configurations in the scan that were rejected due to the max_d2_volume_d_psi2_to_keep filter", "dimensionless");
-  nc.put("fraction_rejected_due_to_DMerc", filter_fractions[REJECTED_DUE_TO_DMERC], "Fraction of configurations in the scan that were rejected due to the min_DMerc_to_keep filter", "dimensionless");
+  nc.put("fraction_rejected_due_to_DMerc", filter_fractions[REJECTED_DUE_TO_DMERC], "Fraction of configurations in the scan that were rejected due to the min_DMerc_times_r2_to_keep filter", "dimensionless");
   nc.put("fraction_rejected_due_to_r_singularity", filter_fractions[REJECTED_DUE_TO_R_SINGULARITY], "Fraction of configurations in the scan that were rejected due to the min_r_singularity_to_keep filter", "dimensionless");
 
   int keep_all_int = (int) keep_all;
@@ -101,7 +101,7 @@ void Scan::write_netcdf() {
       nc.put("max_B20_variation_to_keep", max_B20_variation_to_keep, "Configurations were kept in the scan only if the range (maximum minus minimum) of B20 over toroidal angle is no more than this value", "Tesla/(meter^2)");
       nc.put("min_r_singularity_to_keep", min_r_singularity_to_keep, "Configurations were kept in the scan only if r_singularity_robust is at least this value. r_singularity_robust is the robust estimate of the minor radius at which the flux surface shapes become singular, r_c, as detailed in section 4.2 of Landreman, J Plasma Physics (2021)", "meter");
       nc.put("max_d2_volume_d_psi2_to_keep", max_d2_volume_d_psi2_to_keep, "Configurations were kept in the scan only if the magnetic well d2_volume_d_psi2 is no more than this value. d2_volume_d_psi2 is the second derivative of flux surface volume with respect to psi, where 2*pi*psi is the toroidal flux.", "Tesla^{-2} meter^{-1}");
-      nc.put("min_DMerc_to_keep", min_DMerc_to_keep, "Configurations were kept in the scan only if the Mercier stability criterion DMerc_times_r2 is at least this value. DMerc_times_r2 corresponds to r^2 times the quantity DMerc in Landreman and Jorge, J Plasma Phys (2020).", "Tesla^{-2} meter^{-2}");
+      nc.put("min_DMerc_times_r2_to_keep", min_DMerc_times_r2_to_keep, "Configurations were kept in the scan only if the Mercier stability criterion DMerc_times_r2 is at least this value. DMerc_times_r2 corresponds to r^2 times the quantity DMerc in Landreman and Jorge, J Plasma Phys (2020).", "Tesla^{-2} meter^{-2}");
     }
   }
   nc.put("max_newton_iterations", q.max_newton_iterations, "Maximum iterations of Newton's method for solving the sigma equation", "dimensionless");

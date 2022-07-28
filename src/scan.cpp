@@ -46,7 +46,7 @@ void Scan::defaults() {
   max_B20_variation_to_keep = 1.0e+30;
   min_r_singularity_to_keep = -1.0;
   max_d2_volume_d_psi2_to_keep = 1.0e+30;
-  min_DMerc_to_keep = -1.0e+30;
+  min_DMerc_times_r2_to_keep = -1.0e+30;
 }
 
 Scan::Scan() {

@@ -202,7 +202,7 @@ void Scan::random() {
 	filters_local[REJECTED_DUE_TO_D2_VOLUME_D_PSI2]++;
 	continue;
       }
-      if (!keep_all && q.DMerc_times_r2 < min_DMerc_to_keep) {
+      if (!keep_all && q.DMerc_times_r2 < min_DMerc_times_r2_to_keep) {
 	filters_local[REJECTED_DUE_TO_DMERC]++;
 	continue;
       }

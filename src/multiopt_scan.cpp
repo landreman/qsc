@@ -27,7 +27,7 @@ void MultiOptScan::defaults() {
   max_B20_variation_to_keep = 1.0e+30;
   min_r_singularity_to_keep = -1.0;
   max_d2_volume_d_psi2_to_keep = 1.0e+30;
-  min_DMerc_to_keep = -1.0e+30;
+  min_DMerc_times_r2_to_keep = -1.0e+30;
   max_XY2_to_keep = 1.0e+30;
   max_Z2_to_keep = 1.0e+30;
   max_XY3_to_keep = 1.0e+30;
@@ -444,7 +444,7 @@ void MultiOptScan::eval_scan_index(int j_scan) {
       passed_filters = false;	
     } else if (verbose > 1) std::cout << "Passed d2_volume_d_psi2 filter." << std::endl;
     
-    if (mo.opts[index].q.DMerc_times_r2 < min_DMerc_to_keep) {
+    if (mo.opts[index].q.DMerc_times_r2 < min_DMerc_times_r2_to_keep) {
       filters_local[REJECTED_DUE_TO_DMERC]++;
       if (verbose > 1) std::cout << "Rejecting this configuration due to DMerc." << std::endl;
       passed_filters = false;	

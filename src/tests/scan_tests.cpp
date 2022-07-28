@@ -170,8 +170,8 @@ TEST_CASE("Verify results of a deterministic scan are independent of number of m
   scan1.max_d2_volume_d_psi2_to_keep = 0;
   scan2.max_d2_volume_d_psi2_to_keep = scan1.max_d2_volume_d_psi2_to_keep;
 
-  scan1.min_DMerc_to_keep = 0;
-  scan2.min_DMerc_to_keep = scan1.min_DMerc_to_keep;
+  scan1.min_DMerc_times_r2_to_keep = 0;
+  scan2.min_DMerc_times_r2_to_keep = scan1.min_DMerc_times_r2_to_keep;
   
   scan1.min_L_grad_grad_B_to_keep = 0.05;
   scan2.min_L_grad_grad_B_to_keep = scan1.min_L_grad_grad_B_to_keep;
@@ -356,8 +356,8 @@ TEST_CASE("Verify scan results with and without filters are related as expected.
   scan1.max_d2_volume_d_psi2_to_keep = 0;
   scan2.max_d2_volume_d_psi2_to_keep = scan1.max_d2_volume_d_psi2_to_keep;
 
-  scan1.min_DMerc_to_keep = 0;
-  scan2.min_DMerc_to_keep = scan1.min_DMerc_to_keep;
+  scan1.min_DMerc_times_r2_to_keep = 0;
+  scan2.min_DMerc_times_r2_to_keep = scan1.min_DMerc_times_r2_to_keep;
   
   scan1.min_L_grad_grad_B_to_keep = 0.05;
   scan2.min_L_grad_grad_B_to_keep = scan1.min_L_grad_grad_B_to_keep;
@@ -515,9 +515,9 @@ TEST_CASE("Verify scan results with and without filters are related as expected.
       }
 
       if (j_filter == 9) {
-	scan2.min_DMerc_to_keep = 0;
+	scan2.min_DMerc_times_r2_to_keep = 0;
       } else { 
-	scan2.min_DMerc_to_keep = -1.0e+30;
+	scan2.min_DMerc_times_r2_to_keep = -1.0e+30;
       }
       	
       // Run the scan
@@ -543,7 +543,7 @@ TEST_CASE("Verify scan results with and without filters are related as expected.
 		scan1.scan_B20_variation[j] <= scan2.max_B20_variation_to_keep &&
 		scan1.scan_r_singularity[j] >= scan2.min_r_singularity_to_keep &&
 		scan1.scan_d2_volume_d_psi2[j] <= scan2.max_d2_volume_d_psi2_to_keep &&
-		scan1.scan_DMerc_times_r2[j] >= scan2.min_DMerc_to_keep))) {
+		scan1.scan_DMerc_times_r2[j] >= scan2.min_DMerc_times_r2_to_keep))) {
 	    
 	    n++;
 	    CHECK(Approx(scan1.scan_eta_bar[j]) == scan2.scan_eta_bar[n]);
@@ -662,14 +662,14 @@ TEST_CASE("Verify the number of configurations attempted or kept in a scan match
 	  scan.max_elongation_to_keep = 1.0e+30;
 	  scan.min_R0_to_keep = 0.01;
 	  scan.max_d2_volume_d_psi2_to_keep = 1.0e+30;
-	  scan.min_DMerc_to_keep = -1.0e+30;
+	  scan.min_DMerc_times_r2_to_keep = -1.0e+30;
 	  scan.min_L_grad_grad_B_to_keep = -1.0;
 	} else {
 	  // Constraints should be active
 	  scan.max_elongation_to_keep = 2.8;
 	  scan.min_R0_to_keep = 0.81;
 	  scan.max_d2_volume_d_psi2_to_keep = 0;
-	  scan.min_DMerc_to_keep = 0;  
+	  scan.min_DMerc_times_r2_to_keep = 0;  
 	  scan.min_L_grad_grad_B_to_keep = 0.03;
 	}
 	for (int j_limit = 0; j_limit < 2; j_limit++) {
