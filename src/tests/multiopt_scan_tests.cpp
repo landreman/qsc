@@ -196,10 +196,10 @@ TEST_CASE("Run a small MultiOptScan with keep_all false. [mpi] [multiopt_scan]")
   
   if (single) return;
   
-  // This example only works for 2-6 procs.
+  // This example only works for 2-5 procs.
   int n_procs;
   MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
-  if (n_procs < 2 || n_procs > 6) return;
+  if (n_procs < 2 || n_procs > 5) return;
   
   MultiOptScan mos;
 
@@ -208,15 +208,15 @@ TEST_CASE("Run a small MultiOptScan with keep_all false. [mpi] [multiopt_scan]")
   mos.keep_all = false;
   mos.min_R0_to_keep = 0.5; // This filter should not be active.
   mos.max_elongation_to_keep = 3.0; // This filter should not be active.
-  mos.min_r_singularity_to_keep = 0.25;
-  mos.max_B20_variation_to_keep = 0.065;
+  mos.min_r_singularity_to_keep = 0.2;
+  mos.max_B20_variation_to_keep = 0.04;
 
-  mos.params       = {"weight_grad_grad_B", "weight_iota"};
-  mos.params_min   = {               0.001,          10.0};
-  mos.params_max   = {                 0.1,          30.0};
-  mos.params_n     = {                   3,             2};
-  mos.params_log   = {                true,          true};
-  mos.params_stage = {                   1,            -1};
+  mos.params       = {"weight_B20", "weight_iota"};
+  mos.params_min   = {       0.001,          10.0};
+  mos.params_max   = {        10.0,          20.0};
+  mos.params_n     = {           2,             2};
+  mos.params_log   = {        true,          true};
+  mos.params_stage = {           1,            -1};
 
   // Set 2 opt stages:
   mos.mo_ref.opts.resize(2);
@@ -260,7 +260,6 @@ TEST_CASE("Run a small MultiOptScan with keep_all false. [mpi] [multiopt_scan]")
   mos.mo_ref.opts[1].target_iota = 0.42;
   mos.mo_ref.opts[1].weight_grad_B = 1.0;
   mos.mo_ref.opts[1].weight_B20 = 2.0;
-  mos.mo_ref.opts[1].weight_grad_grad_B = 0.01;
 
   // Run the scan:
   mos.init();
@@ -270,15 +269,13 @@ TEST_CASE("Run a small MultiOptScan with keep_all false. [mpi] [multiopt_scan]")
   if (mos.proc0) {
     CHECK(mos.n_scan == 2);
 
-    CHECK(Approx(mos.scan_weight_grad_grad_B[0]) == 0.001);
-    CHECK(Approx(mos.scan_weight_grad_grad_B[1]) == 0.001);
     CHECK(Approx(mos.scan_weight_iota[0]) == 10.0);
-    CHECK(Approx(mos.scan_weight_iota[1]) == 30.0);
-    CHECK(Approx(mos.scan_weight_B20[0]) == 2.0);
-    CHECK(Approx(mos.scan_weight_B20[1]) == 2.0);
+    CHECK(Approx(mos.scan_weight_iota[1]) == 20.0);
+    CHECK(Approx(mos.scan_weight_B20[0]) == 10.0);
+    CHECK(Approx(mos.scan_weight_B20[1]) == 10.0);
     
-    CHECK(Approx(mos.scan_R0c(1, 0)) == 0.173039969373242);
-    CHECK(Approx(mos.scan_R0c(1, 1)) == 0.175276407386024);
+    CHECK(Approx(mos.scan_R0c(1, 0)) == 0.170733951535488);
+    CHECK(Approx(mos.scan_R0c(1, 1)) == 0.172536139943431);
   }
   
   // For each entry in the scan, run a standalone single QSC and
