@@ -379,6 +379,14 @@ void MultiOptScan::eval_scan_index(int j_scan) {
 	mo.opts[stage].max_d2_volume_d_psi2 = val;
 	if (verbose > 1) std::cout << "Setting max_d2_volume_d_psi2 for opt stage " << stage << " to " << val << std::endl;
 	
+      } else if (params[j].compare("weight_DMerc_times_r2") == 0) {
+	mo.opts[stage].weight_DMerc_times_r2 = val;
+	if (verbose > 1) std::cout << "Setting weight_DMerc_times_r2 for opt stage " << stage << " to " << val << std::endl;
+	
+      } else if (params[j].compare("min_DMerc_times_r2") == 0) {
+	mo.opts[stage].min_DMerc_times_r2 = val;
+	if (verbose > 1) std::cout << "Setting min_DMerc_times_r2 for opt stage " << stage << " to " << val << std::endl;
+	
       } else {
 	std::cout << "Unrecognized entry in params: " << params[j] << std::endl;
 	throw std::runtime_error("Unrecognized entry in params");
@@ -545,21 +553,23 @@ void MultiOptScan::eval_scan_index(int j_scan) {
   parameters_single[34] = mo.opts[index].min_R0;
   parameters_single[35] = mo.opts[index].weight_d2_volume_d_psi2;
   parameters_single[36] = mo.opts[index].max_d2_volume_d_psi2;
-  parameters_single[37] = mo.opts[index].weight_XY2;
-  parameters_single[38] = mo.opts[index].weight_XY2Prime;
-  parameters_single[39] = mo.opts[index].weight_XY2PrimePrime;
-  parameters_single[40] = mo.opts[index].weight_Z2;
-  parameters_single[41] = mo.opts[index].weight_Z2Prime;
-  parameters_single[42] = mo.opts[index].weight_XY3;
-  parameters_single[43] = mo.opts[index].weight_XY3Prime;
-  parameters_single[44] = mo.opts[index].weight_XY3PrimePrime;
-  parameters_single[45] = mo.opts[index].weight_grad_B;
-  parameters_single[46] = mo.opts[index].weight_grad_grad_B;
-  parameters_single[47] = mo.opts[index].weight_r_singularity;
-  parameters_single[48] = mo.opts[index].weight_axis_length;
-  parameters_single[49] = mo.opts[index].target_axis_length;
-  parameters_single[50] = mo.opts[index].weight_standard_deviation_of_R;
-  parameters_single[51] = mo.opts[index].weight_B20_mean;
+  parameters_single[37] = mo.opts[index].weight_DMerc_times_r2;
+  parameters_single[38] = mo.opts[index].min_DMerc_times_r2;
+  parameters_single[39] = mo.opts[index].weight_XY2;
+  parameters_single[40] = mo.opts[index].weight_XY2Prime;
+  parameters_single[41] = mo.opts[index].weight_XY2PrimePrime;
+  parameters_single[42] = mo.opts[index].weight_Z2;
+  parameters_single[43] = mo.opts[index].weight_Z2Prime;
+  parameters_single[44] = mo.opts[index].weight_XY3;
+  parameters_single[45] = mo.opts[index].weight_XY3Prime;
+  parameters_single[46] = mo.opts[index].weight_XY3PrimePrime;
+  parameters_single[47] = mo.opts[index].weight_grad_B;
+  parameters_single[48] = mo.opts[index].weight_grad_grad_B;
+  parameters_single[49] = mo.opts[index].weight_r_singularity;
+  parameters_single[50] = mo.opts[index].weight_axis_length;
+  parameters_single[51] = mo.opts[index].target_axis_length;
+  parameters_single[52] = mo.opts[index].weight_standard_deviation_of_R;
+  parameters_single[53] = mo.opts[index].weight_B20_mean;
 
   for (j = 0; j < axis_nmax_plus_1; j++) {
     parameters_single[j + 0 * axis_nmax_plus_1 + n_parameters_base] = mo.opts[index].q.R0c[j];
@@ -696,6 +706,8 @@ void MultiOptScan::filter_global_arrays() {
   scan_target_min_R0.resize(n_scan, 0.0);
   scan_weight_d2_volume_d_psi2.resize(n_scan, 0.0);
   scan_max_d2_volume_d_psi2.resize(n_scan, 0.0);
+  scan_weight_DMerc_times_r2.resize(n_scan, 0.0);
+  scan_min_DMerc_times_r2.resize(n_scan, 0.0);
   scan_weight_XY2.resize(n_scan, 0.0);
   scan_weight_XY2Prime.resize(n_scan, 0.0);
   scan_weight_XY2PrimePrime.resize(n_scan, 0.0);
@@ -760,21 +772,23 @@ void MultiOptScan::filter_global_arrays() {
     scan_target_min_R0[j]                  = parameters(34, j_global);
     scan_weight_d2_volume_d_psi2[j]        = parameters(35, j_global);
     scan_max_d2_volume_d_psi2[j]           = parameters(36, j_global);
-    scan_weight_XY2[j]                     = parameters(37, j_global);
-    scan_weight_XY2Prime[j]                = parameters(38, j_global);
-    scan_weight_XY2PrimePrime[j]           = parameters(39, j_global);
-    scan_weight_Z2[j]                      = parameters(40, j_global);
-    scan_weight_Z2Prime[j]                 = parameters(41, j_global);
-    scan_weight_XY3[j]                     = parameters(42, j_global);
-    scan_weight_XY3Prime[j]                = parameters(43, j_global);
-    scan_weight_XY3PrimePrime[j]           = parameters(44, j_global);
-    scan_weight_grad_B[j]                  = parameters(45, j_global);
-    scan_weight_grad_grad_B[j]             = parameters(46, j_global);
-    scan_weight_r_singularity[j]           = parameters(47, j_global);
-    scan_weight_axis_length[j]             = parameters(48, j_global);
-    scan_target_axis_length[j]             = parameters(49, j_global);
-    scan_weight_standard_deviation_of_R[j] = parameters(50, j_global);
-    scan_weight_B20_mean[j]                = parameters(51, j_global);
+    scan_weight_DMerc_times_r2[j]          = parameters(37, j_global);
+    scan_min_DMerc_times_r2[j]             = parameters(38, j_global);
+    scan_weight_XY2[j]                     = parameters(39, j_global);
+    scan_weight_XY2Prime[j]                = parameters(40, j_global);
+    scan_weight_XY2PrimePrime[j]           = parameters(41, j_global);
+    scan_weight_Z2[j]                      = parameters(42, j_global);
+    scan_weight_Z2Prime[j]                 = parameters(43, j_global);
+    scan_weight_XY3[j]                     = parameters(44, j_global);
+    scan_weight_XY3Prime[j]                = parameters(45, j_global);
+    scan_weight_XY3PrimePrime[j]           = parameters(46, j_global);
+    scan_weight_grad_B[j]                  = parameters(47, j_global);
+    scan_weight_grad_grad_B[j]             = parameters(48, j_global);
+    scan_weight_r_singularity[j]           = parameters(49, j_global);
+    scan_weight_axis_length[j]             = parameters(50, j_global);
+    scan_target_axis_length[j]             = parameters(51, j_global);
+    scan_weight_standard_deviation_of_R[j] = parameters(52, j_global);
+    scan_weight_B20_mean[j]                = parameters(53, j_global);
     
     for (k = 0; k < axis_nmax_plus_1; k++) {
       scan_R0c(k, j) = parameters(k + 0 * axis_nmax_plus_1 + n_parameters_base, j_global);

@@ -41,8 +41,8 @@ void MultiOptScan::input(std::string filename) {
   toml_read(varlist, indata, "min_L_grad_grad_B_to_keep", min_L_grad_grad_B_to_keep);
   toml_read(varlist, indata, "max_B20_variation_to_keep", max_B20_variation_to_keep);
   toml_read(varlist, indata, "min_r_singularity_to_keep", min_r_singularity_to_keep);
-  toml_read(varlist, indata, "min_DMerc_to_keep", min_DMerc_to_keep);
   toml_read(varlist, indata, "max_d2_volume_d_psi2_to_keep", max_d2_volume_d_psi2_to_keep);
+  toml_read(varlist, indata, "min_DMerc_to_keep", min_DMerc_to_keep);
   toml_read(varlist, indata, "max_XY2_to_keep", max_XY2_to_keep);
   toml_read(varlist, indata, "max_Z2_to_keep", max_Z2_to_keep);
   toml_read(varlist, indata, "max_XY3_to_keep", max_XY3_to_keep);

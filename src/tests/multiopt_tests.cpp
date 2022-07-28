@@ -31,6 +31,7 @@ TEST_CASE("Running a standalone opt should yield identical results to a 1-stage 
       opt.weight_R0 = 4.0;
       opt.min_R0 = 0.8;
       opt.weight_d2_volume_d_psi2 = 5.0;
+      opt.weight_DMerc_times_r2 = 5.5;
       opt.weight_XY2 = 6.0;
       opt.weight_XY2Prime = 7.0;
       opt.weight_XY2PrimePrime = 7.2;
@@ -146,6 +147,7 @@ TEST_CASE("Running a standalone opt should yield identical results to a 1-stage 
       mo.opts[0].weight_R0 = opt.weight_R0;
       mo.opts[0].min_R0 = opt.min_R0;
       mo.opts[0].weight_d2_volume_d_psi2 = opt.weight_d2_volume_d_psi2;
+      mo.opts[0].weight_DMerc_times_r2 = opt.weight_DMerc_times_r2;
       mo.opts[0].weight_XY2 = opt.weight_XY2;
       mo.opts[0].weight_XY2Prime = opt.weight_XY2Prime;
       mo.opts[0].weight_XY2PrimePrime = opt.weight_XY2PrimePrime;

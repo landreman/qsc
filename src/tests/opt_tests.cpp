@@ -28,6 +28,7 @@ TEST_CASE("The objective function should equal 1/2 * sum(residuals^2) [opt]") {
       opt.weight_R0 = 4.0;
       opt.min_R0 = 0.8;
       opt.weight_d2_volume_d_psi2 = 5.0;
+      opt.weight_DMerc_times_r2 = 5.5;
       opt.weight_XY2 = 6.0;
       opt.weight_XY2Prime = 7.0;
       opt.weight_XY2PrimePrime = 7.2;
@@ -80,10 +81,12 @@ TEST_CASE("Compute each optimization term a different way and make sure we get t
       // A config with magnetic well
       opt.q = Qsc("r2 section 5.5");
       opt.min_R0 = 0.98; // so the R0 term is nonzero.
+      opt.min_DMerc_times_r2 = 40.0; // so the DMerc term is nonzero.
     } else {
       // A config with magnetic hill
       opt.q = Qsc("r2 section 5.1");
       opt.min_R0 = 0.01; // so R0_term should be 0.
+      opt.min_DMerc_times_r2 = 0.0;
     }
     opt.q.verbose = 0;
     opt.q.init();
@@ -126,6 +129,13 @@ TEST_CASE("Compute each optimization term a different way and make sure we get t
     } else {
       CHECK(opt.d2_volume_d_psi2_term > 0);
       CHECK(Approx((opt.max_d2_volume_d_psi2 - opt.q.d2_volume_d_psi2) * (opt.max_d2_volume_d_psi2 - opt.q.d2_volume_d_psi2)) == opt.d2_volume_d_psi2_term);
+    }
+
+    if (jconfig == 0) {
+      CHECK(opt.DMerc_times_r2_term > 0);
+      CHECK(Approx((opt.min_DMerc_times_r2 - opt.q.DMerc_times_r2) * (opt.min_DMerc_times_r2 - opt.q.DMerc_times_r2)) == opt.DMerc_times_r2_term);
+    } else {
+      CHECK(Approx(opt.DMerc_times_r2_term) == 0.0);
     }
 
     term = 0.0;
@@ -277,6 +287,7 @@ TEST_CASE("Each term in the objective function should be approximately independe
   o1.weight_R0 = 4.0;
   o1.min_R0 = 0.8;
   o1.weight_d2_volume_d_psi2 = 5.0;
+  o1.weight_DMerc_times_r2 = 5.5;
   o1.weight_XY2 = 6.0;
   o1.weight_XY2Prime = 7.0;
   o1.weight_XY2PrimePrime = 7.2;
@@ -299,6 +310,7 @@ TEST_CASE("Each term in the objective function should be approximately independe
   o2.weight_R0 = 4.0;
   o2.min_R0 = 0.8;
   o2.weight_d2_volume_d_psi2 = 5.0;
+  o2.weight_DMerc_times_r2 = 5.5;
   o2.weight_XY2 = 6.0;
   o2.weight_XY2Prime = 7.0;
   o2.weight_XY2PrimePrime = 7.2;
@@ -332,6 +344,7 @@ TEST_CASE("Each term in the objective function should be approximately independe
   CHECK(Approx(o1.curvature_term).epsilon(tol) == o2.curvature_term);
   CHECK(Approx(o1.R0_term).epsilon(1.0e-4) == o2.R0_term); // This term needs a wider tolerance
   CHECK(Approx(o1.d2_volume_d_psi2_term).epsilon(tol) == o2.d2_volume_d_psi2_term);
+  CHECK(Approx(o1.DMerc_times_r2_term).epsilon(tol) == o2.DMerc_times_r2_term);
   CHECK(Approx(o1.XY2_term).epsilon(tol) == o2.XY2_term);
   CHECK(Approx(o1.XY2Prime_term).epsilon(tol) == o2.XY2Prime_term);
   CHECK(Approx(o1.XY2PrimePrime_term).epsilon(tol) == o2.XY2PrimePrime_term);
@@ -380,6 +393,7 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
       opt.weight_R0 = 4.0;
       opt.min_R0 = 0.8;
       opt.weight_d2_volume_d_psi2 = 5.0;
+      opt.weight_DMerc_times_r2 = 5.5;
       opt.weight_XY2 = 6.0;
       opt.weight_XY2Prime = 7.0;
       opt.weight_XY2PrimePrime = 7.2;
@@ -504,6 +518,7 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
       CHECK(Approx(q0.B20_grid_variation) == opt.iter_B20_variation[0]);
       CHECK(Approx(q0.B20_residual) == opt.iter_B20_residual[0]);
       CHECK(Approx(q0.d2_volume_d_psi2) == opt.iter_d2_volume_d_psi2[0]);
+      CHECK(Approx(q0.DMerc_times_r2) == opt.iter_DMerc_times_r2[0]);
       CHECK(Approx(q0.DMerc_times_r2) == opt.iter_DMerc_times_r2[0]);
       CHECK(Approx(q0.standard_deviation_of_R) == opt.iter_standard_deviation_of_R[0]);
       CHECK(Approx(q0.standard_deviation_of_Z) == opt.iter_standard_deviation_of_Z[0]);

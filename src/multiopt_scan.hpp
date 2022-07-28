@@ -66,7 +66,7 @@ namespace qsc {
     int axis_nmax_plus_1;
     bool quit_after_init;
     
-    const int n_parameters_base = 52;
+    const int n_parameters_base = 54;
     const int n_int_parameters_base = 4;
     const int n_int_parameters = n_int_parameters_base + N_FILTERS;
     int n_parameters;
@@ -96,6 +96,7 @@ namespace qsc {
     Vector scan_weight_elongation, scan_weight_curvature;
     Vector scan_weight_R0, scan_target_min_R0;
     Vector scan_weight_d2_volume_d_psi2, scan_max_d2_volume_d_psi2;
+    Vector scan_weight_DMerc_times_r2, scan_min_DMerc_times_r2;
     Vector scan_weight_XY2, scan_weight_XY2Prime, scan_weight_XY2PrimePrime;
     Vector scan_weight_Z2, scan_weight_Z2Prime;
     Vector scan_weight_XY3, scan_weight_XY3Prime, scan_weight_XY3PrimePrime;
