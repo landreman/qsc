@@ -410,9 +410,11 @@ void MultiOptScan::eval_scan_index(int j_scan) {
     
     if (mo.opts[index].q.grid_max_elongation > max_elongation_to_keep) {
       filters_local[REJECTED_DUE_TO_ELONGATION]++;
-      if (verbose > 1) std::cout << "Rejecting this configuration due to elongation." << std::endl;
+      if (verbose > 1) std::cout << "Rejecting this configuration due to elongation. "
+				 << mo.opts[index].q.grid_max_elongation << std::endl;
       passed_filters = false;	
-    } else if (verbose > 1) std::cout << "Passed elongation filter." << std::endl;
+    } else if (verbose > 1) std::cout << "Passed elongation filter. "
+				      << mo.opts[index].q.grid_max_elongation << std::endl;
     
     if (mo.opts[index].q.grid_min_L_grad_B < min_L_grad_B_to_keep) {
       filters_local[REJECTED_DUE_TO_L_GRAD_B]++;
@@ -422,9 +424,11 @@ void MultiOptScan::eval_scan_index(int j_scan) {
     
     if (mo.opts[index].q.B20_grid_variation > max_B20_variation_to_keep) {
       filters_local[REJECTED_DUE_TO_B20_VARIATION]++;
-      if (verbose > 1) std::cout << "Rejecting this configuration due to B20 variation. " << mo.opts[index].q.B20_grid_variation << std::endl;
+      if (verbose > 1) std::cout << "Rejecting this configuration due to B20 variation. "
+				 << mo.opts[index].q.B20_grid_variation << std::endl;
       passed_filters = false;	
-    } else if (verbose > 1) std::cout << "Passed B20 variation filter." << std::endl;
+    } else if (verbose > 1) std::cout << "Passed B20 variation filter. "
+				      << mo.opts[index].q.B20_grid_variation << std::endl;
     
     if (mo.opts[index].q.d2_volume_d_psi2 > max_d2_volume_d_psi2_to_keep) {
       filters_local[REJECTED_DUE_TO_D2_VOLUME_D_PSI2]++;
@@ -446,9 +450,11 @@ void MultiOptScan::eval_scan_index(int j_scan) {
     
     if (mo.opts[index].q.r_singularity_robust < min_r_singularity_to_keep) {
       filters_local[REJECTED_DUE_TO_R_SINGULARITY]++;
-      if (verbose > 1) std::cout << "Rejecting this configuration due to r_singularity." << std::endl;
+      if (verbose > 1) std::cout << "Rejecting this configuration due to r_singularity. "
+				 << mo.opts[index].q.r_singularity_robust << std::endl;
       passed_filters = false;	
-    } else if (verbose > 1) std::cout << "Passed r_singularity filter." << std::endl;
+    } else if (verbose > 1) std::cout << "Passed r_singularity filter. "
+				      << mo.opts[index].q.r_singularity_robust << std::endl;
     
     if (mo.opts[index].q.grid_max_XY2 > max_XY2_to_keep) {
       filters_local[REJECTED_DUE_TO_MAX_XY2]++;
