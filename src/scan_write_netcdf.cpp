@@ -108,7 +108,7 @@ void Scan::write_netcdf() {
   nc.put("max_linesearch_iterations", q.max_linesearch_iterations, "Maximum number of times the step size is reduced in the line search for each iteration of Newton's method when solving the sigma equation", "dimensionless");
   nc.put("newton_tolerance", q.newton_tolerance, "L2 norm of the residual used as a stopping criterion for Newton's method when solving the sigma equation", "dimensionless");
   nc.put("I2", q.I2, "r^2 term in I(r), which is the toroidal current inside the flux surface times mu0/(2pi)", "Tesla/meter");
-  nc.put("d_phi", q.d_phi, "Grid spacing in phi", "dimensionless");
+  nc.put("d_phi0", q.d_phi0, "Grid spacing in phi0", "dimensionless");
   nc.put("B0", q.B0, "Magnetic field magnitude on the magnetic axis", "Telsa");
   nc.put("sG", q.sG, "Sign of G0", "dimensionless");
   nc.put("spsi", q.spsi, "Sign of the toroidal flux psi", "dimensionless");

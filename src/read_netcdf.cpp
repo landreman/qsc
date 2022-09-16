@@ -169,7 +169,7 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
     nc.get("Y1c", Y1c);
     nc.get("Y1s", Y1s);
     nc.get("elongation", elongation);    
-    nc.get("d_l_d_phi", d_l_d_phi);
+    nc.get("d_l_d_phi", d_l_d_phi0); // Note renaming of variable phi -> phi0 here.
     nc.get("modBinv_sqrt_half_grad_B_colon_grad_B", L_grad_B_inverse);
     if (at_least_order_r2) {
       nc.get("X20", X20);
@@ -219,7 +219,7 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
     nc.get("eta_bar", eta_bar);
     nc.get("sigma0", sigma0);
     nc.get("I2", I2);
-    nc.get("d_phi", d_phi);
+    nc.get("d_phi0", d_phi0);
     nc.get("B0", B0);
     nc.get("G0", G0);
     nc.get("sG", sG);
@@ -271,8 +271,8 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
     nc.get("Y1s", Y1s);
     nc.get("R0", R0);
     nc.get("Z0", Z0);
-    nc.get("d_l_d_phi", d_l_d_phi);
-    nc.get("d2_l_d_phi2", d2_l_d_phi2);
+    nc.get("d_l_d_phi0", d_l_d_phi0);
+    nc.get("d2_l_d_phi02", d2_l_d_phi02);
     nc.get("elongation", elongation);
     nc.get("Boozer_toroidal_angle", Boozer_toroidal_angle);
     nc.get("L_grad_B", L_grad_B);

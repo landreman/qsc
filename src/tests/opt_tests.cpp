@@ -97,25 +97,25 @@ TEST_CASE("Compute each optimization term a different way and make sure we get t
     gsl_vector *gsl_residual = gsl_vector_alloc(opt.n_terms);
     opt.set_residuals(gsl_residual);
   
-    qscfloat denominator = opt.q.d_l_d_phi.sum();
+    qscfloat denominator = opt.q.d_l_d_phi0.sum();
     Vector temp;
     int j;
     qscfloat term;
 
-    temp = opt.q.B20_anomaly * opt.q.B20_anomaly * opt.q.d_l_d_phi;
+    temp = opt.q.B20_anomaly * opt.q.B20_anomaly * opt.q.d_l_d_phi0;
     CHECK(Approx(temp.sum() / denominator) == opt.B20_term);
 
     CHECK(Approx((opt.q.iota - opt.target_iota) * (opt.q.iota - opt.target_iota)) == opt.iota_term);
 
-    temp = opt.q.elongation * opt.q.elongation * opt.q.d_l_d_phi;
+    temp = opt.q.elongation * opt.q.elongation * opt.q.d_l_d_phi0;
     CHECK(Approx(temp.sum() / denominator) == opt.elongation_term);
 
-    temp = opt.q.curvature * opt.q.curvature * opt.q.d_l_d_phi;
+    temp = opt.q.curvature * opt.q.curvature * opt.q.d_l_d_phi0;
     CHECK(Approx(temp.sum() / denominator) == opt.curvature_term);
 
     if (jconfig == 0) {
       CHECK(opt.R0_term > 0);
-      temp = (opt.min_R0 - opt.q.R0) * (opt.min_R0 - opt.q.R0) * opt.q.d_l_d_phi;
+      temp = (opt.min_R0 - opt.q.R0) * (opt.min_R0 - opt.q.R0) * opt.q.d_l_d_phi0;
       for (j = 0; j < opt.q.nphi; j++) {
 	if (opt.q.R0[j] > opt.min_R0) temp[j] = 0;
       }
@@ -139,92 +139,92 @@ TEST_CASE("Compute each optimization term a different way and make sure we get t
     }
 
     term = 0.0;
-    temp = opt.q.X20 * opt.q.X20 * opt.q.d_l_d_phi;
+    temp = opt.q.X20 * opt.q.X20 * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.X2c * opt.q.X2c * opt.q.d_l_d_phi;
+    temp = opt.q.X2c * opt.q.X2c * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.X2s * opt.q.X2s * opt.q.d_l_d_phi;
+    temp = opt.q.X2s * opt.q.X2s * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.Y20 * opt.q.Y20 * opt.q.d_l_d_phi;
+    temp = opt.q.Y20 * opt.q.Y20 * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.Y2c * opt.q.Y2c * opt.q.d_l_d_phi;
+    temp = opt.q.Y2c * opt.q.Y2c * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.Y2s * opt.q.Y2s * opt.q.d_l_d_phi;
+    temp = opt.q.Y2s * opt.q.Y2s * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
     CHECK(Approx(term) == opt.XY2_term);
     
     term = 0.0;
-    temp = opt.q.d_X20_d_varphi * opt.q.d_X20_d_varphi * opt.q.d_l_d_phi;
+    temp = opt.q.d_X20_d_varphi * opt.q.d_X20_d_varphi * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.d_X2c_d_varphi * opt.q.d_X2c_d_varphi * opt.q.d_l_d_phi;
+    temp = opt.q.d_X2c_d_varphi * opt.q.d_X2c_d_varphi * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.d_X2s_d_varphi * opt.q.d_X2s_d_varphi * opt.q.d_l_d_phi;
+    temp = opt.q.d_X2s_d_varphi * opt.q.d_X2s_d_varphi * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.d_Y20_d_varphi * opt.q.d_Y20_d_varphi * opt.q.d_l_d_phi;
+    temp = opt.q.d_Y20_d_varphi * opt.q.d_Y20_d_varphi * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.d_Y2c_d_varphi * opt.q.d_Y2c_d_varphi * opt.q.d_l_d_phi;
+    temp = opt.q.d_Y2c_d_varphi * opt.q.d_Y2c_d_varphi * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.d_Y2s_d_varphi * opt.q.d_Y2s_d_varphi * opt.q.d_l_d_phi;
+    temp = opt.q.d_Y2s_d_varphi * opt.q.d_Y2s_d_varphi * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
     CHECK(Approx(term) == opt.XY2Prime_term);
     
     term = 0.0;
-    temp = opt.q.d2_X20_d_varphi2 * opt.q.d2_X20_d_varphi2 * opt.q.d_l_d_phi;
+    temp = opt.q.d2_X20_d_varphi2 * opt.q.d2_X20_d_varphi2 * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.d2_X2c_d_varphi2 * opt.q.d2_X2c_d_varphi2 * opt.q.d_l_d_phi;
+    temp = opt.q.d2_X2c_d_varphi2 * opt.q.d2_X2c_d_varphi2 * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.d2_X2s_d_varphi2 * opt.q.d2_X2s_d_varphi2 * opt.q.d_l_d_phi;
+    temp = opt.q.d2_X2s_d_varphi2 * opt.q.d2_X2s_d_varphi2 * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.d2_Y20_d_varphi2 * opt.q.d2_Y20_d_varphi2 * opt.q.d_l_d_phi;
+    temp = opt.q.d2_Y20_d_varphi2 * opt.q.d2_Y20_d_varphi2 * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.d2_Y2c_d_varphi2 * opt.q.d2_Y2c_d_varphi2 * opt.q.d_l_d_phi;
+    temp = opt.q.d2_Y2c_d_varphi2 * opt.q.d2_Y2c_d_varphi2 * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.d2_Y2s_d_varphi2 * opt.q.d2_Y2s_d_varphi2 * opt.q.d_l_d_phi;
+    temp = opt.q.d2_Y2s_d_varphi2 * opt.q.d2_Y2s_d_varphi2 * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
     CHECK(Approx(term) == opt.XY2PrimePrime_term);
 
     term = 0.0;
-    temp = opt.q.Z20 * opt.q.Z20 * opt.q.d_l_d_phi;
+    temp = opt.q.Z20 * opt.q.Z20 * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.Z2c * opt.q.Z2c * opt.q.d_l_d_phi;
+    temp = opt.q.Z2c * opt.q.Z2c * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.Z2s * opt.q.Z2s * opt.q.d_l_d_phi;
+    temp = opt.q.Z2s * opt.q.Z2s * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
     CHECK(Approx(term) == opt.Z2_term);
     
     term = 0.0;
-    temp = opt.q.d_Z20_d_varphi * opt.q.d_Z20_d_varphi * opt.q.d_l_d_phi;
+    temp = opt.q.d_Z20_d_varphi * opt.q.d_Z20_d_varphi * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.d_Z2c_d_varphi * opt.q.d_Z2c_d_varphi * opt.q.d_l_d_phi;
+    temp = opt.q.d_Z2c_d_varphi * opt.q.d_Z2c_d_varphi * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.d_Z2s_d_varphi * opt.q.d_Z2s_d_varphi * opt.q.d_l_d_phi;
+    temp = opt.q.d_Z2s_d_varphi * opt.q.d_Z2s_d_varphi * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
     CHECK(Approx(term) == opt.Z2Prime_term);
 
     term = 0.0;
-    temp = opt.q.X3c1 * opt.q.X3c1 * opt.q.d_l_d_phi;
+    temp = opt.q.X3c1 * opt.q.X3c1 * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.Y3c1 * opt.q.Y3c1 * opt.q.d_l_d_phi;
+    temp = opt.q.Y3c1 * opt.q.Y3c1 * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.Y3s1 * opt.q.Y3s1 * opt.q.d_l_d_phi;
+    temp = opt.q.Y3s1 * opt.q.Y3s1 * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
     CHECK(Approx(term) == opt.XY3_term);
     
     term = 0.0;
-    temp = opt.q.d_X3c1_d_varphi * opt.q.d_X3c1_d_varphi * opt.q.d_l_d_phi;
+    temp = opt.q.d_X3c1_d_varphi * opt.q.d_X3c1_d_varphi * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.d_Y3c1_d_varphi * opt.q.d_Y3c1_d_varphi * opt.q.d_l_d_phi;
+    temp = opt.q.d_Y3c1_d_varphi * opt.q.d_Y3c1_d_varphi * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.d_Y3s1_d_varphi * opt.q.d_Y3s1_d_varphi * opt.q.d_l_d_phi;
+    temp = opt.q.d_Y3s1_d_varphi * opt.q.d_Y3s1_d_varphi * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
     CHECK(Approx(term) == opt.XY3Prime_term);
     
     term = 0.0;
-    temp = opt.q.d2_X3c1_d_varphi2 * opt.q.d2_X3c1_d_varphi2 * opt.q.d_l_d_phi;
+    temp = opt.q.d2_X3c1_d_varphi2 * opt.q.d2_X3c1_d_varphi2 * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.d2_Y3c1_d_varphi2 * opt.q.d2_Y3c1_d_varphi2 * opt.q.d_l_d_phi;
+    temp = opt.q.d2_Y3c1_d_varphi2 * opt.q.d2_Y3c1_d_varphi2 * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
-    temp = opt.q.d2_Y3s1_d_varphi2 * opt.q.d2_Y3s1_d_varphi2 * opt.q.d_l_d_phi;
+    temp = opt.q.d2_Y3s1_d_varphi2 * opt.q.d2_Y3s1_d_varphi2 * opt.q.d_l_d_phi0;
     term += temp.sum() / denominator;
     CHECK(Approx(term) == opt.XY3PrimePrime_term);
 
@@ -232,7 +232,7 @@ TEST_CASE("Compute each optimization term a different way and make sure we get t
     for (int j2 = 0; j2 < 3; j2++) {
       for (int j1 = 0; j1 < 3; j1++) {
 	for (int jphi = 0; jphi < opt.q.nphi; jphi++) {
-	  term += opt.q.grad_B_tensor(jphi, j1, j2) * opt.q.grad_B_tensor(jphi, j1, j2) * opt.q.d_l_d_phi[jphi];
+	  term += opt.q.grad_B_tensor(jphi, j1, j2) * opt.q.grad_B_tensor(jphi, j1, j2) * opt.q.d_l_d_phi0[jphi];
 	}
       }
     }
@@ -243,22 +243,22 @@ TEST_CASE("Compute each optimization term a different way and make sure we get t
       for (int j2 = 0; j2 < 3; j2++) {
 	for (int j1 = 0; j1 < 3; j1++) {
 	  for (int jphi = 0; jphi < opt.q.nphi; jphi++) {
-	    term += opt.q.grad_grad_B_tensor(jphi, j1, j2, j3) * opt.q.grad_grad_B_tensor(jphi, j1, j2, j3) * opt.q.d_l_d_phi[jphi];
+	    term += opt.q.grad_grad_B_tensor(jphi, j1, j2, j3) * opt.q.grad_grad_B_tensor(jphi, j1, j2, j3) * opt.q.d_l_d_phi0[jphi];
 	  }
 	}
       }
     }
     CHECK(Approx(term / denominator) == opt.grad_grad_B_term);
 
-    temp = opt.q.d_l_d_phi / (opt.q.r_hat_singularity_robust * opt.q.r_hat_singularity_robust);
+    temp = opt.q.d_l_d_phi0 / (opt.q.r_hat_singularity_robust * opt.q.r_hat_singularity_robust);
     CHECK(Approx(temp.sum() / denominator) == opt.r_singularity_term);
 
     CHECK(Approx(opt.q.axis_length * opt.q.axis_length) == opt.axis_length_term);
 
-    temp = opt.q.d_l_d_phi * (opt.q.R0 - opt.q.mean_R) * (opt.q.R0 - opt.q.mean_R);
+    temp = opt.q.d_l_d_phi0 * (opt.q.R0 - opt.q.mean_R) * (opt.q.R0 - opt.q.mean_R);
     CHECK(Approx(temp.sum() / denominator) == opt.standard_deviation_of_R_term);
 
-    temp = opt.q.d_l_d_phi * opt.q.B20 * opt.q.B20;
+    temp = opt.q.d_l_d_phi0 * opt.q.B20 * opt.q.B20;
     CHECK(Approx(temp.sum() / denominator) == opt.B20_mean_term);
   }
 }

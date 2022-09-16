@@ -5,15 +5,17 @@ using namespace qsc;
 
 void Qsc::calculate_helicity() {
   int j;
+  qscfloat normal_cylindrical_R;
   for (j = 0; j < nphi; j++) {
-    if (normal_cylindrical1[j] >= 0) {
-      if (normal_cylindrical3[j] >= 0) {
+    normal_cylindrical_R = normal_cartesian1[j] * cosphi[j] + normal_cartesian2[j] * sinphi[j];
+    if (normal_cylindrical_R >= 0) {
+      if (normal_cartesian3[j] >= 0) {
 	quadrant[j] = 1;
       } else {
 	quadrant[j] = 4;
       }
     } else {
-      if (normal_cylindrical3[j] >= 0) {
+      if (normal_cartesian3[j] >= 0) {
 	quadrant[j] = 2;
       } else {
 	quadrant[j] = 3;

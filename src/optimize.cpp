@@ -554,7 +554,7 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   int j, k;
   j = 0;
   qscfloat term;
-  arclength_factor = sqrt(q.d_l_d_phi * (q.d_phi * q.nfp / q.axis_length));
+  arclength_factor = sqrt(q.d_l_d_phi0 * (q.d_phi0 * q.nfp / q.axis_length));
   
   objective_function = 0.0;
   B20_term = 0.0;

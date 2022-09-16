@@ -12,7 +12,10 @@ void Qsc::allocate() {
   // Ensure nphi is odd:
   if (nphi % 2 == 0) nphi++;
 
+  phi0.resize(nphi, 0.0);
   phi.resize(nphi, 0.0);
+  sinphi.resize(nphi, 0.0);
+  cosphi.resize(nphi, 0.0);
   R0.resize(nphi, 0.0);
   Z0.resize(nphi, 0.0);
   R0p.resize(nphi, 0.0);
@@ -21,28 +24,32 @@ void Qsc::allocate() {
   Z0pp.resize(nphi, 0.0);
   R0ppp.resize(nphi, 0.0);
   Z0ppp.resize(nphi, 0.0);
+  f.resize(nphi, 0.0);
+  fp.resize(nphi, 0.0);
+  fpp.resize(nphi, 0.0);
+  fppp.resize(nphi, 0.0);
   curvature.resize(nphi, 0.0);
   torsion.resize(nphi, 0.0);
   sinangle.resize(nphi, 0.0);
   cosangle.resize(nphi, 0.0);
-  d_l_d_phi.resize(nphi, 0.0);
-  d2_l_d_phi2.resize(nphi, 0.0);
+  d_l_d_phi0.resize(nphi, 0.0);
+  d2_l_d_phi02.resize(nphi, 0.0);
   
-  tangent_cylindrical1.resize(nphi, 0.0);
-  tangent_cylindrical2.resize(nphi, 0.0);
-  tangent_cylindrical3.resize(nphi, 0.0);
+  tangent_cartesian1.resize(nphi, 0.0);
+  tangent_cartesian2.resize(nphi, 0.0);
+  tangent_cartesian3.resize(nphi, 0.0);
 
-  normal_cylindrical1.resize(nphi, 0.0);
-  normal_cylindrical2.resize(nphi, 0.0);
-  normal_cylindrical3.resize(nphi, 0.0);
+  normal_cartesian1.resize(nphi, 0.0);
+  normal_cartesian2.resize(nphi, 0.0);
+  normal_cartesian3.resize(nphi, 0.0);
 
-  binormal_cylindrical1.resize(nphi, 0.0);
-  binormal_cylindrical2.resize(nphi, 0.0);
-  binormal_cylindrical3.resize(nphi, 0.0);
+  binormal_cartesian1.resize(nphi, 0.0);
+  binormal_cartesian2.resize(nphi, 0.0);
+  binormal_cartesian3.resize(nphi, 0.0);
 
-  d_tangent_d_l_cylindrical1.resize(nphi, 0.0);
-  d_tangent_d_l_cylindrical2.resize(nphi, 0.0);
-  d_tangent_d_l_cylindrical3.resize(nphi, 0.0);
+  d_tangent_d_l_cartesian1.resize(nphi, 0.0);
+  d_tangent_d_l_cartesian2.resize(nphi, 0.0);
+  d_tangent_d_l_cartesian3.resize(nphi, 0.0);
 
   tempvec.resize(nphi, 0.0);
   tempvec1.resize(nphi, 0.0);
@@ -55,7 +62,7 @@ void Qsc::allocate() {
   Boozer_toroidal_angle.resize(nphi, 0.0);
   etabar_squared_over_curvature_squared.resize(nphi, 0.0);
 
-  d_d_phi.resize(nphi, nphi, 0.0);
+  d_d_phi0.resize(nphi, nphi, 0.0);
   d_d_varphi.resize(nphi, nphi, 0.0);
   work_matrix.resize(nphi, nphi, 0.0);
   

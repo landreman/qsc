@@ -37,6 +37,9 @@ void qsc::Qsc::input(std::string filename) {
   toml_read(varlist, indata, "R0s", R0s);
   toml_read(varlist, indata, "Z0c", Z0c);
   toml_read(varlist, indata, "Z0s", Z0s);
+  toml_read(varlist, indata, "fc", fc);
+  toml_read(varlist, indata, "fs", fs);
+  toml_read(varlist, indata, "angle_shift", angle_shift);
 
   toml_unused(varlist, indata);
   
@@ -46,16 +49,22 @@ void qsc::Qsc::input(std::string filename) {
   newsize = std::max(newsize, R0s.size());
   newsize = std::max(newsize, Z0c.size());
   newsize = std::max(newsize, Z0s.size());
+  newsize = std::max(newsize, fc.size());
+  newsize = std::max(newsize, fs.size());
   pad_vector(R0c, newsize);
   pad_vector(R0s, newsize);
   pad_vector(Z0c, newsize);
   pad_vector(Z0s, newsize);
+  pad_vector(fc, newsize);
+  pad_vector(fs, newsize);
 
   std::cout << "Fourier amplitudes for the magnetic axis shape:" << std::endl;
   std::cout << "R0c: " << R0c << std::endl;
   std::cout << "R0s: " << R0s << std::endl;
   std::cout << "Z0c: " << Z0c << std::endl;
   std::cout << "Z0s: " << Z0s << std::endl;
+  std::cout << "fc:  " <<  fc << std::endl;
+  std::cout << "fs:  " <<  fs << std::endl;
 
   if (verbose > 0) {
     auto end = std::chrono::steady_clock::now();

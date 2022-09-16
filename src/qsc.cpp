@@ -17,6 +17,7 @@ void Qsc::defaults() {
   B2s = 0.0;
   B2c = 0.0;
   p2 = 0.0;
+  angle_shift = false;
 
   nfp = 3;
   nphi = 15;
@@ -39,6 +40,8 @@ Qsc::Qsc() {
   R0s.resize(1, 0.0);
   Z0c.resize(1, 0.0);
   Z0s.resize(1, 0.0);
+  fc.resize(1, 0.0);
+  fs.resize(1, 0.0);
 
   grid_min_R0 = 0.0;
   curvature = 0.0;

@@ -208,12 +208,12 @@ void Qsc::calculate_r2() {
 
   B20_grid_variation = B20.max() - B20.min();
   
-  qscfloat normalizer = 1.0 / d_l_d_phi.sum();
-  work1 = B20 * d_l_d_phi;
+  qscfloat normalizer = 1.0 / d_l_d_phi0.sum();
+  work1 = B20 * d_l_d_phi0;
   B20_mean = work1.sum() * normalizer;
   B20_anomaly = B20 - B20_mean;
   
-  work1 = B20_anomaly * B20_anomaly * d_l_d_phi;
+  work1 = B20_anomaly * B20_anomaly * d_l_d_phi0;
   B20_residual = sqrt(work1.sum() * normalizer) / B0;
 
   work1 = std::abs(X20);

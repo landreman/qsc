@@ -37,7 +37,7 @@ TEST_CASE("netcdf") {
     CHECK(Approx(qfile.B2c) == q11.B2c);
     CHECK(Approx(qfile.B2s) == q11.B2s);
     CHECK(Approx(qfile.p2) == q11.p2);
-    CHECK(Approx(qfile.d_phi) == q11.d_phi);
+    CHECK(Approx(qfile.d_phi0) == q11.d_phi0);
     CHECK(Approx(qfile.B0) == q11.B0);
     CHECK(Approx(qfile.G0) == q11.G0);
     CHECK(qfile.sG == q11.sG);
@@ -90,8 +90,8 @@ TEST_CASE("netcdf") {
       CHECK(Approx(qfile.Y1s[j]) == q11.Y1s[j]);
       CHECK(Approx(qfile.R0[j]) == q11.R0[j]);
       CHECK(Approx(qfile.Z0[j]) == q11.Z0[j]);
-      CHECK(Approx(qfile.d_l_d_phi[j]) == q11.d_l_d_phi[j]);
-      CHECK(Approx(qfile.d2_l_d_phi2[j]) == q11.d2_l_d_phi2[j]);
+      CHECK(Approx(qfile.d_l_d_phi0[j]) == q11.d_l_d_phi0[j]);
+      CHECK(Approx(qfile.d2_l_d_phi02[j]) == q11.d2_l_d_phi02[j]);
       CHECK(Approx(qfile.elongation[j]) == q11.elongation[j]);
       CHECK(Approx(qfile.Boozer_toroidal_angle[j]) == q11.Boozer_toroidal_angle[j]);
       CHECK(Approx(qfile.d_X1c_d_varphi[j]) == q11.d_X1c_d_varphi[j]);

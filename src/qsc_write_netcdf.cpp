@@ -36,7 +36,7 @@ void Qsc::write_netcdf(std::string filename) {
   nc.put("eta_bar", eta_bar, "Constant equal to B1c / B0", "1/meter");
   nc.put("sigma0", sigma0, "Value of sigma at phi=0", "dimensionless");
   nc.put("I2", I2, "r^2 term in I(r), which is the toroidal current inside the flux surface times mu0/(2pi)", "Tesla/meter");
-  nc.put("d_phi", d_phi, "Grid spacing in phi", "dimensionless");
+  nc.put("d_phi0", d_phi0, "Grid spacing in phi0", "dimensionless");
   nc.put("B0", B0, "Magnetic field magnitude on the magnetic axis", "Telsa");
   nc.put("G0", G0, "Value on the magnetic axis of G(r), which is the poloidal current outside the flux surface times mu0/(2pi)", "Tesla*meter");
   nc.put("sG", sG, "Sign of G0", "dimensionless");
@@ -111,8 +111,8 @@ void Qsc::write_netcdf(std::string filename) {
   nc.put(nphi_dim, "Z0pp", Z0pp, "d^2 / d phi^2 derivative of Z0", "meter");
   nc.put(nphi_dim, "R0ppp", R0ppp, "d^3 / d phi^3 derivative of R0", "meter");
   nc.put(nphi_dim, "Z0ppp", Z0ppp, "d^3 / d phi^3 derivative of Z0", "meter");
-  nc.put(nphi_dim, "d_l_d_phi", d_l_d_phi, "Differential arclength of the magnetic axis with respect to the standard toroidal angle phi", "meter");
-  nc.put(nphi_dim, "d2_l_d_phi2", d2_l_d_phi2, "Second derivative of arclength of the magnetic axis with respect to the standard toroidal angle phi", "meter");
+  nc.put(nphi_dim, "d_l_d_phi0", d_l_d_phi0, "Differential arclength of the magnetic axis with respect to the curve parameter phi0", "meter");
+  nc.put(nphi_dim, "d2_l_d_phi02", d2_l_d_phi02, "Second derivative of arclength of the magnetic axis with respect to the curve parameter phi0", "meter");
   nc.put(nphi_dim, "elongation", elongation, "Ratio of major to minor axes of the O(r^1) elliptical surfaces in the plane perpendicular to the magnetic axis", "dimensionless");
   nc.put(nphi_dim, "Boozer_toroidal_angle", Boozer_toroidal_angle, "Boozer toroidal angle varphi", "dimensionless");
   nc.put(nphi_dim, "L_grad_B", L_grad_B, "Scale length associated with first derivatives of the magnetic field, eq (3.1) in Landreman J Plasma Physics (2021)", "meter");
@@ -206,8 +206,8 @@ void Qsc::write_netcdf(std::string filename) {
   
   // ND arrays for N > 1:
   std::vector<dim_id_type> nphi_nphi_dim {nphi_dim, nphi_dim};
-  nc.put(nphi_nphi_dim, "d_d_phi", &d_d_phi(0, 0),
-	 "Pseudospectral differentiation matrix with respect to the standard toroidal angle phi", "dimensionless");
+  nc.put(nphi_nphi_dim, "d_d_phi0", &d_d_phi0(0, 0),
+	 "Pseudospectral differentiation matrix with respect to the curve parameter phi0", "dimensionless");
   nc.put(nphi_nphi_dim, "d_d_varphi", &d_d_varphi(0, 0),
 	 "Pseudospectral differentiation matrix with respect to the Boozer toroidal angle varphi", "dimensionless");
 

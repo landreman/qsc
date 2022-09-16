@@ -181,7 +181,7 @@ TEST_CASE("Compare published configurations to fortran version of QSC") {
       CHECK(Approx(c.Y1s[j]) == f.Y1s[j]);
       CHECK(Approx(c.R0[j]) == f.R0[j]);
       CHECK(Approx(c.Z0[j]) == f.Z0[j]);
-      CHECK(Approx(c.d_l_d_phi[j]) == f.d_l_d_phi[j]);
+      CHECK(Approx(c.d_l_d_phi0[j]) == f.d_l_d_phi0[j]);
       CHECK(Approx(c.elongation[j]) == f.elongation[j]);
       CHECK(Approx(c.Boozer_toroidal_angle[j]) == f.Boozer_toroidal_angle[j]);
       CHECK(Approx(c.L_grad_B_inverse[j]) == f.L_grad_B_inverse[j]);

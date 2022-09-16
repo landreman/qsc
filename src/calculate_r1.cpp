@@ -109,8 +109,8 @@ void Qsc::r1_diagnostics() {
     / (2 * abs(tempvec2));
 
   grid_max_elongation = elongation.max();
-  tempvec = elongation * d_l_d_phi;
-  mean_elongation = tempvec.sum() / d_l_d_phi.sum();
+  tempvec = elongation * d_l_d_phi0;
+  mean_elongation = tempvec.sum() / d_l_d_phi0.sum();
   //index = np.argmax(elongation);
   //max_elongation = -fourier_minimum(-elongation);
 

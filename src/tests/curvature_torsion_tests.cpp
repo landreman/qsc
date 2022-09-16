@@ -29,6 +29,12 @@ TEST_CASE("curvature and torsion: stellarator-symmetric case") {
   q.allocate();
   q.init_axis();
 
+  qscfloat d_l_d_phi0_fortran[] = {2.380946450468805, 2.401491603596588, 2.37739502011906 ,
+       2.195045899072531, 1.946968810010707, 1.916183968203471,
+       2.142191459922493, 2.350113816182883, 2.350113816182884,
+       2.142191459922493, 1.916183968203471, 1.946968810010706,
+       2.195045899072531, 2.377395020119059, 2.401491603596588};
+  
   qscfloat curvature_fortran[] = {1.74354628565018, 1.61776632275718, 1.5167042487094,
     1.9179603622369, 2.95373444883134, 3.01448808361584, 1.7714523990583,
     1.02055493647363, 1.02055493647363, 1.77145239905828, 3.01448808361582,
@@ -45,8 +51,9 @@ TEST_CASE("curvature and torsion: stellarator-symmetric case") {
     0.498195826255542, 0.583626271820683, 0.673010789615233,
     0.758441235180374, 0.835619610154036, 0.909085423994535,
     0.987854372315234, 1.07480876233066, 1.16568914299866};
-    
+
   for (int j = 0; j < q.nphi; j++) {
+    CHECK(q.d_l_d_phi0[j] == Approx(d_l_d_phi0_fortran[j]));
     CHECK(q.curvature[j] == Approx(curvature_fortran[j]));
     CHECK(q.torsion[j] == Approx(torsion_fortran[j]));
     CHECK(q.Boozer_toroidal_angle[j] == Approx(varphi_fortran[j]));

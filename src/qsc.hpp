@@ -33,10 +33,10 @@ namespace qsc {
   class Qsc {
   private:
     Vector sinangle, cosangle, tempvec, tempvec1, tempvec2, tempvec3;
-    Vector tangent_cylindrical1, tangent_cylindrical2, tangent_cylindrical3;
-    Vector normal_cylindrical1, normal_cylindrical2, normal_cylindrical3;
-    Vector binormal_cylindrical1, binormal_cylindrical2, binormal_cylindrical3;
-    Vector d_tangent_d_l_cylindrical1, d_tangent_d_l_cylindrical2, d_tangent_d_l_cylindrical3;
+    Vector tangent_cartesian1, tangent_cartesian2, tangent_cartesian3;
+    Vector normal_cartesian1, normal_cartesian2, normal_cartesian3;
+    Vector binormal_cartesian1, binormal_cartesian2, binormal_cartesian3;
+    Vector d_tangent_d_l_cartesian1, d_tangent_d_l_cartesian2, d_tangent_d_l_cartesian3;
     Vector torsion_numerator, torsion_denominator, etabar_squared_over_curvature_squared;
     std::valarray<int> quadrant, ipiv, r2_ipiv;
     Vector state, residual, work1, work2;
@@ -58,17 +58,19 @@ namespace qsc {
     
   public:
     int verbose;
-    Vector R0c, R0s, Z0c, Z0s;
+    Vector R0c, R0s, Z0c, Z0s, fc, fs;
+    bool angle_shift;
     int nphi, nfp;
     qscfloat eta_bar, sigma0, B2c, B2s, I2, p2;
-    Vector phi, R0, Z0, R0p, Z0p, R0pp, Z0pp, R0ppp, Z0ppp;
-    Vector d_l_d_phi, d2_l_d_phi2;
+    Vector phi0, phi, sinphi, cosphi, R0, Z0, R0p, Z0p, R0pp, Z0pp, R0ppp, Z0ppp;
+    Vector f, fp, fpp, fppp;
+    Vector d_l_d_phi0, d2_l_d_phi02;
     Vector curvature, torsion;
-    qscfloat d_phi, B0, G0, B0_over_abs_G0, abs_G0_over_B0, d_l_d_varphi;
+    qscfloat d_phi0, B0, G0, B0_over_abs_G0, abs_G0_over_B0, d_l_d_varphi;
     int sG, spsi, helicity;
     qscfloat axis_length, rms_curvature;
     qscfloat mean_R, mean_Z, standard_deviation_of_R, standard_deviation_of_Z;
-    Matrix d_d_phi, d_d_varphi;
+    Matrix d_d_phi0, d_d_varphi;
     Vector X1s, X1c, sigma, Y1s, Y1c, elongation;
     Vector Boozer_toroidal_angle, L_grad_B, L_grad_B_inverse;
     Vector L_grad_grad_B, L_grad_grad_B_inverse;

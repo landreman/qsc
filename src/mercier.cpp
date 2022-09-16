@@ -10,11 +10,11 @@ void qsc::Qsc::mercier() {
   // See Overleaf note "Mercier criterion near the magnetic axis- detailed notes".
   // See also "20200604-02 Checking sign in Mercier DGeod near axis.docx"
 
-  // integrand = d_l_d_phi * (Y1c * Y1c + X1c * (X1c + Y1s)) / (Y1c * Y1c + (X1c + Y1s) * (X1c + Y1s))
-  work1 = d_l_d_phi * (eta_bar*eta_bar*eta_bar*eta_bar + curvature*curvature*curvature*curvature*sigma*sigma + eta_bar*eta_bar*curvature*curvature) 
+  // integrand = d_l_d_phi0 * (Y1c * Y1c + X1c * (X1c + Y1s)) / (Y1c * Y1c + (X1c + Y1s) * (X1c + Y1s))
+  work1 = d_l_d_phi0 * (eta_bar*eta_bar*eta_bar*eta_bar + curvature*curvature*curvature*curvature*sigma*sigma + eta_bar*eta_bar*curvature*curvature) 
     / (eta_bar*eta_bar*eta_bar*eta_bar + curvature*curvature*curvature*curvature*(1+sigma*sigma) + 2*eta_bar*eta_bar*curvature*curvature);
 
-  qscfloat integral = work1.sum() * d_phi * nfp * 2 * pi / axis_length;
+  qscfloat integral = work1.sum() * d_phi0 * nfp * 2 * pi / axis_length;
 
   // DGeod_times_r2 = -(2 * sign_G * sign_psi * mu0 * mu0 * p2 * p2 * G0 * G0 * G0 * G0 * eta_bar * eta_bar &
   DGeod_times_r2 = -(2 * mu0 * mu0 * p2 * p2 * G0 * G0 * G0 * G0 * eta_bar * eta_bar 
