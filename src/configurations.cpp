@@ -15,10 +15,7 @@ Qsc::Qsc(std::string config_name) {
     eta_bar = -0.9;
     order_r_option = ORDER_R_OPTION_R1;
 
-    R0c.resize(2, 0.0);
-    R0s.resize(2, 0.0);
-    Z0c.resize(2, 0.0);
-    Z0s.resize(2, 0.0);
+    resize_axis_arrays(2, 0.0);
     R0c[0] = 1.0;
     R0c[1] = 0.045;
     Z0s[1] = -0.045;
@@ -28,10 +25,7 @@ Qsc::Qsc(std::string config_name) {
     eta_bar = -2.25;
     order_r_option = ORDER_R_OPTION_R1;
 
-    R0c.resize(2, 0.0);
-    R0s.resize(2, 0.0);
-    Z0c.resize(2, 0.0);
-    Z0s.resize(2, 0.0);
+    resize_axis_arrays(2, 0.0);
     R0c[0] = 1.0;
     R0c[1] = 0.265;
     Z0s[1] = -0.21;
@@ -42,10 +36,7 @@ Qsc::Qsc(std::string config_name) {
     sigma0 = -0.6;
     order_r_option = ORDER_R_OPTION_R1;
 
-    R0c.resize(2, 0.0);
-    R0s.resize(2, 0.0);
-    Z0c.resize(2, 0.0);
-    Z0s.resize(2, 0.0);
+    resize_axis_arrays(2, 0.0);
     R0c[0] = 1.0;
     R0c[1] = 0.042;
     Z0s[1] = -0.042;
@@ -58,10 +49,7 @@ Qsc::Qsc(std::string config_name) {
     B2c = -0.00322;
     order_r_option = ORDER_R_OPTION_R2p1;
 
-    R0c.resize(3, 0.0);
-    R0s.resize(3, 0.0);
-    Z0c.resize(3, 0.0);
-    Z0s.resize(3, 0.0);
+    resize_axis_arrays(3, 0.0);
     R0c[0] = 1.0;
     R0c[1] = 0.155;
     R0c[2] = 0.0102;
@@ -75,10 +63,7 @@ Qsc::Qsc(std::string config_name) {
     B2c = -0.158;
     order_r_option = ORDER_R_OPTION_R2p1;
 
-    R0c.resize(4, 0.0);
-    R0s.resize(4, 0.0);
-    Z0c.resize(4, 0.0);
-    Z0s.resize(4, 0.0);
+    resize_axis_arrays(4, 0.0);
     R0c[0] = 1.0;
     R0c[1] = 0.173;
     R0c[2] = 0.0168;
@@ -97,10 +82,7 @@ Qsc::Qsc(std::string config_name) {
     p2 = -600000.0;
     order_r_option = ORDER_R_OPTION_R2p1;
     
-    R0c.resize(2, 0.0);
-    R0s.resize(2, 0.0);
-    Z0c.resize(2, 0.0);
-    Z0s.resize(2, 0.0);
+    resize_axis_arrays(2, 0.0);
     R0c[0] = 1.0;
     R0c[1] = 0.09;
     Z0s[1] = -0.09;
@@ -112,10 +94,7 @@ Qsc::Qsc(std::string config_name) {
     B2c = 0.1348;
     order_r_option = ORDER_R_OPTION_R2p1;
 
-    R0c.resize(5, 0.0);
-    R0s.resize(5, 0.0);
-    Z0c.resize(5, 0.0);
-    Z0s.resize(5, 0.0);
+    resize_axis_arrays(5, 0.0);
     R0c[0] = 1.0;
     R0c[1] = 0.17;
     R0c[2] = 0.01804;
@@ -138,10 +117,7 @@ Qsc::Qsc(std::string config_name) {
     p2 = -0.5e7;
     order_r_option = ORDER_R_OPTION_R2p1;
 
-    R0c.resize(2, 0.0);
-    R0s.resize(2, 0.0);
-    Z0c.resize(2, 0.0);
-    Z0s.resize(2, 0.0);
+    resize_axis_arrays(2, 0.0);
     R0c[0] = 1.0;
     R0c[1] = 0.3;
     Z0s[1] = 0.3;

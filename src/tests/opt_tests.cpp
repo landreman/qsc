@@ -532,10 +532,7 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
       q.p2 = opt.q.p2;
       q.verbose = 0;
       q.order_r_option = opt.q.order_r_option;
-      q.R0c.resize(opt.q.R0c.size(), 0.0);
-      q.R0s.resize(opt.q.R0c.size(), 0.0);
-      q.Z0c.resize(opt.q.R0c.size(), 0.0);
-      q.Z0s.resize(opt.q.R0c.size(), 0.0);
+      q.resize_axis_arrays(opt.q.R0c.size(), 0.0);
       q.init();
       for (j = 0; j < opt.n_iter; j++) {
 	CAPTURE(j);
@@ -668,10 +665,7 @@ TEST_CASE("Check Opt::unpack_state_vector() and Opt::set_state_vector() [opt]") 
   qscfloat arbitrary_val = 3.14;
   Opt opt;
   opt.verbose = 0;
-  opt.q.R0c.resize(n_fourier, 0.0);
-  opt.q.R0s.resize(n_fourier, 0.0);
-  opt.q.Z0c.resize(n_fourier, 0.0);
-  opt.q.Z0s.resize(n_fourier, 0.0);
+  opt.q.resize_axis_arrays(n_fourier, 0.0);
   opt.vary_R0c.resize(n_fourier, false);
   opt.vary_R0s.resize(n_fourier, false);
   opt.vary_Z0c.resize(n_fourier, false);

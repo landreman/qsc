@@ -35,13 +35,9 @@ void Qsc::defaults() {
 
 Qsc::Qsc() {
   defaults();
-  
-  R0c.resize(1, 1.0);
-  R0s.resize(1, 0.0);
-  Z0c.resize(1, 0.0);
-  Z0s.resize(1, 0.0);
-  fc.resize(1, 0.0);
-  fs.resize(1, 0.0);
+
+  resize_axis_arrays(1, 0.0);
+  R0c[0] = 1.0;
 
   grid_min_R0 = 0.0;
   curvature = 0.0;
@@ -62,6 +58,15 @@ Qsc::Qsc() {
   DMerc_times_r2 = 0.0;
   DGeod_times_r2 = 0.0;
   DWell_times_r2 = 0.0;
+}
+
+void Qsc::resize_axis_arrays(int newsize, qscfloat val) {
+  R0c.resize(newsize, val);
+  R0s.resize(newsize, val);
+  Z0c.resize(newsize, val);
+  Z0s.resize(newsize, val);
+  fc.resize(newsize, val);
+  fs.resize(newsize, val);
 }
 
 /** High-level routine to call the low-level routines.

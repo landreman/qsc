@@ -11,11 +11,8 @@ TEST_CASE("curvature and torsion: stellarator-symmetric case") {
   Qsc q;
   q.nfp = 5;
   q.nphi = 15;
-  
-  q.R0c.resize(4, 0.0);
-  q.R0s.resize(4, 0.0);
-  q.Z0c.resize(4, 0.0);
-  q.Z0s.resize(4, 0.0);
+
+  q.resize_axis_arrays(4, 0.0);
 
   q.R0c[0] = 1.3;
   q.R0c[1] = 0.3;
@@ -65,10 +62,7 @@ TEST_CASE("curvature and torsion: non-stellarator-symmetric case") {
   q.nfp = 5;
   q.nphi = 15;
   
-  q.R0c.resize(4, 0.0);
-  q.R0s.resize(4, 0.0);
-  q.Z0c.resize(4, 0.0);
-  q.Z0s.resize(4, 0.0);
+  q.resize_axis_arrays(4, 0.0);
 
   q.R0c[0] = 1.3;
   q.R0c[1] = 0.3;

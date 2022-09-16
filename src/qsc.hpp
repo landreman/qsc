@@ -110,6 +110,7 @@ namespace qsc {
     Qsc(std::string);
     void input(std::string);
     void defaults();
+    void resize_axis_arrays(int, qscfloat);
     void validate();
     void allocate();
     void init_axis();

@@ -18,10 +18,7 @@ TEST_CASE("Compare Shafranov shift to VMEC and textbook expressions for a circul
   q.nphi = 3;
   q.order_r_option = "r2";
 
-  q.R0c.resize(1, 0.0);
-  q.R0s.resize(1, 0.0);
-  q.Z0c.resize(1, 0.0);
-  q.Z0s.resize(1, 0.0);
+  q.resize_axis_arrays(1, 0.0);
 
   qscfloat R0 = 1.7;
   q.R0c[0] = R0;

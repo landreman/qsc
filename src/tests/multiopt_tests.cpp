@@ -351,10 +351,7 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
       opt1.q.B2c = mo.opts[0].iter_B2c[index];
       opt1.q.B2s = mo.opts[0].iter_B2s[index];
       opt1.q.order_r_option = mo.opts[1].q.order_r_option;
-      opt1.q.R0c.resize(2 + fourier_refine1);
-      opt1.q.R0s.resize(2 + fourier_refine1);
-      opt1.q.Z0c.resize(2 + fourier_refine1);
-      opt1.q.Z0s.resize(2 + fourier_refine1);
+      opt1.q.resize_axis_arrays(2 + fourier_refine1, 0.0);
       for (k = 0; k < 2 + fourier_refine1; k++) {
 	opt1.q.R0c[k] = mo.opts[0].iter_R0c(k, index);
 	opt1.q.R0s[k] = mo.opts[0].iter_R0s(k, index);
@@ -590,10 +587,7 @@ TEST_CASE("Check that using a stage-dependent nphi works. [multiopt]") {
       opt1.q.B2c = mo.opts[0].iter_B2c[index];
       opt1.q.B2s = mo.opts[0].iter_B2s[index];
       opt1.q.order_r_option = mo.opts[1].q.order_r_option;
-      opt1.q.R0c.resize(2 + fourier_refine1);
-      opt1.q.R0s.resize(2 + fourier_refine1);
-      opt1.q.Z0c.resize(2 + fourier_refine1);
-      opt1.q.Z0s.resize(2 + fourier_refine1);
+      opt1.q.resize_axis_arrays(2 + fourier_refine1, 0.0);
       for (k = 0; k < 2 + fourier_refine1; k++) {
 	opt1.q.R0c[k] = mo.opts[0].iter_R0c(k, index);
 	opt1.q.R0s[k] = mo.opts[0].iter_R0s(k, index);

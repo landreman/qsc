@@ -18,10 +18,8 @@ TEST_CASE("grad B tensor for an axisymmetric vacuum field") {
   qscfloat tol = 1.0e-12;
   if (single) tol = 2.0e-5;
 
-  q.R0c.resize(1, 1.0);
-  q.R0s.resize(1, 0.0);
-  q.Z0c.resize(1, 0.0);
-  q.Z0s.resize(1, 0.0);
+  q.resize_axis_arrays(1, 0.0);
+  q.R0c[0] = 1.0;
 
   /*
   for (int sG = -1; sG <= -1; sG += 2) {
@@ -110,10 +108,8 @@ TEST_CASE("grad grad B tensor for an axisymmetric vacuum field") {
   q.verbose = 0;
   q.order_r_option = ORDER_R_OPTION_R2;
   
-  q.R0c.resize(1, 1.0);
-  q.R0s.resize(1, 0.0);
-  q.Z0c.resize(1, 0.0);
-  q.Z0s.resize(1, 0.0);
+  q.resize_axis_arrays(1, 0.0);
+  q.R0c[0] = 1.0;
 
   /*
   for (int sG = -1; sG <= -1; sG += 2) {
@@ -210,13 +206,16 @@ TEST_CASE("grad grad B tensor alternative derivation and symmetry") {
     std::cout << "jconfig=" << jconfig << std::endl;
     CAPTURE(jconfig);
     
+    std::cout << "AAA\n";
     Qsc q(configs[jconfig]);
+    std::cout << "BBB\n";
     q.nphi = 65;
     q.max_linesearch_iterations = 20; // It helps to have this larger value in single precision
   
     for (int sG = -1; sG <= 1; sG += 2) {
       for (int spsi = -1; spsi <= 1; spsi += 2) {
 	for (qscfloat B0 = 0.9; B0 < 2.0; B0 += 0.7) {
+	  std::cout << "sG:" << sG << " spsi:" << spsi << " B0:" << B0 << std::endl;
 	  q.sG = sG;
 	  q.spsi = spsi;
 	  q.B0 = B0;

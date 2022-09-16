@@ -225,11 +225,9 @@ TEST_CASE("Compare published configurations to fortran version of QSC") {
 TEST_CASE("r_singularity in Landreman JPP (2021) figure 2") {
   Qsc q;
   q.nfp = 2;
-  
-  q.R0c.resize(2, 1.0);
-  q.R0s.resize(2, 0.0);
-  q.Z0c.resize(2, 0.0);
-  q.Z0s.resize(2, 0.0);
+
+  q.resize_axis_arrays(2, 0.0);
+  q.R0c[0] = 1.0;
   q.R0c[1] = -0.12;
   q.Z0s[1] =  0.12;
   q.eta_bar = -0.7;

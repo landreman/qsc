@@ -92,10 +92,7 @@ TEST_CASE("Each scan result should match a standalone Qsc. [mpi]") {
 	q.nphi = scan.q.nphi;
 	q.p2 = scan.q.p2;
 	q.order_r_option = scan.q.order_r_option;
-	q.R0c.resize(nf, 0.0);
-	q.R0s.resize(nf, 0.0);
-	q.Z0c.resize(nf, 0.0);
-	q.Z0s.resize(nf, 0.0);
+	q.resize_axis_arrays(nf, 0.0);
 	
 	int j, k;
 	for (j = 0; j < scan.n_scan; j++) {

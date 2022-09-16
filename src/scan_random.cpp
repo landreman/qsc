@@ -63,10 +63,7 @@ void Scan::random() {
 
   for (j = 0; j < N_FILTERS; j++) filters_local[j] = 0;
 
-  q.R0c.resize(axis_nmax_plus_1, 0.0);
-  q.R0s.resize(axis_nmax_plus_1, 0.0);
-  q.Z0c.resize(axis_nmax_plus_1, 0.0);
-  q.Z0s.resize(axis_nmax_plus_1, 0.0);
+  q.resize_axis_arrays(axis_nmax_plus_1, 0.0);
 
   std::chrono::time_point<std::chrono::steady_clock> end_time, checkpoint_time;
   std::chrono::time_point<std::chrono::steady_clock> section_start_time, section_end_time;

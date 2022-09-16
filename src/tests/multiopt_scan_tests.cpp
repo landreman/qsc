@@ -150,10 +150,7 @@ TEST_CASE("Run a small MultiOptScan with keep_all true. [mpi] [multiopt_scan]") 
       q.B2c = mos.scan_B2c[j];
       q.B2s = mos.scan_B2s[j];
       q.order_r_option = "r2.1";
-      q.R0c.resize(mos.axis_nmax_plus_1, 0.0);
-      q.R0s.resize(mos.axis_nmax_plus_1, 0.0);
-      q.Z0c.resize(mos.axis_nmax_plus_1, 0.0);
-      q.Z0s.resize(mos.axis_nmax_plus_1, 0.0);
+      q.resize_axis_arrays(mos.axis_nmax_plus_1, 0.0);
       for (int k = 0; k < mos.axis_nmax_plus_1; k++) {
 	q.R0c[k] = mos.scan_R0c(k, j);
 	q.R0s[k] = mos.scan_R0s(k, j);
@@ -293,10 +290,7 @@ TEST_CASE("Run a small MultiOptScan with keep_all false. [mpi] [multiopt_scan]")
       q.B2c = mos.scan_B2c[j];
       q.B2s = mos.scan_B2s[j];
       q.order_r_option = "r2.1";
-      q.R0c.resize(mos.axis_nmax_plus_1, 0.0);
-      q.R0s.resize(mos.axis_nmax_plus_1, 0.0);
-      q.Z0c.resize(mos.axis_nmax_plus_1, 0.0);
-      q.Z0s.resize(mos.axis_nmax_plus_1, 0.0);
+      q.resize_axis_arrays(mos.axis_nmax_plus_1, 0.0);
       for (int k = 0; k < mos.axis_nmax_plus_1; k++) {
 	q.R0c[k] = mos.scan_R0c(k, j);
 	q.R0s[k] = mos.scan_R0s(k, j);

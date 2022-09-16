@@ -44,6 +44,9 @@ void Opt::optimize() {
   axis_arr = q.Z0s;
   q.Z0s.resize(newsize, 0.0);
   for (j = 0; j < oldsize; j++) q.Z0s[j] = axis_arr[j];
+  // TODO: handle fc/fs here
+  q.fc.resize(newsize, 0.0);
+  q.fs.resize(newsize, 0.0);
   
   bool_arr = vary_R0c;
   vary_R0c.resize(newsize, false);
