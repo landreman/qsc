@@ -18,6 +18,8 @@ void Opt::input(std::string filename) {
   vary_R0s.resize(q.R0c.size(), false);
   vary_Z0c.resize(q.R0c.size(), false);
   vary_Z0s.resize(q.R0c.size(), true);
+  vary_fc.resize(q.R0c.size(), false);
+  vary_fs.resize(q.R0c.size(), false);
   vary_R0c[0] = false;
   vary_Z0s[0] = false;
     

@@ -66,6 +66,8 @@ vary_R0c = [false, true, true, true]
 vary_Z0s = [false, true, true, true]
 vary_R0s = [false, false, false, false]
 vary_Z0c = [false, false, false, false]
+vary_fs = [false, false, false, false]
+vary_fc = [false, false, false, false]
 
 weight_iota = 30.0
 target_iota = 0.42
