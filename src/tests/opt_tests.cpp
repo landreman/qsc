@@ -373,7 +373,7 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
   q0.init();
   q0.calculate();
 
-  for (int vary_axis_option = 0; vary_axis_option < 3; vary_axis_option++) {
+  for (int vary_axis_option = 0; vary_axis_option < 5; vary_axis_option++) {
     CAPTURE(vary_axis_option);
     for (int vary_scalars_option = 0; vary_scalars_option < 7; vary_scalars_option++) {
       CAPTURE(vary_scalars_option);
@@ -437,6 +437,26 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
 	opt.vary_Z0s = {false, true};
 	opt.vary_fc = {false, false};
 	opt.vary_fs = {false, false};
+	opt.diff_method = DIFF_METHOD_FORWARD;
+	break;
+      case 3:
+	// Realistic scenario
+	opt.vary_R0c = {false, true};
+	opt.vary_R0s = {false, false};
+	opt.vary_Z0c = {false, false};
+	opt.vary_Z0s = {false, true};
+	opt.vary_fc = {false, false};
+	opt.vary_fs = {false, true};
+	opt.diff_method = DIFF_METHOD_FORWARD;
+	break;
+      case 4:
+	// Vary everything
+	opt.vary_R0c = {false, true};
+	opt.vary_R0s = {false, true};
+	opt.vary_Z0c = {false, true};
+	opt.vary_Z0s = {false, true};
+	opt.vary_fc = {false, true};
+	opt.vary_fs = {false, true};
 	opt.diff_method = DIFF_METHOD_FORWARD;
 	break;
       default:
@@ -608,6 +628,26 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
 	  if (j > 0) CHECK(Approx(opt.iter_Z0c(1, j)).epsilon(eps) != q0.Z0c[1]);
 	  if (j > 0) CHECK(Approx(opt.iter_Z0s(1, j)).epsilon(eps) != q0.Z0s[1]);
 	  break;
+	case 3:
+	  // Realistic scenario	
+	  CHECK(Approx(opt.iter_R0s(1, j)) == q0.R0s[1]);
+	  CHECK(Approx(opt.iter_Z0c(1, j)) == q0.Z0c[1]);
+	  CHECK(Approx(opt.iter_fc(1, j)) == q0.fc[1]);
+	  if (j > 0) CHECK(Approx(opt.iter_R0c(1, j)).epsilon(eps) != q0.R0c[1]);
+	  if (j > 0) CHECK(Approx(opt.iter_Z0s(1, j)).epsilon(eps) != q0.Z0s[1]);
+	  if (j > 0) CHECK(Approx(opt.iter_fs(1, j)).epsilon(eps) != q0.fs[1]);
+	  break;
+	case 4:
+	  // Vary everything
+	  if (j > 0) {
+	    CHECK(Approx(opt.iter_R0c(1, j)).epsilon(eps) != q0.R0c[1]);
+	    CHECK(Approx(opt.iter_R0s(1, j)).epsilon(eps) != q0.R0s[1]);
+	    CHECK(Approx(opt.iter_Z0c(1, j)).epsilon(eps) != q0.Z0c[1]);
+	    CHECK(Approx(opt.iter_Z0s(1, j)).epsilon(eps) != q0.Z0s[1]);
+	    CHECK(Approx(opt.iter_fc(1, j)).epsilon(eps) != q0.fc[1]);
+	    CHECK(Approx(opt.iter_fs(1, j)).epsilon(eps) != q0.fs[1]);
+	  }
+	  break;
 	default:
 	  CHECK(false); // Should not get here
 	}
@@ -708,16 +748,18 @@ TEST_CASE("Check Opt::unpack_state_vector() and Opt::set_state_vector() [opt]") 
 	    CAPTURE(vary_R00);
 	    opt.vary_R0c[0] = (bool) vary_R00;
 
-	    for (int fourier_index = 0; fourier_index < (1 << (4 * (n_fourier - 1))); fourier_index++) {
+	    for (int fourier_index = 0; fourier_index < (1 << (6 * (n_fourier - 1))); fourier_index++) {
 	      CAPTURE(fourier_index);
 	      // std::cout << "fourier_index:" << fourier_index << std::endl;
 	      // std::cout << "fourier_index >> (j * 4 + 0):" << (fourier_index >> (j * 4 + 0)) << std::endl;
 	      for (j = 0; j < n_fourier - 1; j++) {
 		// Pick out the relevant bit of fourier_index:
-		opt.vary_R0c[j + 1] = (bool) ((fourier_index >> (j * 4 + 0)) & 1);
-		opt.vary_R0s[j + 1] = (bool) ((fourier_index >> (j * 4 + 1)) & 1);
-		opt.vary_Z0c[j + 1] = (bool) ((fourier_index >> (j * 4 + 2)) & 1);
-		opt.vary_Z0s[j + 1] = (bool) ((fourier_index >> (j * 4 + 3)) & 1);
+		opt.vary_R0c[j + 1] = (bool) ((fourier_index >> (j * 6 + 0)) & 1);
+		opt.vary_R0s[j + 1] = (bool) ((fourier_index >> (j * 6 + 1)) & 1);
+		opt.vary_Z0c[j + 1] = (bool) ((fourier_index >> (j * 6 + 2)) & 1);
+		opt.vary_Z0s[j + 1] = (bool) ((fourier_index >> (j * 6 + 3)) & 1);
+		opt.vary_fc[ j + 1] = (bool) ((fourier_index >> (j * 6 + 4)) & 1);
+		opt.vary_fs[ j + 1] = (bool) ((fourier_index >> (j * 6 + 5)) & 1);
 	      }
 
 	      /*
@@ -856,6 +898,8 @@ TEST_CASE("1d optimization for iota [opt]") {
 TEST_CASE("Try Fourier refinement. Make sure the vary_R0c etc arrays are extended properly. [opt]") {
   if (single) return;
 
+  for (int angle_shift = 0; angle_shift < 2; angle_shift++) {
+    CAPTURE(angle_shift);
   for (int fourier_refine = 0; fourier_refine < 5; fourier_refine++) {
     CAPTURE(fourier_refine);
 
@@ -880,7 +924,13 @@ TEST_CASE("Try Fourier refinement. Make sure the vary_R0c etc arrays are extende
     opt.vary_Z0c = {false, false};
     opt.vary_Z0s = {false, true};
     opt.vary_fc = {false, false};
-    opt.vary_fs = {false, false};
+    if (angle_shift == 1) {
+      opt.vary_fs = {false, true};
+      opt.refine_angle_shift = true;
+    } else {
+      opt.vary_fs = {false, false};
+      opt.refine_angle_shift = false;
+    }
     opt.fourier_refine = fourier_refine;
     opt.target_iota = 0.495;
     opt.weight_iota = 1.0e4;
@@ -914,8 +964,15 @@ TEST_CASE("Try Fourier refinement. Make sure the vary_R0c etc arrays are extende
       CHECK(opt.vary_R0c[j]);
       CHECK_FALSE(opt.vary_R0s[j]);
       CHECK_FALSE(opt.vary_Z0c[j]);
+      CHECK_FALSE(opt.vary_fc[j]);
       CHECK(opt.vary_Z0s[j]);
+      if (angle_shift == 0) {
+	CHECK_FALSE(opt.vary_fs[j]);
+      } else {
+	CHECK(opt.vary_fs[j]);
+      }
     }
+  }
   }
 }
 
