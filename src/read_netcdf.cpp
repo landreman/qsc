@@ -239,6 +239,7 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
     nc.get("mean_Z", mean_Z);
     nc.get("standard_deviation_of_R", standard_deviation_of_R);
     nc.get("standard_deviation_of_Z", standard_deviation_of_Z);
+    nc.get("arclength_variance", arclength_variance);
     nc.get("max_newton_iterations", max_newton_iterations);
     nc.get("max_linesearch_iterations", max_linesearch_iterations);
     nc.get("newton_tolerance", newton_tolerance);

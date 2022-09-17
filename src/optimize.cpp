@@ -968,6 +968,7 @@ void gsl_callback(const size_t iter, void *params,
   opt->iter_DMerc_times_r2[n_iter] = opt->q.DMerc_times_r2;
   opt->iter_standard_deviation_of_R[n_iter] = opt->q.standard_deviation_of_R;
   opt->iter_standard_deviation_of_Z[n_iter] = opt->q.standard_deviation_of_Z;
+  opt->iter_arclength_variance[n_iter] = opt->q.arclength_variance;
   opt->iter_axis_length[n_iter] = opt->q.axis_length;
   for (j = 0; j < opt->q.R0c.size(); j++) {
     opt->iter_R0c(j, n_iter) = opt->q.R0c[j];

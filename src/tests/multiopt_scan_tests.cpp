@@ -183,6 +183,7 @@ TEST_CASE("Run a small MultiOptScan with keep_all true. [mpi] [multiopt_scan]") 
       CHECK(Approx(q.DMerc_times_r2) == mos.scan_DMerc_times_r2[j]);
       CHECK(Approx(q.standard_deviation_of_R) == mos.scan_standard_deviation_of_R[j]);
       CHECK(Approx(q.standard_deviation_of_Z) == mos.scan_standard_deviation_of_Z[j]);
+      CHECK(Approx(q.arclength_variance) == mos.scan_arclength_variance[j]);
       CHECK(q.helicity == mos.scan_helicity[j]);
       CHECK(Approx(q.grid_max_XY2) == mos.scan_max_XY2[j]);
       CHECK(Approx(q.grid_max_Z2) == mos.scan_max_Z2[j]);
@@ -331,6 +332,7 @@ TEST_CASE("Run a small MultiOptScan with keep_all false. [mpi] [multiopt_scan]")
       CHECK(Approx(q.DMerc_times_r2) == mos.scan_DMerc_times_r2[j]);
       CHECK(Approx(q.standard_deviation_of_R) == mos.scan_standard_deviation_of_R[j]);
       CHECK(Approx(q.standard_deviation_of_Z) == mos.scan_standard_deviation_of_Z[j]);
+      CHECK(Approx(q.arclength_variance) == mos.scan_arclength_variance[j]);
       CHECK(q.helicity == mos.scan_helicity[j]);
       CHECK(Approx(q.grid_max_XY2) == mos.scan_max_XY2[j]);
       CHECK(Approx(q.grid_max_Z2) == mos.scan_max_Z2[j]);

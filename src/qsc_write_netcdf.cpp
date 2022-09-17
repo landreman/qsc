@@ -56,6 +56,7 @@ void Qsc::write_netcdf(std::string filename) {
   nc.put("mean_Z", mean_Z, "Average Z coordinate of the magnetic axis, where the average is taken with respect to arclength", "meter");
   nc.put("standard_deviation_of_R", standard_deviation_of_R, "Standard deviation of the major radius of the magnetic axis, where the average is taken with respect to arclength", "meter");
   nc.put("standard_deviation_of_Z", standard_deviation_of_Z, "Standard deviation of the Z coordinate of the magnetic axis, where the average is taken with respect to arclength", "meter");
+  nc.put("arclength_variance", arclength_variance, "Variance of the differential arclength d l / d phi0", "meter^2");
   nc.put("max_newton_iterations", max_newton_iterations, "Maximum iterations of Newton's method for solving the sigma equation", "dimensionless");
   nc.put("max_linesearch_iterations", max_linesearch_iterations, "Maximum number of times the step size is reduced in the line search for each iteration of Newton's method when solving the sigma equation", "dimensionless");
   nc.put("newton_tolerance", newton_tolerance, "L2 norm of the residual used as a stopping criterion for Newton's method when solving the sigma equation", "dimensionless");

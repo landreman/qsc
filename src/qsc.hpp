@@ -69,6 +69,7 @@ namespace qsc {
     int sG, spsi, helicity;
     qscfloat axis_length, rms_curvature;
     qscfloat mean_R, mean_Z, standard_deviation_of_R, standard_deviation_of_Z;
+    qscfloat arclength_variance;
     Matrix d_d_phi0, d_d_varphi;
     Vector X1s, X1c, sigma, Y1s, Y1c, elongation;
     Vector Boozer_toroidal_angle, L_grad_B, L_grad_B_inverse;

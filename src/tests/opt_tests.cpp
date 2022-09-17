@@ -550,6 +550,7 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
       CHECK(Approx(q0.DMerc_times_r2) == opt.iter_DMerc_times_r2[0]);
       CHECK(Approx(q0.standard_deviation_of_R) == opt.iter_standard_deviation_of_R[0]);
       CHECK(Approx(q0.standard_deviation_of_Z) == opt.iter_standard_deviation_of_Z[0]);
+      CHECK(Approx(q0.arclength_variance) == opt.iter_arclength_variance[0]);
       CHECK(Approx(q0.axis_length) == opt.iter_axis_length[0]);
 
       // Now set up a standalone QSC to check each iteration
@@ -595,6 +596,7 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
 	CHECK(Approx(q.DMerc_times_r2) == opt.iter_DMerc_times_r2[j]);
 	CHECK(Approx(q.standard_deviation_of_R) == opt.iter_standard_deviation_of_R[j]);
 	CHECK(Approx(q.standard_deviation_of_Z) == opt.iter_standard_deviation_of_Z[j]);
+	CHECK(Approx(q.arclength_variance) == opt.iter_arclength_variance[j]);
 	CHECK(Approx(q.axis_length) == opt.iter_axis_length[j]);
       
 	// Check if things were fixed that were supposed to be fixed,

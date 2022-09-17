@@ -56,6 +56,7 @@ void Opt::allocate() {
   iter_DMerc_times_r2.resize(max_iter, 0.0);
   iter_standard_deviation_of_R.resize(max_iter, 0.0);
   iter_standard_deviation_of_Z.resize(max_iter, 0.0);
+  iter_arclength_variance.resize(max_iter, 0.0);
   iter_axis_length.resize(max_iter, 0.0);
 
   iter_fourier_refine_step.resize(max_iter, 0);

@@ -91,6 +91,7 @@ namespace qsc {
     Vector iter_r_singularity, iter_B20_variation, iter_B20_residual;
     Vector iter_d2_volume_d_psi2, iter_DMerc_times_r2;
     Vector iter_standard_deviation_of_R, iter_standard_deviation_of_Z;
+    Vector iter_arclength_variance;
     Vector iter_axis_length;
     std::valarray<int> iter_fourier_refine_step;
     

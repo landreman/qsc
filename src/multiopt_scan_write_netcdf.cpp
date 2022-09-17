@@ -115,6 +115,7 @@ void MultiOptScan::write_netcdf() {
   nc.put(n_scan_dim, "scan_n_evals", scan_n_evals, "For each configuration kept from the scan, the number of times the objective function was evaluated", "dimensionless");
   nc.put(n_scan_dim, "scan_standard_deviation_of_R", scan_standard_deviation_of_R, "Standard deviation of the major radius of the magnetic axis, with respect to arclength along the axis", "meter");
   nc.put(n_scan_dim, "scan_standard_deviation_of_Z", scan_standard_deviation_of_Z, "Standard deviation of the Cartesian Z coordinate of the magnetic axis, with respect to arclength along the axis", "meter");
+  nc.put(n_scan_dim, "scan_arclength_variance", scan_arclength_variance, "Variance of the differential arclength d l / d phi0", "meter^2");
   nc.put(n_scan_dim, "scan_min_L_grad_grad_B", scan_min_L_grad_grad_B, "For each configuration kept from the scan, the minimum along the magnetic axis of the scale length L_grad_grad_B, (eq (3.2) in Landreman J Plasma Physics (2021). This quantity corresponds to grid_min_L_grad_grad_B for a single Qsc run.", "meter");
   nc.put(n_scan_dim, "scan_B20_variation", scan_B20_variation, "For each configuration kept from the scan, the maximum of B20 along the magnetic axis minus the minimum of B20. This quantity corresponds to B20_grid_variation for a single Qsc run.", "Telsa/(meter^2)");
   nc.put(n_scan_dim, "scan_B20_residual", scan_B20_residual, "", "");

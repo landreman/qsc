@@ -88,6 +88,7 @@ void Opt::write_netcdf() {
   nc.put(n_iter_dim, "iter_DMerc_times_r2", iter_DMerc_times_r2, "DMerc_times_r2 at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_standard_deviation_of_R", iter_standard_deviation_of_R, "standard_deviation_of_R at each iteration", "dimensionless");
   nc.put(n_iter_dim, "iter_standard_deviation_of_Z", iter_standard_deviation_of_Z, "standard_deviation_of_Z at each iteration", "dimensionless");
+  nc.put(n_iter_dim, "iter_arclength_variance", iter_arclength_variance, "Variance of the differential arclength d l / d phi0 at each iteration", "meter^2");
   nc.put(n_iter_dim, "iter_axis_length", iter_axis_length, "Length of the magnetic axis at each iteration", "meters");
   
   /*

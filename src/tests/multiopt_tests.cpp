@@ -235,6 +235,7 @@ TEST_CASE("Running a standalone opt should yield identical results to a 1-stage 
 	CHECK(Approx(mo.opts[0].iter_DMerc_times_r2[j]) == opt.iter_DMerc_times_r2[j]);
 	CHECK(Approx(mo.opts[0].iter_standard_deviation_of_R[j]) == opt.iter_standard_deviation_of_R[j]);
 	CHECK(Approx(mo.opts[0].iter_standard_deviation_of_Z[j]) == opt.iter_standard_deviation_of_Z[j]);
+	CHECK(Approx(mo.opts[0].iter_arclength_variance[j]) == opt.iter_arclength_variance[j]);
 	CHECK(Approx(mo.opts[0].iter_axis_length[j]) == opt.iter_axis_length[j]);
       
       }
@@ -498,6 +499,7 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
 	  CHECK(Approx(mo.opts[0].iter_DMerc_times_r2[j]) == opt0.iter_DMerc_times_r2[j]);
 	  CHECK(Approx(mo.opts[0].iter_standard_deviation_of_R[j]) == opt0.iter_standard_deviation_of_R[j]);
 	  CHECK(Approx(mo.opts[0].iter_standard_deviation_of_Z[j]) == opt0.iter_standard_deviation_of_Z[j]);
+	  CHECK(Approx(mo.opts[0].iter_arclength_variance[j]) == opt0.iter_arclength_variance[j]);
 	  CHECK(Approx(mo.opts[0].iter_axis_length[j]) == opt0.iter_axis_length[j]);
 	}
 	
@@ -529,6 +531,7 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
 	  CHECK(Approx(mo.opts[1].iter_DMerc_times_r2[j]) == opt1.iter_DMerc_times_r2[j]);
 	  CHECK(Approx(mo.opts[1].iter_standard_deviation_of_R[j]) == opt1.iter_standard_deviation_of_R[j]);
 	  CHECK(Approx(mo.opts[1].iter_standard_deviation_of_Z[j]) == opt1.iter_standard_deviation_of_Z[j]);
+	  CHECK(Approx(mo.opts[1].iter_arclength_variance[j]) == opt1.iter_arclength_variance[j]);
 	  CHECK(Approx(mo.opts[1].iter_axis_length[j]) == opt1.iter_axis_length[j]);
 	}
 	
@@ -761,6 +764,7 @@ TEST_CASE("Check that using a stage-dependent nphi works. [multiopt]") {
 	CHECK(Approx(mo.opts[0].iter_DMerc_times_r2[j]) == opt0.iter_DMerc_times_r2[j]);
 	CHECK(Approx(mo.opts[0].iter_standard_deviation_of_R[j]) == opt0.iter_standard_deviation_of_R[j]);
 	CHECK(Approx(mo.opts[0].iter_standard_deviation_of_Z[j]) == opt0.iter_standard_deviation_of_Z[j]);
+	CHECK(Approx(mo.opts[0].iter_arclength_variance[j]) == opt0.iter_arclength_variance[j]);
 	CHECK(Approx(mo.opts[0].iter_axis_length[j]) == opt0.iter_axis_length[j]);
       }
       
@@ -792,6 +796,7 @@ TEST_CASE("Check that using a stage-dependent nphi works. [multiopt]") {
 	CHECK(Approx(mo.opts[1].iter_DMerc_times_r2[j]) == opt1.iter_DMerc_times_r2[j]);
 	CHECK(Approx(mo.opts[1].iter_standard_deviation_of_R[j]) == opt1.iter_standard_deviation_of_R[j]);
 	CHECK(Approx(mo.opts[1].iter_standard_deviation_of_Z[j]) == opt1.iter_standard_deviation_of_Z[j]);
+	CHECK(Approx(mo.opts[1].iter_arclength_variance[j]) == opt1.iter_arclength_variance[j]);
 	CHECK(Approx(mo.opts[1].iter_axis_length[j]) == opt1.iter_axis_length[j]);
       }
       
