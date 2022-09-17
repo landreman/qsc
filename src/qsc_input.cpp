@@ -39,7 +39,6 @@ void qsc::Qsc::input(std::string filename) {
   toml_read(varlist, indata, "Z0s", Z0s);
   toml_read(varlist, indata, "fc", fc);
   toml_read(varlist, indata, "fs", fs);
-  toml_read(varlist, indata, "angle_shift", angle_shift);
 
   toml_unused(varlist, indata);
   

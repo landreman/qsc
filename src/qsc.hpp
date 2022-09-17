@@ -59,7 +59,6 @@ namespace qsc {
   public:
     int verbose;
     Vector R0c, R0s, Z0c, Z0s, fc, fs;
-    bool angle_shift;
     int nphi, nfp;
     qscfloat eta_bar, sigma0, B2c, B2s, I2, p2;
     Vector phi0, phi, sinphi, cosphi, R0, Z0, R0p, Z0p, R0pp, Z0pp, R0ppp, Z0ppp;

@@ -900,26 +900,165 @@ TEST_CASE("Try Fourier refinement. Make sure the vary_R0c etc arrays are extende
 
   for (int angle_shift = 0; angle_shift < 2; angle_shift++) {
     CAPTURE(angle_shift);
-  for (int fourier_refine = 0; fourier_refine < 5; fourier_refine++) {
-    CAPTURE(fourier_refine);
+    for (int fourier_refine = 0; fourier_refine < 5; fourier_refine++) {
+      CAPTURE(fourier_refine);
 
+      Opt opt;
+      // Set up a realistic optimization for QA:
+      opt.q.nfp = 2;
+      opt.q.nphi = 31;
+      opt.q.verbose = 0;
+      opt.q.order_r_option = "r2.1";
+      opt.q.R0c = {1.0, 0.05};
+      opt.q.Z0s = {0.0, -0.05};
+      opt.q.R0s = {0.0, 0.0};
+      opt.q.Z0c = {0.0, 0.0};
+      opt.q.fs = {0.0, 0.0};
+      opt.q.fc = {0.0, 0.0};
+      opt.q.eta_bar = 1.0;
+      opt.q.B2c = 0.0;
+      opt.vary_eta_bar = true;
+      opt.vary_B2c = true;
+      opt.vary_R0c = {false, true};
+      opt.vary_R0s = {false, false};
+      opt.vary_Z0c = {false, false};
+      opt.vary_Z0s = {false, true};
+      opt.vary_fc = {false, false};
+      if (angle_shift == 1) {
+	opt.vary_fs = {false, true};
+	opt.refine_angle_shift = true;
+      } else {
+	opt.vary_fs = {false, false};
+	opt.refine_angle_shift = false;
+      }
+      opt.fourier_refine = fourier_refine;
+      opt.target_iota = 0.495;
+      opt.weight_iota = 1.0e4;
+      opt.weight_XY2 = 1.0;
+      opt.weight_XY2Prime = 1.0;
+      opt.weight_XY3 = 1.0;
+      opt.weight_XY3Prime = 1.0;
+      opt.weight_B20 = 300.0;
+      opt.max_iter = 1000;
+      opt.diff_method = DIFF_METHOD_FORWARD;
+      
+      opt.allocate();
+      opt.optimize();
+      
+      CHECK(opt.n_evals > opt.n_iter);
+      CHECK(opt.q.nphi == 31);
+      REQUIRE(opt.vary_R0c.size() == 2 + fourier_refine);
+      REQUIRE(opt.vary_R0s.size() == 2 + fourier_refine);
+      REQUIRE(opt.vary_Z0c.size() == 2 + fourier_refine);
+      REQUIRE(opt.vary_Z0s.size() == 2 + fourier_refine);
+      REQUIRE(opt.vary_fc.size() == 2 + fourier_refine);
+      REQUIRE(opt.vary_fs.size() == 2 + fourier_refine);
+      CHECK_FALSE(opt.vary_R0c[0]);
+      CHECK_FALSE(opt.vary_R0s[0]);
+      CHECK_FALSE(opt.vary_Z0c[0]);
+      CHECK_FALSE(opt.vary_Z0s[0]);
+      CHECK_FALSE(opt.vary_fc[0]);
+      CHECK_FALSE(opt.vary_fs[0]);
+      for (int j = 1; j < 2 + fourier_refine; j++) {
+	CAPTURE(j);
+	CHECK(opt.vary_R0c[j]);
+	CHECK_FALSE(opt.vary_R0s[j]);
+	CHECK_FALSE(opt.vary_Z0c[j]);
+	CHECK_FALSE(opt.vary_fc[j]);
+	CHECK(opt.vary_Z0s[j]);
+	if (angle_shift == 0) {
+	  CHECK_FALSE(opt.vary_fs[j]);
+	} else {
+	  CHECK(opt.vary_fs[j]);
+	}
+      }
+    }
+  }
+}
+
+TEST_CASE("Verify that Fourier refinement works gracefully if the max_iter limit is reached [opt]") {
+  if (single) return;
+
+  for (int angle_shift = 0; angle_shift < 2; angle_shift++) {
+    CAPTURE(angle_shift);
+    for (int fourier_refine = 0; fourier_refine < 5; fourier_refine++) {
+      CAPTURE(fourier_refine);
+      
+      Opt opt;
+      // Set up a realistic optimization for QA:
+      opt.q.nfp = 2;
+      opt.q.nphi = 31;
+      opt.q.verbose = 0;
+      opt.q.order_r_option = "r2.1";
+      opt.q.R0c = {1.0, 0.05};
+      opt.q.Z0s = {0.0, -0.05};
+      opt.q.R0s = {0.0, 0.0};
+      opt.q.Z0c = {0.0, 0.0};
+      opt.q.fs = {0.0, 0.0};
+      opt.q.fc = {0.0, 0.0};
+      opt.q.eta_bar = 1.0;
+      opt.q.B2c = 0.0;
+      opt.vary_eta_bar = true;
+      opt.vary_B2c = true;
+      opt.vary_R0c = {false, true};
+      opt.vary_R0s = {false, false};
+      opt.vary_Z0c = {false, false};
+      opt.vary_Z0s = {false, true};
+      opt.vary_fc = {false, false};
+      if (angle_shift == 1) {
+	opt.vary_fs = {false, true};
+	opt.refine_angle_shift = true;
+      } else {
+	opt.vary_fs = {false, false};
+	opt.refine_angle_shift = false;
+      }
+      opt.fourier_refine = fourier_refine;
+      opt.target_iota = 0.495;
+      opt.weight_iota = 1.0e4;
+      opt.weight_XY2 = 1.0;
+      opt.weight_XY2Prime = 1.0;
+      opt.weight_XY3 = 1.0;
+      opt.weight_XY3Prime = 1.0;
+      opt.weight_B20 = 300.0;
+      opt.max_iter = 5;
+      opt.diff_method = DIFF_METHOD_CENTERED;
+      
+      opt.allocate();
+      opt.optimize();
+      
+      REQUIRE(opt.vary_R0c.size() == 2 + fourier_refine);
+      REQUIRE(opt.vary_R0s.size() == 2 + fourier_refine);
+      REQUIRE(opt.vary_Z0c.size() == 2 + fourier_refine);
+      REQUIRE(opt.vary_Z0s.size() == 2 + fourier_refine);
+      REQUIRE(opt.vary_fc.size() == 2 + fourier_refine);
+      REQUIRE(opt.vary_fs.size() == 2 + fourier_refine);
+    }
+  }
+}
+
+TEST_CASE("Try changing nphi at each stage of Fourier refinement. [opt]") {
+  if (single) return;
+
+  for (int angle_shift = 0; angle_shift < 2; angle_shift++) {
+    CAPTURE(angle_shift);
+    int fourier_refine = 2;
     Opt opt;
-    // Set up a realistic optimization for QA:
-    opt.q.nfp = 2;
-    opt.q.nphi = 31;
+    // Set up a realistic optimization for QH:
+    opt.q.nfp = 4;
+    opt.q.nphi = 61; // This value will be over-written by the values in opt.nphi.
     opt.q.verbose = 0;
     opt.q.order_r_option = "r2.1";
-    opt.q.R0c = {1.0, 0.05};
-    opt.q.Z0s = {0.0, -0.05};
+    opt.q.R0c = {1.0, 0.17};
+    opt.q.Z0s = {0.0, 0.17};
     opt.q.R0s = {0.0, 0.0};
     opt.q.Z0c = {0.0, 0.0};
-    opt.q.fs = {0.0, 0.0};
     opt.q.fc = {0.0, 0.0};
+    opt.q.fs = {0.0, 0.0};
     opt.q.eta_bar = 1.0;
     opt.q.B2c = 0.0;
     opt.vary_eta_bar = true;
     opt.vary_B2c = true;
-    opt.vary_R0c = {false, true};
+    opt.vary_R0c = {false, false};
     opt.vary_R0s = {false, false};
     opt.vary_Z0c = {false, false};
     opt.vary_Z0s = {false, true};
@@ -932,20 +1071,13 @@ TEST_CASE("Try Fourier refinement. Make sure the vary_R0c etc arrays are extende
       opt.refine_angle_shift = false;
     }
     opt.fourier_refine = fourier_refine;
-    opt.target_iota = 0.495;
-    opt.weight_iota = 1.0e4;
-    opt.weight_XY2 = 1.0;
-    opt.weight_XY2Prime = 1.0;
-    opt.weight_XY3 = 1.0;
-    opt.weight_XY3Prime = 1.0;
-    opt.weight_B20 = 300.0;
-    opt.max_iter = 1000;
-    opt.diff_method = DIFF_METHOD_FORWARD;
-
+    opt.nphi = {19, 25, 31};
+    opt.weight_grad_B = 1.0;
+    opt.weight_B20 = 1.0;
+    
     opt.allocate();
     opt.optimize();
-
-    CHECK(opt.n_evals > opt.n_iter);
+    
     CHECK(opt.q.nphi == 31);
     REQUIRE(opt.vary_R0c.size() == 2 + fourier_refine);
     REQUIRE(opt.vary_R0s.size() == 2 + fourier_refine);
@@ -959,135 +1091,35 @@ TEST_CASE("Try Fourier refinement. Make sure the vary_R0c etc arrays are extende
     CHECK_FALSE(opt.vary_Z0s[0]);
     CHECK_FALSE(opt.vary_fc[0]);
     CHECK_FALSE(opt.vary_fs[0]);
-    for (int j = 1; j < 2 + fourier_refine; j++) {
-      CAPTURE(j);
-      CHECK(opt.vary_R0c[j]);
-      CHECK_FALSE(opt.vary_R0s[j]);
-      CHECK_FALSE(opt.vary_Z0c[j]);
-      CHECK_FALSE(opt.vary_fc[j]);
-      CHECK(opt.vary_Z0s[j]);
-      if (angle_shift == 0) {
-	CHECK_FALSE(opt.vary_fs[j]);
-      } else {
-	CHECK(opt.vary_fs[j]);
-      }
+    
+    CHECK_FALSE(opt.vary_R0c[1]);
+    CHECK_FALSE(opt.vary_R0s[1]);
+    CHECK_FALSE(opt.vary_Z0c[1]);
+    CHECK(opt.vary_Z0s[1]);
+    CHECK_FALSE(opt.vary_fc[1]);
+
+    CHECK(opt.vary_R0c[2]);
+    CHECK_FALSE(opt.vary_R0s[2]);
+    CHECK_FALSE(opt.vary_Z0c[2]);
+    CHECK(opt.vary_Z0s[2]);
+    CHECK_FALSE(opt.vary_fc[2]);
+    
+    CHECK(opt.vary_R0c[3]);
+    CHECK_FALSE(opt.vary_R0s[3]);
+    CHECK_FALSE(opt.vary_Z0c[3]);
+    CHECK(opt.vary_Z0s[3]);
+    CHECK_FALSE(opt.vary_fc[3]);
+    
+    if (angle_shift == 1) {
+      CHECK(opt.vary_fs[1]);
+      CHECK(opt.vary_fs[2]);
+      CHECK(opt.vary_fs[3]);
+    } else {
+      CHECK_FALSE(opt.vary_fs[1]);
+      CHECK_FALSE(opt.vary_fs[2]);
+      CHECK_FALSE(opt.vary_fs[3]);
     }
-  }
-  }
-}
-
-TEST_CASE("Verify that Fourier refinement works gracefully if the max_iter limit is reached [opt]") {
-  if (single) return;
-
-  for (int fourier_refine = 0; fourier_refine < 5; fourier_refine++) {
-    CAPTURE(fourier_refine);
-
-    Opt opt;
-    // Set up a realistic optimization for QA:
-    opt.q.nfp = 2;
-    opt.q.nphi = 31;
-    opt.q.verbose = 0;
-    opt.q.order_r_option = "r2.1";
-    opt.q.R0c = {1.0, 0.05};
-    opt.q.Z0s = {0.0, -0.05};
-    opt.q.R0s = {0.0, 0.0};
-    opt.q.Z0c = {0.0, 0.0};
-    opt.q.fs = {0.0, 0.0};
-    opt.q.fc = {0.0, 0.0};
-    opt.q.eta_bar = 1.0;
-    opt.q.B2c = 0.0;
-    opt.vary_eta_bar = true;
-    opt.vary_B2c = true;
-    opt.vary_R0c = {false, true};
-    opt.vary_R0s = {false, false};
-    opt.vary_Z0c = {false, false};
-    opt.vary_Z0s = {false, true};
-    opt.vary_fc = {false, false};
-    opt.vary_fs = {false, false};
-    opt.fourier_refine = fourier_refine;
-    opt.target_iota = 0.495;
-    opt.weight_iota = 1.0e4;
-    opt.weight_XY2 = 1.0;
-    opt.weight_XY2Prime = 1.0;
-    opt.weight_XY3 = 1.0;
-    opt.weight_XY3Prime = 1.0;
-    opt.weight_B20 = 300.0;
-    opt.max_iter = 5;
-    opt.diff_method = DIFF_METHOD_CENTERED;
-
-    opt.allocate();
-    opt.optimize();
-
-    REQUIRE(opt.vary_R0c.size() == 2 + fourier_refine);
-    REQUIRE(opt.vary_R0s.size() == 2 + fourier_refine);
-    REQUIRE(opt.vary_Z0c.size() == 2 + fourier_refine);
-    REQUIRE(opt.vary_Z0s.size() == 2 + fourier_refine);
-    REQUIRE(opt.vary_fc.size() == 2 + fourier_refine);
-    REQUIRE(opt.vary_fs.size() == 2 + fourier_refine);
-  }
-}
-
-TEST_CASE("Try changing nphi at each stage of Fourier refinement. [opt]") {
-  if (single) return;
-
-  int fourier_refine = 2;
-  Opt opt;
-  // Set up a realistic optimization for QH:
-  opt.q.nfp = 4;
-  opt.q.nphi = 61; // This value will be over-written by the values in opt.nphi.
-  opt.q.verbose = 0;
-  opt.q.order_r_option = "r2.1";
-  opt.q.R0c = {1.0, 0.17};
-  opt.q.Z0s = {0.0, 0.17};
-  opt.q.R0s = {0.0, 0.0};
-  opt.q.Z0c = {0.0, 0.0};
-  opt.q.fs = {0.0, 0.0};
-  opt.q.fc = {0.0, 0.0};
-  opt.q.eta_bar = 1.0;
-  opt.q.B2c = 0.0;
-  opt.vary_eta_bar = true;
-  opt.vary_B2c = true;
-  opt.vary_R0c = {false, false};
-  opt.vary_R0s = {false, false};
-  opt.vary_Z0c = {false, false};
-  opt.vary_Z0s = {false, true};
-  opt.vary_fc = {false, false};
-  opt.vary_fs = {false, false};
-  opt.fourier_refine = fourier_refine;
-  opt.nphi = {19, 25, 31};
-  opt.weight_grad_B = 1.0;
-  opt.weight_B20 = 1.0;
-
-  opt.allocate();
-  opt.optimize();
-
-  CHECK(opt.q.nphi == 31);
-  REQUIRE(opt.vary_R0c.size() == 2 + fourier_refine);
-  REQUIRE(opt.vary_R0s.size() == 2 + fourier_refine);
-  REQUIRE(opt.vary_Z0c.size() == 2 + fourier_refine);
-  REQUIRE(opt.vary_Z0s.size() == 2 + fourier_refine);
-  REQUIRE(opt.vary_fc.size() == 2 + fourier_refine);
-  REQUIRE(opt.vary_fs.size() == 2 + fourier_refine);
-  CHECK_FALSE(opt.vary_R0c[0]);
-  CHECK_FALSE(opt.vary_R0s[0]);
-  CHECK_FALSE(opt.vary_Z0c[0]);
-  CHECK_FALSE(opt.vary_Z0s[0]);
-  CHECK_FALSE(opt.vary_fc[0]);
-  CHECK_FALSE(opt.vary_fs[0]);
-  
-  CHECK_FALSE(opt.vary_R0c[1]);
-  CHECK_FALSE(opt.vary_R0s[1]);
-  CHECK_FALSE(opt.vary_Z0c[1]);
-  CHECK(opt.vary_Z0s[1]);
     
-  CHECK(opt.vary_R0c[2]);
-  CHECK_FALSE(opt.vary_R0s[2]);
-  CHECK_FALSE(opt.vary_Z0c[2]);
-  CHECK(opt.vary_Z0s[2]);
-    
-  CHECK(opt.vary_R0c[3]);
-  CHECK_FALSE(opt.vary_R0s[3]);
-  CHECK_FALSE(opt.vary_Z0c[3]);
-  CHECK(opt.vary_Z0s[3]);
+  }
 }
 

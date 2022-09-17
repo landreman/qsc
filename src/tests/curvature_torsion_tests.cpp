@@ -117,7 +117,6 @@ TEST_CASE("curvature and torsion: including angle shift") {
   Qsc q;
   q.nfp = 3;
   q.nphi = 15;
-  q.angle_shift = true;
 
   q.resize_axis_arrays(4, 0.0);
 

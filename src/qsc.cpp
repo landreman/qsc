@@ -17,7 +17,6 @@ void Qsc::defaults() {
   B2s = 0.0;
   B2c = 0.0;
   p2 = 0.0;
-  angle_shift = false;
 
   nfp = 3;
   nphi = 15;
