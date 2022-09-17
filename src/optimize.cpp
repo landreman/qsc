@@ -134,9 +134,9 @@ void Opt::optimize() {
       std::cout << vary_Z0c << std::endl;
       std::cout << "vary_Z0s: ";
       std::cout << vary_Z0s << std::endl;
-      std::cout << "vary_fc: ";
+      std::cout << "vary_fc:  ";
       std::cout << vary_fc << std::endl;
-      std::cout << "vary_fs: ";
+      std::cout << "vary_fs:  ";
       std::cout << vary_fs << std::endl;
       std::cout << "nphi: " << q.nphi << std::endl;
     }
