@@ -263,6 +263,7 @@ void Qsc::read_netcdf(std::string filename, char C_or_F) {
 
     // Vectors
     nc.get("phi", phi);
+    nc.get("phi0", phi0);
     nc.get("curvature", curvature);
     nc.get("torsion", torsion);
     nc.get("sigma", sigma);

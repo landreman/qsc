@@ -39,12 +39,14 @@ namespace qsc {
     algorithm_type algorithm;
     Vector residuals;
     int fourier_refine;
+    bool refine_angle_shift;
     diff_method_type diff_method;
     std::valarray<int> nphi;
 
     bool vary_eta_bar, vary_sigma0;
     bool vary_B2c, vary_B2s;
     std::valarray<bool> vary_R0c, vary_R0s, vary_Z0c, vary_Z0s;
+    std::valarray<bool> vary_fc, vary_fs;
     
     qscfloat weight_B20, weight_iota, target_iota;
     qscfloat weight_elongation, weight_curvature;
@@ -82,6 +84,7 @@ namespace qsc {
     
     Vector iter_eta_bar, iter_sigma0, iter_B2s, iter_B2c;
     Matrix iter_R0c, iter_R0s, iter_Z0c, iter_Z0s;
+    Matrix iter_fc, iter_fs;
     Vector iter_min_R0, iter_max_curvature;
     Vector iter_iota, iter_max_elongation;
     Vector iter_min_L_grad_B, iter_min_L_grad_grad_B;

@@ -166,6 +166,8 @@ void MultiOptScan::write_netcdf() {
   nc.put(axis_nmax_plus_1_n_scan_dim, "scan_R0s", &scan_R0s(0, 0), "For each configuration kept from the scan, the amplitudes of the sin(n*phi) components of the major radius of the magnetic axis", "meter");
   nc.put(axis_nmax_plus_1_n_scan_dim, "scan_Z0c", &scan_Z0c(0, 0), "For each configuration kept from the scan, the amplitudes of the cos(n*phi) components of the Cartesian Z coordinate of the magnetic axis", "meter");
   nc.put(axis_nmax_plus_1_n_scan_dim, "scan_Z0s", &scan_Z0s(0, 0), "For each configuration kept from the scan, the amplitudes of the sin(n*phi) components of the Cartesian Z coordinate of the magnetic axis", "meter");
+  nc.put(axis_nmax_plus_1_n_scan_dim, "scan_fc", &scan_fc(0, 0), "For each configuration kept from the scan, the amplitudes of the cos(n*phi) components of the angle shift f", "dimensionless");
+  nc.put(axis_nmax_plus_1_n_scan_dim, "scan_fs", &scan_fs(0, 0), "For each configuration kept from the scan, the amplitudes of the sin(n*phi) components of the angle shift f", "dimensionless");
 
   // Done defining the NetCDF data.
   nc.write_and_close();

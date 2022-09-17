@@ -230,6 +230,8 @@ void Opt::write_netcdf() {
   nc.put(axis_nmax_plus_1_n_iter_dim, "iter_R0s", &iter_R0s(0, 0), "The amplitudes of the sin(n*phi) components of the major radius of the magnetic axis", "meter");
   nc.put(axis_nmax_plus_1_n_iter_dim, "iter_Z0c", &iter_Z0c(0, 0), "The amplitudes of the cos(n*phi) components of the Cartesian Z coordinate of the magnetic axis", "meter");
   nc.put(axis_nmax_plus_1_n_iter_dim, "iter_Z0s", &iter_Z0s(0, 0), "The amplitudes of the sin(n*phi) components of the Cartesian Z coordinate of the magnetic axis", "meter");
+  nc.put(axis_nmax_plus_1_n_iter_dim, "iter_fc", &iter_fc(0, 0), "The amplitudes of the cos(n*phi) components of the angle shift f", "dimensionless");
+  nc.put(axis_nmax_plus_1_n_iter_dim, "iter_fs", &iter_fs(0, 0), "The amplitudes of the sin(n*phi) components of the angle shift f", "dimensionless");
 
   // Done defining the NetCDF data.
   nc.write_and_close();

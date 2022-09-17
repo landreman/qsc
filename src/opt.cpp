@@ -9,6 +9,7 @@ void Opt::defaults() {
   make_names = true;
   algorithm = GSL_LM;
   fourier_refine = 0;
+  refine_angle_shift = false;
   toml_group = "opt";
   diff_method = DIFF_METHOD_FORWARD;
   n_evals = 0;
@@ -23,6 +24,8 @@ void Opt::defaults() {
   vary_R0s.resize(q.R0c.size(), false);
   vary_Z0c.resize(q.R0c.size(), false);
   vary_Z0s.resize(q.R0c.size(), true);
+  vary_fc.resize(q.R0c.size(), false);
+  vary_fs.resize(q.R0c.size(), false);
   vary_R0c[0] = false;
   vary_Z0s[0] = false;
   

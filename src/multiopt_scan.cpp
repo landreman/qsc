@@ -88,7 +88,7 @@ void MultiOptScan::init() {
 
   axis_nmax_plus_1 = mo_ref.opts[0].q.R0c.size();
   for (j = 0; j < mo_ref.opts.size(); j++) axis_nmax_plus_1 += mo_ref.opts[j].fourier_refine;
-  int n_fourier_parameters = axis_nmax_plus_1 * 4;
+  int n_fourier_parameters = axis_nmax_plus_1 * 6;
 
   n_parameters = n_parameters_base + n_fourier_parameters;
   parameters_single.resize(n_parameters);
@@ -576,6 +576,8 @@ void MultiOptScan::eval_scan_index(int j_scan) {
     parameters_single[j + 1 * axis_nmax_plus_1 + n_parameters_base] = mo.opts[index].q.R0s[j];
     parameters_single[j + 2 * axis_nmax_plus_1 + n_parameters_base] = mo.opts[index].q.Z0c[j];
     parameters_single[j + 3 * axis_nmax_plus_1 + n_parameters_base] = mo.opts[index].q.Z0s[j];
+    parameters_single[j + 4 * axis_nmax_plus_1 + n_parameters_base] = mo.opts[index].q.fc[j];
+    parameters_single[j + 5 * axis_nmax_plus_1 + n_parameters_base] = mo.opts[index].q.fs[j];
   }
     
   end_time_single = std::chrono::steady_clock::now();
@@ -696,6 +698,8 @@ void MultiOptScan::filter_global_arrays() {
   scan_R0s.resize(axis_nmax_plus_1, n_scan, 0.0);
   scan_Z0c.resize(axis_nmax_plus_1, n_scan, 0.0);
   scan_Z0s.resize(axis_nmax_plus_1, n_scan, 0.0);
+  scan_fc.resize(axis_nmax_plus_1, n_scan, 0.0);
+  scan_fs.resize(axis_nmax_plus_1, n_scan, 0.0);
 
   scan_weight_B20.resize(n_scan, 0.0);
   scan_weight_iota.resize(n_scan, 0.0);
@@ -795,6 +799,8 @@ void MultiOptScan::filter_global_arrays() {
       scan_R0s(k, j) = parameters(k + 1 * axis_nmax_plus_1 + n_parameters_base, j_global);
       scan_Z0c(k, j) = parameters(k + 2 * axis_nmax_plus_1 + n_parameters_base, j_global);
       scan_Z0s(k, j) = parameters(k + 3 * axis_nmax_plus_1 + n_parameters_base, j_global);
+      scan_fc( k, j) = parameters(k + 4 * axis_nmax_plus_1 + n_parameters_base, j_global);
+      scan_fs( k, j) = parameters(k + 5 * axis_nmax_plus_1 + n_parameters_base, j_global);
     }
   }
   if (j + 1 != n_scan) {

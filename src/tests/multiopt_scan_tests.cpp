@@ -69,6 +69,8 @@ TEST_CASE("Run a small MultiOptScan with keep_all true. [mpi] [multiopt_scan]") 
   mos.mo_ref.opts[0].q.Z0s = {0.0, 0.17};
   mos.mo_ref.opts[0].q.R0s = {0.0, 0.0};
   mos.mo_ref.opts[0].q.Z0c = {0.0, 0.0};
+  mos.mo_ref.opts[0].q.fs = {0.0, 0.0};
+  mos.mo_ref.opts[0].q.fc = {0.0, 0.0};
 
   // Set parameters for opt stage 0:
   mos.mo_ref.opts[0].verbose = 0;
@@ -80,6 +82,8 @@ TEST_CASE("Run a small MultiOptScan with keep_all true. [mpi] [multiopt_scan]") 
   mos.mo_ref.opts[0].vary_Z0s = {false, true};
   mos.mo_ref.opts[0].vary_R0s = {false, false};
   mos.mo_ref.opts[0].vary_Z0c = {false, false};
+  mos.mo_ref.opts[0].vary_fs = {false, false};
+  mos.mo_ref.opts[0].vary_fc = {false, false};
   mos.mo_ref.opts[0].weight_grad_B = 1.0;
   mos.mo_ref.opts[0].weight_B20 = 1.0;
   
@@ -93,6 +97,8 @@ TEST_CASE("Run a small MultiOptScan with keep_all true. [mpi] [multiopt_scan]") 
   mos.mo_ref.opts[1].vary_Z0s = {false, true, true, true};
   mos.mo_ref.opts[1].vary_R0s = {false, false, false, false};
   mos.mo_ref.opts[1].vary_Z0c = {false, false, false, false};
+  mos.mo_ref.opts[1].vary_fs = {false, false, false, false};
+  mos.mo_ref.opts[1].vary_fc = {false, false, false, false};
   mos.mo_ref.opts[1].weight_grad_B = 1.0;
   mos.mo_ref.opts[1].weight_B20 = 2.0;
   mos.mo_ref.opts[1].weight_grad_grad_B = 0.01;
@@ -156,6 +162,8 @@ TEST_CASE("Run a small MultiOptScan with keep_all true. [mpi] [multiopt_scan]") 
 	q.R0s[k] = mos.scan_R0s(k, j);
 	q.Z0c[k] = mos.scan_Z0c(k, j);
 	q.Z0s[k] = mos.scan_Z0s(k, j);
+	q.fc[k] = mos.scan_fc(k, j);
+	q.fs[k] = mos.scan_fs(k, j);
       }
 
       q.init();
@@ -229,6 +237,8 @@ TEST_CASE("Run a small MultiOptScan with keep_all false. [mpi] [multiopt_scan]")
   mos.mo_ref.opts[0].q.Z0s = {0.0, 0.17};
   mos.mo_ref.opts[0].q.R0s = {0.0, 0.0};
   mos.mo_ref.opts[0].q.Z0c = {0.0, 0.0};
+  mos.mo_ref.opts[0].q.fs = {0.0, 0.0};
+  mos.mo_ref.opts[0].q.fc = {0.0, 0.0};
 
   // Set parameters for opt stage 0:
   mos.mo_ref.opts[0].verbose = 0;
@@ -239,6 +249,8 @@ TEST_CASE("Run a small MultiOptScan with keep_all false. [mpi] [multiopt_scan]")
   mos.mo_ref.opts[0].vary_Z0s = {false, true};
   mos.mo_ref.opts[0].vary_R0s = {false, false};
   mos.mo_ref.opts[0].vary_Z0c = {false, false};
+  mos.mo_ref.opts[0].vary_fs = {false, false};
+  mos.mo_ref.opts[0].vary_fc = {false, false};
   mos.mo_ref.opts[0].weight_iota = 30.0;
   mos.mo_ref.opts[0].target_iota = 0.42;
   mos.mo_ref.opts[0].weight_grad_B = 1.0;
@@ -253,6 +265,8 @@ TEST_CASE("Run a small MultiOptScan with keep_all false. [mpi] [multiopt_scan]")
   mos.mo_ref.opts[1].vary_Z0s = {false, true, true, true};
   mos.mo_ref.opts[1].vary_R0s = {false, false, false, false};
   mos.mo_ref.opts[1].vary_Z0c = {false, false, false, false};
+  mos.mo_ref.opts[1].vary_fs = {false, false, false, false};
+  mos.mo_ref.opts[1].vary_fc = {false, false, false, false};
   mos.mo_ref.opts[1].weight_iota = 30.0;
   mos.mo_ref.opts[1].target_iota = 0.42;
   mos.mo_ref.opts[1].weight_grad_B = 1.0;
@@ -296,6 +310,8 @@ TEST_CASE("Run a small MultiOptScan with keep_all false. [mpi] [multiopt_scan]")
 	q.R0s[k] = mos.scan_R0s(k, j);
 	q.Z0c[k] = mos.scan_Z0c(k, j);
 	q.Z0s[k] = mos.scan_Z0s(k, j);
+	q.fc[k] = mos.scan_fc(k, j);
+	q.fs[k] = mos.scan_fs(k, j);
       }
 
       q.init();

@@ -34,6 +34,8 @@ void Opt::input(std::string filename) {
   toml_read(varlist, indata, "vary_R0s", vary_R0s);
   toml_read(varlist, indata, "vary_Z0c", vary_Z0c);
   toml_read(varlist, indata, "vary_Z0s", vary_Z0s);
+  toml_read(varlist, indata, "vary_fc", vary_fc);
+  toml_read(varlist, indata, "vary_fs", vary_fs);
   
   toml_read(varlist, indata, "weight_B20", weight_B20);
   toml_read(varlist, indata, "weight_iota", weight_iota);
@@ -66,6 +68,7 @@ void Opt::input(std::string filename) {
   toml_read(varlist, indata, "verbose", verbose);
   toml_read(varlist, indata, "make_names", make_names);
   toml_read(varlist, indata, "fourier_refine", fourier_refine);
+  toml_read(varlist, indata, "refine_angle_shift", refine_angle_shift);
   toml_read(varlist, indata, "nphi", nphi);
   if (nphi.size() > 0 && nphi.size() != fourier_refine + 1)
     throw std::runtime_error("Size of the multiopt nphi array does not match fourier_refine + 1");
@@ -142,6 +145,14 @@ void Opt::input(std::string filename) {
     
     std::cout << "vary_Z0s:";
     for (j = 0; j < vary_Z0s.size(); j++) std::cout << " " << vary_Z0s[j];
+    std::cout << std::endl;
+    
+    std::cout << "vary_fc:";
+    for (j = 0; j < vary_fc.size(); j++) std::cout << " " << vary_fc[j];
+    std::cout << std::endl;
+    
+    std::cout << "vary_fs:";
+    for (j = 0; j < vary_fs.size(); j++) std::cout << " " << vary_fs[j];
     std::cout << std::endl;
     
     std::cout << "weight_B20: " << weight_B20 << std::endl;

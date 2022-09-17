@@ -416,6 +416,8 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
 	opt.vary_R0s = {false, false};
 	opt.vary_Z0c = {false, false};
 	opt.vary_Z0s = {false, false};
+	opt.vary_fc = {false, false};
+	opt.vary_fs = {false, false};
 	break;
       case 1:
 	// Do vary the axis, except for the major radius
@@ -423,6 +425,8 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
 	opt.vary_R0s = {false, true};
 	opt.vary_Z0c = {false, true};
 	opt.vary_Z0s = {false, true};
+	opt.vary_fc = {false, false};
+	opt.vary_fs = {false, false};
 	opt.diff_method = DIFF_METHOD_CENTERED;
 	break;
       case 2:
@@ -431,6 +435,8 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
 	opt.vary_R0s = {false, true};
 	opt.vary_Z0c = {false, true};
 	opt.vary_Z0s = {false, true};
+	opt.vary_fc = {false, false};
+	opt.vary_fs = {false, false};
 	opt.diff_method = DIFF_METHOD_FORWARD;
 	break;
       default:
@@ -507,6 +513,8 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
 	CHECK(Approx(opt.iter_R0s(k, 0)) == q0.R0s[k]);
 	CHECK(Approx(opt.iter_Z0c(k, 0)) == q0.Z0c[k]);
 	CHECK(Approx(opt.iter_Z0s(k, 0)) == q0.Z0s[k]);
+	CHECK(Approx(opt.iter_fc(k, 0)) == q0.fc[k]);
+	CHECK(Approx(opt.iter_fs(k, 0)) == q0.fs[k]);
       }
       CHECK(Approx(q0.grid_min_R0) == opt.iter_min_R0[0]);
       CHECK(Approx(q0.grid_max_curvature) == opt.iter_max_curvature[0]);
@@ -547,6 +555,8 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
 	  q.R0s[k] = opt.iter_R0s(k, j);
 	  q.Z0c[k] = opt.iter_Z0c(k, j);
 	  q.Z0s[k] = opt.iter_Z0s(k, j);
+	  q.fc[k] = opt.iter_fc(k, j);
+	  q.fs[k] = opt.iter_fs(k, j);
 	}
 	// Run standalone QSC:
 	q.calculate();
@@ -573,6 +583,8 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
 	CHECK(Approx(opt.iter_R0s(0, j)) == q0.R0s[0]);
 	CHECK(Approx(opt.iter_Z0c(0, j)) == q0.Z0c[0]);
 	CHECK(Approx(opt.iter_Z0s(0, j)) == q0.Z0s[0]);
+	CHECK(Approx(opt.iter_fc(0, j)) == q0.fc[0]);
+	CHECK(Approx(opt.iter_fs(0, j)) == q0.fs[0]);
 	qscfloat eps = 1.0e-13;
 	switch (vary_axis_option) {
 	case 0:
@@ -670,6 +682,8 @@ TEST_CASE("Check Opt::unpack_state_vector() and Opt::set_state_vector() [opt]") 
   opt.vary_R0s.resize(n_fourier, false);
   opt.vary_Z0c.resize(n_fourier, false);
   opt.vary_Z0s.resize(n_fourier, false);
+  opt.vary_fc.resize(n_fourier, false);
+  opt.vary_fs.resize(n_fourier, false);
   opt.weight_grad_B = 1.0; // Need at least 1 residual term.
   // opt.q = Qsc(config);
   std::cout << "max fourier_index:" << (1 << (4 * (n_fourier - 1))) << std::endl;
@@ -756,6 +770,8 @@ TEST_CASE("1d optimization for iota [opt]") {
       opt.q.Z0s = {0.0, 0.15};
       opt.q.R0s = {0.0, 0.0};
       opt.q.Z0c = {0.0, 0.0};
+      opt.q.fs = {0.0, 0.0};
+      opt.q.fc = {0.0, 0.0};
       opt.q.eta_bar = 0.8;
       opt.q.B2c = 0.0;
 
@@ -804,6 +820,8 @@ TEST_CASE("1d optimization for iota [opt]") {
       }
       opt.vary_R0s = {false, false};
       opt.vary_Z0c = {false, false};
+      opt.vary_fc = {false, false};
+      opt.vary_fs = {false, false};
       
       // Target only iota:
       qscfloat target_iota = -0.5;
@@ -851,6 +869,8 @@ TEST_CASE("Try Fourier refinement. Make sure the vary_R0c etc arrays are extende
     opt.q.Z0s = {0.0, -0.05};
     opt.q.R0s = {0.0, 0.0};
     opt.q.Z0c = {0.0, 0.0};
+    opt.q.fs = {0.0, 0.0};
+    opt.q.fc = {0.0, 0.0};
     opt.q.eta_bar = 1.0;
     opt.q.B2c = 0.0;
     opt.vary_eta_bar = true;
@@ -859,6 +879,8 @@ TEST_CASE("Try Fourier refinement. Make sure the vary_R0c etc arrays are extende
     opt.vary_R0s = {false, false};
     opt.vary_Z0c = {false, false};
     opt.vary_Z0s = {false, true};
+    opt.vary_fc = {false, false};
+    opt.vary_fs = {false, false};
     opt.fourier_refine = fourier_refine;
     opt.target_iota = 0.495;
     opt.weight_iota = 1.0e4;
@@ -879,10 +901,14 @@ TEST_CASE("Try Fourier refinement. Make sure the vary_R0c etc arrays are extende
     REQUIRE(opt.vary_R0s.size() == 2 + fourier_refine);
     REQUIRE(opt.vary_Z0c.size() == 2 + fourier_refine);
     REQUIRE(opt.vary_Z0s.size() == 2 + fourier_refine);
+    REQUIRE(opt.vary_fc.size() == 2 + fourier_refine);
+    REQUIRE(opt.vary_fs.size() == 2 + fourier_refine);
     CHECK_FALSE(opt.vary_R0c[0]);
     CHECK_FALSE(opt.vary_R0s[0]);
     CHECK_FALSE(opt.vary_Z0c[0]);
     CHECK_FALSE(opt.vary_Z0s[0]);
+    CHECK_FALSE(opt.vary_fc[0]);
+    CHECK_FALSE(opt.vary_fs[0]);
     for (int j = 1; j < 2 + fourier_refine; j++) {
       CAPTURE(j);
       CHECK(opt.vary_R0c[j]);
@@ -909,6 +935,8 @@ TEST_CASE("Verify that Fourier refinement works gracefully if the max_iter limit
     opt.q.Z0s = {0.0, -0.05};
     opt.q.R0s = {0.0, 0.0};
     opt.q.Z0c = {0.0, 0.0};
+    opt.q.fs = {0.0, 0.0};
+    opt.q.fc = {0.0, 0.0};
     opt.q.eta_bar = 1.0;
     opt.q.B2c = 0.0;
     opt.vary_eta_bar = true;
@@ -917,6 +945,8 @@ TEST_CASE("Verify that Fourier refinement works gracefully if the max_iter limit
     opt.vary_R0s = {false, false};
     opt.vary_Z0c = {false, false};
     opt.vary_Z0s = {false, true};
+    opt.vary_fc = {false, false};
+    opt.vary_fs = {false, false};
     opt.fourier_refine = fourier_refine;
     opt.target_iota = 0.495;
     opt.weight_iota = 1.0e4;
@@ -935,6 +965,8 @@ TEST_CASE("Verify that Fourier refinement works gracefully if the max_iter limit
     REQUIRE(opt.vary_R0s.size() == 2 + fourier_refine);
     REQUIRE(opt.vary_Z0c.size() == 2 + fourier_refine);
     REQUIRE(opt.vary_Z0s.size() == 2 + fourier_refine);
+    REQUIRE(opt.vary_fc.size() == 2 + fourier_refine);
+    REQUIRE(opt.vary_fs.size() == 2 + fourier_refine);
   }
 }
 
@@ -952,6 +984,8 @@ TEST_CASE("Try changing nphi at each stage of Fourier refinement. [opt]") {
   opt.q.Z0s = {0.0, 0.17};
   opt.q.R0s = {0.0, 0.0};
   opt.q.Z0c = {0.0, 0.0};
+  opt.q.fs = {0.0, 0.0};
+  opt.q.fc = {0.0, 0.0};
   opt.q.eta_bar = 1.0;
   opt.q.B2c = 0.0;
   opt.vary_eta_bar = true;
@@ -960,6 +994,8 @@ TEST_CASE("Try changing nphi at each stage of Fourier refinement. [opt]") {
   opt.vary_R0s = {false, false};
   opt.vary_Z0c = {false, false};
   opt.vary_Z0s = {false, true};
+  opt.vary_fc = {false, false};
+  opt.vary_fs = {false, false};
   opt.fourier_refine = fourier_refine;
   opt.nphi = {19, 25, 31};
   opt.weight_grad_B = 1.0;
@@ -973,10 +1009,14 @@ TEST_CASE("Try changing nphi at each stage of Fourier refinement. [opt]") {
   REQUIRE(opt.vary_R0s.size() == 2 + fourier_refine);
   REQUIRE(opt.vary_Z0c.size() == 2 + fourier_refine);
   REQUIRE(opt.vary_Z0s.size() == 2 + fourier_refine);
+  REQUIRE(opt.vary_fc.size() == 2 + fourier_refine);
+  REQUIRE(opt.vary_fs.size() == 2 + fourier_refine);
   CHECK_FALSE(opt.vary_R0c[0]);
   CHECK_FALSE(opt.vary_R0s[0]);
   CHECK_FALSE(opt.vary_Z0c[0]);
   CHECK_FALSE(opt.vary_Z0s[0]);
+  CHECK_FALSE(opt.vary_fc[0]);
+  CHECK_FALSE(opt.vary_fs[0]);
   
   CHECK_FALSE(opt.vary_R0c[1]);
   CHECK_FALSE(opt.vary_R0s[1]);

@@ -25,6 +25,8 @@ void Opt::optimize() {
   if (vary_R0s.size() != q.R0s.size()) throw std::runtime_error("Size of vary_R0s is incorrect");
   if (vary_Z0c.size() != q.Z0c.size()) throw std::runtime_error("Size of vary_Z0c is incorrect");
   if (vary_Z0s.size() != q.Z0s.size()) throw std::runtime_error("Size of vary_Z0s is incorrect");
+  if (vary_fc.size() != q.fc.size()) throw std::runtime_error("Size of vary_fc is incorrect");
+  if (vary_fs.size() != q.fs.size()) throw std::runtime_error("Size of vary_fs is incorrect");
   
   // Add fourier_refine modes to the end of input arrays:
   Vector axis_arr;
@@ -44,9 +46,12 @@ void Opt::optimize() {
   axis_arr = q.Z0s;
   q.Z0s.resize(newsize, 0.0);
   for (j = 0; j < oldsize; j++) q.Z0s[j] = axis_arr[j];
-  // TODO: handle fc/fs here
+  axis_arr = q.fc;
   q.fc.resize(newsize, 0.0);
+  for (j = 0; j < oldsize; j++) q.fc[j] = axis_arr[j];
+  axis_arr = q.fs;
   q.fs.resize(newsize, 0.0);
+  for (j = 0; j < oldsize; j++) q.fs[j] = axis_arr[j];
   
   bool_arr = vary_R0c;
   vary_R0c.resize(newsize, false);
@@ -60,6 +65,12 @@ void Opt::optimize() {
   bool_arr = vary_Z0s;
   vary_Z0s.resize(newsize, false);
   for (j = 0; j < oldsize; j++) vary_Z0s[j] = bool_arr[j];
+  bool_arr = vary_fc;
+  vary_fc.resize(newsize, false);
+  for (j = 0; j < oldsize; j++) vary_fc[j] = bool_arr[j];
+  bool_arr = vary_fs;
+  vary_fs.resize(newsize, false);
+  for (j = 0; j < oldsize; j++) vary_fs[j] = bool_arr[j];
 
   const gsl_multifit_nlinear_trs * gsl_multifit_nlinear_trs_choice;
   if (verbose > 0) std::cout << "Algorithm: ";
@@ -97,6 +108,8 @@ void Opt::optimize() {
     if (j_fourier_refine > 0) {
       vary_R0c[oldsize + j_fourier_refine - 1] = true;
       vary_Z0s[oldsize + j_fourier_refine - 1] = true;
+      if (refine_angle_shift)
+	vary_fs[oldsize + j_fourier_refine - 1] = true;
       // For non-stellarator-symmetry, could also modify vary_R0s and vary_Z0c here.
     }
     // If the opt nphi vector is empty, nphi from the original qsc object will be used.
@@ -121,6 +134,10 @@ void Opt::optimize() {
       std::cout << vary_Z0c << std::endl;
       std::cout << "vary_Z0s: ";
       std::cout << vary_Z0s << std::endl;
+      std::cout << "vary_fc: ";
+      std::cout << vary_fc << std::endl;
+      std::cout << "vary_fs: ";
+      std::cout << vary_fs << std::endl;
       std::cout << "nphi: " << q.nphi << std::endl;
     }
     init_parameters();
@@ -201,6 +218,8 @@ void Opt::optimize() {
       std::cout << "  R0s: " << q.R0s << std::endl;
       std::cout << "  Z0c: " << q.Z0c << std::endl;
       std::cout << "  Z0s: " << q.Z0s << std::endl;
+      std::cout << "  fc: " << q.fc << std::endl;
+      std::cout << "  fs: " << q.fs << std::endl;
       std::cout << "  iota: " << q.iota << "  r_singularity: " << q.r_singularity_robust << std::endl;
       std::cout << "  L grad B: " << q.grid_min_L_grad_B << "  L grad grad B: " << q.grid_min_L_grad_grad_B << std::endl;
       std::cout << "  B20 variation: " << q.B20_grid_variation << "  min(R0): " << q.grid_min_R0 << std::endl;
@@ -302,6 +321,18 @@ void Opt::init_parameters() {
   for (j = 0; j < vary_Z0s.size(); j++) {
     if (vary_Z0s[j]) {
       if (make_names) state_vector_names.push_back("Z0s[" + std::to_string(j) + "]");
+      n_parameters++;
+    }
+  }
+  for (j = 0; j < vary_fc.size(); j++) {
+    if (vary_fc[j]) {
+      if (make_names) state_vector_names.push_back("fc[" + std::to_string(j) + "]");
+      n_parameters++;
+    }
+  }
+  for (j = 0; j < vary_fs.size(); j++) {
+    if (vary_fs[j]) {
+      if (make_names) state_vector_names.push_back("fs[" + std::to_string(j) + "]");
       n_parameters++;
     }
   }
@@ -498,6 +529,18 @@ void Opt::set_state_vector(qscfloat *state_vector) {
       j++;
     }
   }
+  for (k = 0; k < vary_fc.size(); k++) {
+    if (vary_fc[k]) {
+      state_vector[j] = q.fc[k];
+      j++;
+    }
+  }
+  for (k = 0; k < vary_fs.size(); k++) {
+    if (vary_fs[k]) {
+      state_vector[j] = q.fs[k];
+      j++;
+    }
+  }
   assert (j == n_parameters);
 }
 
@@ -544,6 +587,18 @@ void Opt::unpack_state_vector(qscfloat *state_vector) {
   for (k = 0; k < vary_Z0s.size(); k++) {
     if (vary_Z0s[k]) {
       q.Z0s[k] = state_vector[j];
+      j++;
+    }
+  }
+  for (k = 0; k < vary_fc.size(); k++) {
+    if (vary_fc[k]) {
+      q.fc[k] = state_vector[j];
+      j++;
+    }
+  }
+  for (k = 0; k < vary_fs.size(); k++) {
+    if (vary_fs[k]) {
+      q.fs[k] = state_vector[j];
       j++;
     }
   }
@@ -919,6 +974,8 @@ void gsl_callback(const size_t iter, void *params,
     opt->iter_R0s(j, n_iter) = opt->q.R0s[j];
     opt->iter_Z0c(j, n_iter) = opt->q.Z0c[j];
     opt->iter_Z0s(j, n_iter) = opt->q.Z0s[j];
+    opt->iter_fc(j, n_iter) = opt->q.fc[j];
+    opt->iter_fs(j, n_iter) = opt->q.fs[j];
   }
 
   opt->iter_fourier_refine_step[n_iter] = opt->j_fourier_refine;

@@ -54,6 +54,8 @@ TEST_CASE("Running a standalone opt should yield identical results to a 1-stage 
 	opt.vary_R0s = {false, false};
 	opt.vary_Z0c = {false, false};
 	opt.vary_Z0s = {false, false};
+	opt.vary_fc = {false, false};
+	opt.vary_fs = {false, false};
 	break;
       case 1:
 	// Do vary the axis, except for the major radius
@@ -61,6 +63,8 @@ TEST_CASE("Running a standalone opt should yield identical results to a 1-stage 
 	opt.vary_R0s = {false, true};
 	opt.vary_Z0c = {false, true};
 	opt.vary_Z0s = {false, true};
+	opt.vary_fc = {false, false};
+	opt.vary_fs = {false, false};
 	opt.diff_method = DIFF_METHOD_CENTERED;
 	break;
       case 2:
@@ -69,6 +73,8 @@ TEST_CASE("Running a standalone opt should yield identical results to a 1-stage 
 	opt.vary_R0s = {false, true};
 	opt.vary_Z0c = {false, true};
 	opt.vary_Z0s = {false, true};
+	opt.vary_fc = {false, false};
+	opt.vary_fs = {false, false};
 	opt.diff_method = DIFF_METHOD_FORWARD;
 	break;
       default:
@@ -167,6 +173,8 @@ TEST_CASE("Running a standalone opt should yield identical results to a 1-stage 
       mo.opts[0].vary_R0s = opt.vary_R0s;
       mo.opts[0].vary_Z0c = opt.vary_Z0c;
       mo.opts[0].vary_Z0s = opt.vary_Z0s;
+      mo.opts[0].vary_fc = opt.vary_fc;
+      mo.opts[0].vary_fs = opt.vary_fs;
       mo.opts[0].vary_eta_bar = opt.vary_eta_bar;
       mo.opts[0].vary_sigma0 = opt.vary_sigma0;
       mo.opts[0].vary_B2c = opt.vary_B2c;
@@ -191,6 +199,8 @@ TEST_CASE("Running a standalone opt should yield identical results to a 1-stage 
 	  CHECK(Approx(mo.opts[0].iter_R0s(k, j)) == opt.iter_R0s(k, j));
 	  CHECK(Approx(mo.opts[0].iter_Z0c(k, j)) == opt.iter_Z0c(k, j));
 	  CHECK(Approx(mo.opts[0].iter_Z0s(k, j)) == opt.iter_Z0s(k, j));
+	  CHECK(Approx(mo.opts[0].iter_fc(k, j)) == opt.iter_fc(k, j));
+	  CHECK(Approx(mo.opts[0].iter_fs(k, j)) == opt.iter_fs(k, j));
 	}
 	CHECK(Approx(mo.opts[0].iter_min_R0[j]) == opt.iter_min_R0[j]);
 	CHECK(Approx(mo.opts[0].iter_max_curvature[j]) == opt.iter_max_curvature[j]);
@@ -230,6 +240,8 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
       mo.opts[0].q.R0s = {0.0, 0.0};
       mo.opts[0].q.Z0c = {0.0, 0.0};
       mo.opts[0].q.Z0s = {0.0, 0.17};
+      mo.opts[0].q.fc = {0.0, 0.0};
+      mo.opts[0].q.fs = {0.0, 0.0};
       mo.opts[0].q.eta_bar = 1.0;
       mo.opts[0].q.order_r_option = "r2.1";
       mo.opts[0].fourier_refine = fourier_refine1;
@@ -239,6 +251,8 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
       mo.opts[0].vary_R0s = {false, false};
       mo.opts[0].vary_Z0c = {false, false};
       mo.opts[0].vary_Z0s = {false, true};
+      mo.opts[0].vary_fc = {false, false};
+      mo.opts[0].vary_fs = {false, false};
       mo.opts[0].weight_grad_B = 1.0;
       mo.opts[0].weight_B20 = 0.1;
 
@@ -253,6 +267,8 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
       mo.opts[1].vary_R0s.resize(2 + fourier_refine1, false);
       mo.opts[1].vary_Z0c.resize(2 + fourier_refine1, false);
       mo.opts[1].vary_Z0s.resize(2 + fourier_refine1, false);
+      mo.opts[1].vary_fc.resize(2 + fourier_refine1, false);
+      mo.opts[1].vary_fs.resize(2 + fourier_refine1, false);
       mo.opts[1].vary_Z0s[1] = true;
       for (j = 0; j < fourier_refine1; j++) {
 	mo.opts[1].vary_R0c[j + 2] = true;
@@ -276,6 +292,8 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
       opt0.q.R0s = mo.opts[0].q.R0s;
       opt0.q.Z0c = mo.opts[0].q.Z0c;
       opt0.q.Z0s = mo.opts[0].q.Z0s;
+      opt0.q.fc = mo.opts[0].q.fc;
+      opt0.q.fs = mo.opts[0].q.fs;
       
       opt0.diff_method = mo.opts[0].diff_method;
       opt0.max_iter = mo.opts[0].max_iter;
@@ -288,6 +306,8 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
       opt0.vary_R0s = mo.opts[0].vary_R0s;
       opt0.vary_Z0c = mo.opts[0].vary_Z0c;
       opt0.vary_Z0s = mo.opts[0].vary_Z0s;
+      opt0.vary_fc = mo.opts[0].vary_fc;
+      opt0.vary_fs = mo.opts[0].vary_fs;
       opt0.weight_grad_B = mo.opts[0].weight_grad_B;
       opt0.weight_B20 = mo.opts[0].weight_B20;
       
@@ -298,10 +318,14 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
       CHECK(mo.opts[1].q.R0s.size() == newsize);
       CHECK(mo.opts[1].q.Z0c.size() == newsize);
       CHECK(mo.opts[1].q.Z0s.size() == newsize);
+      CHECK(mo.opts[1].q.fc.size() == newsize);
+      CHECK(mo.opts[1].q.fs.size() == newsize);
       CHECK(mo.opts[1].vary_R0c.size() == newsize);
       CHECK(mo.opts[1].vary_R0s.size() == newsize);
       CHECK(mo.opts[1].vary_Z0c.size() == newsize);
       CHECK(mo.opts[1].vary_Z0s.size() == newsize);
+      CHECK(mo.opts[1].vary_fc.size() == newsize);
+      CHECK(mo.opts[1].vary_fs.size() == newsize);
 
       for (j = 0; j < newsize; j++) {
 	CAPTURE(j);
@@ -329,6 +353,8 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
 	CHECK(Approx(mo.opts[0].iter_R0s(k, index)) == mo.opts[1].iter_R0s(k, 0));
 	CHECK(Approx(mo.opts[0].iter_Z0c(k, index)) == mo.opts[1].iter_Z0c(k, 0));
 	CHECK(Approx(mo.opts[0].iter_Z0s(k, index)) == mo.opts[1].iter_Z0s(k, 0));
+	CHECK(Approx(mo.opts[0].iter_fc(k, index)) == mo.opts[1].iter_fc(k, 0));
+	CHECK(Approx(mo.opts[0].iter_fs(k, index)) == mo.opts[1].iter_fs(k, 0));
       }
       // At the start of stage 1, the new Fourier modes which were not in stage 0 should all be 0:
       for (k = 2 + fourier_refine1; k < newsize; k++) {
@@ -336,6 +362,8 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
 	CHECK(Approx(mo.opts[1].iter_R0s(k, 0)) == 0.0);
 	CHECK(Approx(mo.opts[1].iter_Z0c(k, 0)) == 0.0);
 	CHECK(Approx(mo.opts[1].iter_Z0s(k, 0)) == 0.0);
+	CHECK(Approx(mo.opts[1].iter_fc(k, 0)) == 0.0);
+	CHECK(Approx(mo.opts[1].iter_fs(k, 0)) == 0.0);
       }
 
       // Now that the multiopt has run, we know the initial conditions
@@ -357,6 +385,8 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
 	opt1.q.R0s[k] = mo.opts[0].iter_R0s(k, index);
 	opt1.q.Z0c[k] = mo.opts[0].iter_Z0c(k, index);
 	opt1.q.Z0s[k] = mo.opts[0].iter_Z0s(k, index);
+	opt1.q.fc[k] = mo.opts[0].iter_fc(k, index);
+	opt1.q.fs[k] = mo.opts[0].iter_fs(k, index);
       }
       
       opt1.diff_method = mo.opts[1].diff_method;
@@ -370,6 +400,8 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
       opt1.vary_R0s.resize(2 + fourier_refine1, false);
       opt1.vary_Z0c.resize(2 + fourier_refine1, false);
       opt1.vary_Z0s.resize(2 + fourier_refine1, true);
+      opt1.vary_fc.resize(2 + fourier_refine1, false);
+      opt1.vary_fs.resize(2 + fourier_refine1, false);
       opt1.vary_R0c[0] = false;
       opt1.vary_R0c[1] = false;
       opt1.vary_Z0s[0] = false;
@@ -397,6 +429,8 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
 	  CHECK(Approx(mo.opts[0].iter_R0s(k, j)) == opt0.iter_R0s(k, j));
 	  CHECK(Approx(mo.opts[0].iter_Z0c(k, j)) == opt0.iter_Z0c(k, j));
 	  CHECK(Approx(mo.opts[0].iter_Z0s(k, j)) == opt0.iter_Z0s(k, j));
+	  CHECK(Approx(mo.opts[0].iter_fc(k, j)) == opt0.iter_fc(k, j));
+	  CHECK(Approx(mo.opts[0].iter_fs(k, j)) == opt0.iter_fs(k, j));
 	}
 	CHECK(Approx(mo.opts[0].iter_min_R0[j]) == opt0.iter_min_R0[j]);
 	CHECK(Approx(mo.opts[0].iter_max_curvature[j]) == opt0.iter_max_curvature[j]);
@@ -426,6 +460,8 @@ TEST_CASE("Check that 2-stage multiopt jobs work for any choice of Fourier refin
 	  CHECK(Approx(mo.opts[1].iter_R0s(k, j)) == opt1.iter_R0s(k, j));
 	  CHECK(Approx(mo.opts[1].iter_Z0c(k, j)) == opt1.iter_Z0c(k, j));
 	  CHECK(Approx(mo.opts[1].iter_Z0s(k, j)) == opt1.iter_Z0s(k, j));
+	  CHECK(Approx(mo.opts[1].iter_fc(k, j)) == opt1.iter_fc(k, j));
+	  CHECK(Approx(mo.opts[1].iter_fs(k, j)) == opt1.iter_fs(k, j));
 	}
 	CHECK(Approx(mo.opts[1].iter_min_R0[j]) == opt1.iter_min_R0[j]);
 	CHECK(Approx(mo.opts[1].iter_max_curvature[j]) == opt1.iter_max_curvature[j]);
@@ -465,6 +501,8 @@ TEST_CASE("Check that using a stage-dependent nphi works. [multiopt]") {
       mo.opts[0].q.R0s = {0.0, 0.0};
       mo.opts[0].q.Z0c = {0.0, 0.0};
       mo.opts[0].q.Z0s = {0.0, 0.17};
+      mo.opts[0].q.fc = {0.0, 0.0};
+      mo.opts[0].q.fs = {0.0, 0.0};
       mo.opts[0].q.eta_bar = 1.0;
       mo.opts[0].q.order_r_option = "r2.1";
       mo.opts[0].fourier_refine = fourier_refine1;
@@ -474,6 +512,8 @@ TEST_CASE("Check that using a stage-dependent nphi works. [multiopt]") {
       mo.opts[0].vary_R0s = {false, false};
       mo.opts[0].vary_Z0c = {false, false};
       mo.opts[0].vary_Z0s = {false, true};
+      mo.opts[0].vary_fc = {false, false};
+      mo.opts[0].vary_fs = {false, false};
       mo.opts[0].weight_grad_B = 1.0;
       mo.opts[0].weight_B20 = 0.1;
 
@@ -489,6 +529,8 @@ TEST_CASE("Check that using a stage-dependent nphi works. [multiopt]") {
       mo.opts[1].vary_R0s.resize(2 + fourier_refine1, false);
       mo.opts[1].vary_Z0c.resize(2 + fourier_refine1, false);
       mo.opts[1].vary_Z0s.resize(2 + fourier_refine1, false);
+      mo.opts[1].vary_fc.resize(2 + fourier_refine1, false);
+      mo.opts[1].vary_fs.resize(2 + fourier_refine1, false);
       mo.opts[1].vary_Z0s[1] = true;
       for (j = 0; j < fourier_refine1; j++) {
 	mo.opts[1].vary_R0c[j + 2] = true;
@@ -512,6 +554,8 @@ TEST_CASE("Check that using a stage-dependent nphi works. [multiopt]") {
       opt0.q.R0s = mo.opts[0].q.R0s;
       opt0.q.Z0c = mo.opts[0].q.Z0c;
       opt0.q.Z0s = mo.opts[0].q.Z0s;
+      opt0.q.fc = mo.opts[0].q.fc;
+      opt0.q.fs = mo.opts[0].q.fs;
       
       opt0.diff_method = mo.opts[0].diff_method;
       opt0.max_iter = mo.opts[0].max_iter;
@@ -524,6 +568,8 @@ TEST_CASE("Check that using a stage-dependent nphi works. [multiopt]") {
       opt0.vary_R0s = mo.opts[0].vary_R0s;
       opt0.vary_Z0c = mo.opts[0].vary_Z0c;
       opt0.vary_Z0s = mo.opts[0].vary_Z0s;
+      opt0.vary_fc = mo.opts[0].vary_fc;
+      opt0.vary_fs = mo.opts[0].vary_fs;
       opt0.weight_grad_B = mo.opts[0].weight_grad_B;
       opt0.weight_B20 = mo.opts[0].weight_B20;
       
@@ -534,10 +580,14 @@ TEST_CASE("Check that using a stage-dependent nphi works. [multiopt]") {
       CHECK(mo.opts[1].q.R0s.size() == newsize);
       CHECK(mo.opts[1].q.Z0c.size() == newsize);
       CHECK(mo.opts[1].q.Z0s.size() == newsize);
+      CHECK(mo.opts[1].q.fc.size() == newsize);
+      CHECK(mo.opts[1].q.fs.size() == newsize);
       CHECK(mo.opts[1].vary_R0c.size() == newsize);
       CHECK(mo.opts[1].vary_R0s.size() == newsize);
       CHECK(mo.opts[1].vary_Z0c.size() == newsize);
       CHECK(mo.opts[1].vary_Z0s.size() == newsize);
+      CHECK(mo.opts[1].vary_fc.size() == newsize);
+      CHECK(mo.opts[1].vary_fs.size() == newsize);
 
       for (j = 0; j < newsize; j++) {
 	CAPTURE(j);
@@ -565,6 +615,8 @@ TEST_CASE("Check that using a stage-dependent nphi works. [multiopt]") {
 	CHECK(Approx(mo.opts[0].iter_R0s(k, index)) == mo.opts[1].iter_R0s(k, 0));
 	CHECK(Approx(mo.opts[0].iter_Z0c(k, index)) == mo.opts[1].iter_Z0c(k, 0));
 	CHECK(Approx(mo.opts[0].iter_Z0s(k, index)) == mo.opts[1].iter_Z0s(k, 0));
+	CHECK(Approx(mo.opts[0].iter_fc(k, index)) == mo.opts[1].iter_fc(k, 0));
+	CHECK(Approx(mo.opts[0].iter_fs(k, index)) == mo.opts[1].iter_fs(k, 0));
       }
       // At the start of stage 1, the new Fourier modes which were not in stage 0 should all be 0:
       for (k = 2 + fourier_refine1; k < newsize; k++) {
@@ -572,6 +624,8 @@ TEST_CASE("Check that using a stage-dependent nphi works. [multiopt]") {
 	CHECK(Approx(mo.opts[1].iter_R0s(k, 0)) == 0.0);
 	CHECK(Approx(mo.opts[1].iter_Z0c(k, 0)) == 0.0);
 	CHECK(Approx(mo.opts[1].iter_Z0s(k, 0)) == 0.0);
+	CHECK(Approx(mo.opts[1].iter_fc(k, 0)) == 0.0);
+	CHECK(Approx(mo.opts[1].iter_fs(k, 0)) == 0.0);
       }
 
       // Now that the multiopt has run, we know the initial conditions
@@ -593,6 +647,8 @@ TEST_CASE("Check that using a stage-dependent nphi works. [multiopt]") {
 	opt1.q.R0s[k] = mo.opts[0].iter_R0s(k, index);
 	opt1.q.Z0c[k] = mo.opts[0].iter_Z0c(k, index);
 	opt1.q.Z0s[k] = mo.opts[0].iter_Z0s(k, index);
+	opt1.q.fc[k] = mo.opts[0].iter_fc(k, index);
+	opt1.q.fs[k] = mo.opts[0].iter_fs(k, index);
       }
       
       opt1.diff_method = mo.opts[1].diff_method;
@@ -606,6 +662,8 @@ TEST_CASE("Check that using a stage-dependent nphi works. [multiopt]") {
       opt1.vary_R0s.resize(2 + fourier_refine1, false);
       opt1.vary_Z0c.resize(2 + fourier_refine1, false);
       opt1.vary_Z0s.resize(2 + fourier_refine1, true);
+      opt1.vary_fc.resize(2 + fourier_refine1, false);
+      opt1.vary_fs.resize(2 + fourier_refine1, false);
       opt1.vary_R0c[0] = false;
       opt1.vary_R0c[1] = false;
       opt1.vary_Z0s[0] = false;
@@ -633,6 +691,8 @@ TEST_CASE("Check that using a stage-dependent nphi works. [multiopt]") {
 	  CHECK(Approx(mo.opts[0].iter_R0s(k, j)) == opt0.iter_R0s(k, j));
 	  CHECK(Approx(mo.opts[0].iter_Z0c(k, j)) == opt0.iter_Z0c(k, j));
 	  CHECK(Approx(mo.opts[0].iter_Z0s(k, j)) == opt0.iter_Z0s(k, j));
+	  CHECK(Approx(mo.opts[0].iter_fc(k, j)) == opt0.iter_fc(k, j));
+	  CHECK(Approx(mo.opts[0].iter_fs(k, j)) == opt0.iter_fs(k, j));
 	}
 	CHECK(Approx(mo.opts[0].iter_min_R0[j]) == opt0.iter_min_R0[j]);
 	CHECK(Approx(mo.opts[0].iter_max_curvature[j]) == opt0.iter_max_curvature[j]);
@@ -662,6 +722,8 @@ TEST_CASE("Check that using a stage-dependent nphi works. [multiopt]") {
 	  CHECK(Approx(mo.opts[1].iter_R0s(k, j)) == opt1.iter_R0s(k, j));
 	  CHECK(Approx(mo.opts[1].iter_Z0c(k, j)) == opt1.iter_Z0c(k, j));
 	  CHECK(Approx(mo.opts[1].iter_Z0s(k, j)) == opt1.iter_Z0s(k, j));
+	  CHECK(Approx(mo.opts[1].iter_fc(k, j)) == opt1.iter_fc(k, j));
+	  CHECK(Approx(mo.opts[1].iter_fs(k, j)) == opt1.iter_fs(k, j));
 	}
 	CHECK(Approx(mo.opts[1].iter_min_R0[j]) == opt1.iter_min_R0[j]);
 	CHECK(Approx(mo.opts[1].iter_max_curvature[j]) == opt1.iter_max_curvature[j]);

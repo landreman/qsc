@@ -40,6 +40,8 @@ void Opt::allocate() {
   iter_R0s.resize(q.R0c.size() + fourier_refine, max_iter, 0.0);
   iter_Z0c.resize(q.R0c.size() + fourier_refine, max_iter, 0.0);
   iter_Z0s.resize(q.R0c.size() + fourier_refine, max_iter, 0.0);
+  iter_fc.resize(q.R0c.size() + fourier_refine, max_iter, 0.0);
+  iter_fs.resize(q.R0c.size() + fourier_refine, max_iter, 0.0);
   
   iter_min_R0.resize(max_iter, 0.0);
   iter_max_curvature.resize(max_iter, 0.0);

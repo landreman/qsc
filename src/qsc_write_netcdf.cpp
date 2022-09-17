@@ -93,6 +93,7 @@ void Qsc::write_netcdf(std::string filename) {
 
   // 1D arrays
   nc.put(nphi_dim, "phi", phi, "The grid in the standard toroidal angle phi", "dimensionless");
+  nc.put(nphi_dim, "phi0", phi0, "The grid in the curve parameter phi0", "dimensionless");
   nc.put(nphi_dim, "curvature", curvature, "Curvature kappa of the magnetic axis", "1/meter");
   nc.put(nphi_dim, "torsion", torsion, "Torsion tau of the magnetic axis", "1/meter");
   nc.put(nphi_dim, "sigma", sigma, "Y1c / Y1s, appearing in eq (2.14) of Landreman and Sengupta, J Plasma Physics (2019)", "dimensionless");
