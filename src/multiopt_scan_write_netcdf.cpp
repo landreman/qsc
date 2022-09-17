@@ -159,6 +159,7 @@ void MultiOptScan::write_netcdf() {
   nc.put(n_scan_dim, "scan_weight_axis_length", scan_weight_axis_length, " ", "dimensionless");
   nc.put(n_scan_dim, "scan_target_axis_length", scan_target_axis_length, " ", "meters");
   nc.put(n_scan_dim, "scan_weight_standard_deviation_of_R", scan_weight_standard_deviation_of_R, " ", "dimensionless");
+  nc.put(n_scan_dim, "scan_weight_arclength_variance", scan_weight_arclength_variance, " ", "dimensionless");
   nc.put(n_scan_dim, "scan_weight_B20_mean", scan_weight_B20_mean, " ", "dimensionless");
 
   // ND arrays for N > 1:

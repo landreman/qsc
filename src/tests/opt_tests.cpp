@@ -42,6 +42,7 @@ TEST_CASE("The objective function should equal 1/2 * sum(residuals^2) [opt]") {
       opt.weight_r_singularity = 12.0;
       opt.weight_axis_length = 13.0;
       opt.weight_standard_deviation_of_R = 14.0;
+      opt.weight_arclength_variance = 14.5;
       opt.weight_B20_mean = 15.0;
       break;
     case 1:
@@ -258,6 +259,10 @@ TEST_CASE("Compute each optimization term a different way and make sure we get t
     temp = opt.q.d_l_d_phi0 * (opt.q.R0 - opt.q.mean_R) * (opt.q.R0 - opt.q.mean_R);
     CHECK(Approx(temp.sum() / denominator) == opt.standard_deviation_of_R_term);
 
+    temp = opt.q.d_l_d_phi0 * (opt.q.d_l_d_phi0 - opt.q.arclength_mean) * (opt.q.d_l_d_phi0 - opt.q.arclength_mean);
+    CHECK(Approx(temp.sum() / denominator) == opt.arclength_variance_term);
+    CHECK(Approx(opt.arclength_variance_term) == opt.q.arclength_variance);
+
     temp = opt.q.d_l_d_phi0 * opt.q.B20 * opt.q.B20;
     CHECK(Approx(temp.sum() / denominator) == opt.B20_mean_term);
   }
@@ -301,6 +306,7 @@ TEST_CASE("Each term in the objective function should be approximately independe
   o1.weight_r_singularity = 12.0;
   o1.weight_axis_length = 13.0;
   o1.weight_standard_deviation_of_R = 14.0;
+  o1.weight_arclength_variance = 14.5;
   o1.weight_B20_mean = 15.0;
   
   o2.weight_B20 = 2.0;
@@ -324,6 +330,7 @@ TEST_CASE("Each term in the objective function should be approximately independe
   o2.weight_r_singularity = 12.0;
   o2.weight_axis_length = 13.0;
   o2.weight_standard_deviation_of_R = 14.0;
+  o2.weight_arclength_variance = 14.5;
   o2.weight_B20_mean = 15.0;
 
   o1.init_parameters();
@@ -358,6 +365,7 @@ TEST_CASE("Each term in the objective function should be approximately independe
   CHECK(Approx(o1.r_singularity_term).epsilon(tol) == o2.r_singularity_term);
   CHECK(Approx(o1.axis_length_term).epsilon(tol) == o2.axis_length_term);
   CHECK(Approx(o1.standard_deviation_of_R_term).epsilon(tol) == o2.standard_deviation_of_R_term);
+  CHECK(Approx(o1.arclength_variance_term).epsilon(tol) == o2.arclength_variance_term);
   CHECK(Approx(o1.B20_mean_term).epsilon(tol) == o2.B20_mean_term);
 
 }
@@ -407,6 +415,7 @@ TEST_CASE("Running standalone QSC on each configuration in the optimization hist
       opt.weight_r_singularity = 12.0;
       opt.weight_axis_length = 13.0;
       opt.weight_standard_deviation_of_R = 14.0;
+      opt.weight_arclength_variance = 14.5;
       opt.weight_B20_mean = 15.0;
       
       switch (vary_axis_option) {

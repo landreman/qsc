@@ -45,6 +45,7 @@ TEST_CASE("Running a standalone opt should yield identical results to a 1-stage 
       opt.weight_r_singularity = 12.0;
       opt.weight_axis_length = 13.0;
       opt.weight_standard_deviation_of_R = 14.0;
+      opt.weight_arclength_variance = 14.5;
       opt.weight_B20_mean = 15.0;
       
       switch (vary_axis_option) {
@@ -187,6 +188,7 @@ TEST_CASE("Running a standalone opt should yield identical results to a 1-stage 
       mo.opts[0].weight_r_singularity = opt.weight_r_singularity;
       mo.opts[0].weight_axis_length = opt.weight_axis_length;
       mo.opts[0].weight_standard_deviation_of_R = opt.weight_standard_deviation_of_R;
+      mo.opts[0].weight_arclength_variance = opt.weight_arclength_variance;
       mo.opts[0].weight_B20_mean = opt.weight_B20_mean;
       
       mo.opts[0].vary_R0c = opt.vary_R0c;

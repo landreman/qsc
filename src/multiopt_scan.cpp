@@ -335,6 +335,10 @@ void MultiOptScan::eval_scan_index(int j_scan) {
 	mo.opts[stage].weight_standard_deviation_of_R = val;
 	if (verbose > 1) std::cout << "Setting weight_standard_deviation_of_R for opt stage " << stage << " to " << val << std::endl;
 	
+      } else if (params[j].compare("weight_arclength_variance") == 0) {
+	mo.opts[stage].weight_arclength_variance = val;
+	if (verbose > 1) std::cout << "Setting weight_arclength_variance for opt stage " << stage << " to " << val << std::endl;
+	
       } else if (params[j].compare("weight_XY2") == 0) {
 	mo.opts[stage].weight_XY2 = val;
 	if (verbose > 1) std::cout << "Setting weight_XY2 for opt stage " << stage << " to " << val << std::endl;
@@ -570,7 +574,8 @@ void MultiOptScan::eval_scan_index(int j_scan) {
   parameters_single[51] = mo.opts[index].weight_axis_length;
   parameters_single[52] = mo.opts[index].target_axis_length;
   parameters_single[53] = mo.opts[index].weight_standard_deviation_of_R;
-  parameters_single[54] = mo.opts[index].weight_B20_mean;
+  parameters_single[54] = mo.opts[index].weight_arclength_variance;
+  parameters_single[55] = mo.opts[index].weight_B20_mean;
 
   for (j = 0; j < axis_nmax_plus_1; j++) {
     parameters_single[j + 0 * axis_nmax_plus_1 + n_parameters_base] = mo.opts[index].q.R0c[j];
@@ -728,6 +733,7 @@ void MultiOptScan::filter_global_arrays() {
   scan_weight_axis_length.resize(n_scan, 0.0);
   scan_target_axis_length.resize(n_scan, 0.0);
   scan_weight_standard_deviation_of_R.resize(n_scan, 0.0);
+  scan_weight_arclength_variance.resize(n_scan, 0.0);
   scan_weight_B20_mean.resize(n_scan, 0.0);
     
   // Unpack parameters.
@@ -795,7 +801,8 @@ void MultiOptScan::filter_global_arrays() {
     scan_weight_axis_length[j]             = parameters(51, j_global);
     scan_target_axis_length[j]             = parameters(52, j_global);
     scan_weight_standard_deviation_of_R[j] = parameters(53, j_global);
-    scan_weight_B20_mean[j]                = parameters(54, j_global);
+    scan_weight_arclength_variance[j]      = parameters(54, j_global);
+    scan_weight_B20_mean[j]                = parameters(55, j_global);
     
     for (k = 0; k < axis_nmax_plus_1; k++) {
       scan_R0c(k, j) = parameters(k + 0 * axis_nmax_plus_1 + n_parameters_base, j_global);

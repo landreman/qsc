@@ -144,7 +144,7 @@ void Qsc::init_axis() {
   standard_deviation_of_Z = sqrt(tempvec.sum() * d_phi0 * nfp / axis_length);
 
   tempvec = d_l_d_phi0 * d_l_d_phi0;
-  qscfloat arclength_mean = tempvec.sum() * d_phi0 * nfp / axis_length;
+  arclength_mean = tempvec.sum() * d_phi0 * nfp / axis_length;
   tempvec = (d_l_d_phi0 - arclength_mean) * (d_l_d_phi0 - arclength_mean) * d_l_d_phi0;
   arclength_variance = tempvec.sum() * d_phi0 * nfp / axis_length;
     

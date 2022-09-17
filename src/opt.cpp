@@ -54,6 +54,7 @@ void Opt::defaults() {
   weight_axis_length = -1.0;
   target_axis_length = 0.0;
   weight_standard_deviation_of_R = -1.0;
+  weight_arclength_variance = -1.0;
   weight_B20_mean = -1.0;
 }
 

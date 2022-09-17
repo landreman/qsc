@@ -226,6 +226,7 @@ void Opt::optimize() {
       std::cout << "  d2 volume / d psi2: " << q.d2_volume_d_psi2 << std::endl;
       std::cout << "  DMerc_times_r2: " << q.DMerc_times_r2 << std::endl;
       std::cout << "  axis_length: " << q.axis_length << "  stddev(R): " << q.standard_deviation_of_R << std::endl;
+      std::cout << "  arclength_variance: " << q.arclength_variance << std::endl;
     }
     
     gsl_multifit_nlinear_free(work);
@@ -457,6 +458,11 @@ void Opt::init_residuals() {
     if (make_names)
       for (j = 0; j < q.nphi; j++) residual_names.push_back("standard_deviation_of_R[" + std::to_string(j) + "]");
   }
+  if (weight_arclength_variance > 0) {
+    n_terms += q.nphi;
+    if (make_names)
+      for (j = 0; j < q.nphi; j++) residual_names.push_back("arclength_variance[" + std::to_string(j) + "]");
+  }
   if (weight_B20_mean > 0) {
     n_terms += q.nphi;
     if (make_names)
@@ -635,6 +641,7 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   r_singularity_term = 0.0;
   axis_length_term = 0.0;
   standard_deviation_of_R_term = 0.0;
+  arclength_variance_term = 0.0;
   B20_mean_term = 0.0;
 
   // The order of terms here must match the order in Opt::init_residuals().
@@ -867,6 +874,12 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
   }
 
   for (k = 0; k < q.nphi; k++) {
+    term = arclength_factor[k] * (q.d_l_d_phi0[k] - q.arclength_mean);
+    arclength_variance_term += term * term;
+    if (weight_arclength_variance > 0) residuals[j++] = weight_arclength_variance * term;
+  }
+
+  for (k = 0; k < q.nphi; k++) {
     term = arclength_factor[k] * q.B20[k];
     B20_mean_term += term * term;
     if (weight_B20_mean > 0) residuals[j++] = weight_B20_mean * term;
@@ -876,12 +889,14 @@ void Opt::set_residuals(gsl_vector* gsl_residual) {
     weight_d2_volume_d_psi2, weight_DMerc_times_r2,
     weight_XY2, weight_XY2Prime, weight_XY2PrimePrime, weight_Z2, weight_Z2Prime, weight_XY3, weight_XY3Prime, weight_XY3PrimePrime,
     weight_grad_B, weight_grad_grad_B, weight_r_singularity,
-    weight_axis_length, weight_standard_deviation_of_R, weight_B20_mean};
+    weight_axis_length, weight_standard_deviation_of_R,
+    weight_arclength_variance, weight_B20_mean};
 
   Vector terms = {B20_term, iota_term, elongation_term, curvature_term,
 		  R0_term, d2_volume_d_psi2_term, DMerc_times_r2_term, XY2_term, XY2Prime_term, XY2PrimePrime_term, Z2_term, Z2Prime_term,
     XY3_term, XY3Prime_term, XY3PrimePrime_term, grad_B_term, grad_grad_B_term, r_singularity_term,
-    axis_length_term, standard_deviation_of_R_term, B20_mean_term};
+    axis_length_term, standard_deviation_of_R_term,
+    arclength_variance_term, B20_mean_term};
 
   assert (weights.size() == terms.size());
   for (k = 0; k < terms.size(); k++) {
@@ -949,6 +964,7 @@ void gsl_callback(const size_t iter, void *params,
   opt->iter_r_singularity_term[n_iter] = opt->r_singularity_term;
   opt->iter_axis_length_term[n_iter] = opt->axis_length_term;
   opt->iter_standard_deviation_of_R_term[n_iter] = opt->standard_deviation_of_R_term;
+  opt->iter_arclength_variance_term[n_iter] = opt->arclength_variance_term;
   opt->iter_B20_mean_term[n_iter] = opt->B20_mean_term;
 
   opt->iter_eta_bar[n_iter] = opt->q.eta_bar;
