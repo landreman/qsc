@@ -201,7 +201,7 @@ void Opt::optimize() {
     
     // Run the optimization
     gsl_multifit_nlinear_init(gsl_state_vector, &gsl_optimizer, work);
-    gsl_multifit_nlinear_driver(max_iter_for_gsl, xtol, gtol, ftol,
+    gsl_multifit_nlinear_driver(max_iter_for_gsl, (double)xtol, (double)gtol, (double)ftol,
 				gsl_callback, (void*)this, &info, work);
     n_evals += gsl_optimizer.nevalf;
     
