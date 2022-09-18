@@ -188,9 +188,9 @@ void Opt::optimize() {
       throw std::runtime_error("Unrecognized diff_method.");
     }
     const gsl_multifit_nlinear_type *T = gsl_multifit_nlinear_trust;
-    const double xtol = 1.0e-8;
-    const double gtol = 1.0e-8;
-    const double ftol = 1.0e-8;
+    //const double xtol = 1.0e-8;
+    //const double gtol = 1.0e-8;
+    //const double ftol = 1.0e-8;
     gsl_multifit_nlinear_workspace *work = gsl_multifit_nlinear_alloc(T, &gsl_optimizer_params, n_terms, n_parameters);
     gsl_vector * f = gsl_multifit_nlinear_residual(work);
     gsl_vector * x = gsl_multifit_nlinear_position(work);

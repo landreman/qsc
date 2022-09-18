@@ -18,6 +18,9 @@ void Opt::write_netcdf() {
   // Scalars
   nc.put("n_iter", n_iter, "Number of optimization iterations saved", "dimensionless");
   nc.put("n_evals", n_evals, "Number of evaluations of the objective function", "dimensionless");
+  nc.put("ftol", ftol, "Stopping tolerance for the optimization algorithm", "dimensionless");
+  nc.put("gtol", gtol, "Stopping tolerance for the optimization algorithm", "dimensionless");
+  nc.put("xtol", xtol, "Stopping tolerance for the optimization algorithm", "dimensionless");
   
   nc.put("weight_B20", weight_B20, "Weight for the B20 term in the objective function for optimization", "dimensionless");
   nc.put("weight_iota", weight_iota, "Weight for the iota term in the objective function for optimization", "dimensionless");

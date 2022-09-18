@@ -90,6 +90,23 @@ void Qsc::calculate() {
   }
 
   if (verbose > 0) {
+    std::cout << "Final configuration:" << std::endl;
+    std::cout << "  eta_bar: " << eta_bar << "  sigma0: " << sigma0 << std::endl;
+    std::cout << "  B2c: " << B2c << "  B2s: " << B2s << std::endl;
+    std::cout << "  R0c: " << R0c << std::endl;
+    std::cout << "  R0s: " << R0s << std::endl;
+    std::cout << "  Z0c: " << Z0c << std::endl;
+    std::cout << "  Z0s: " << Z0s << std::endl;
+    std::cout << "  fc: " << fc << std::endl;
+    std::cout << "  fs: " << fs << std::endl;
+    std::cout << "  iota: " << iota << "  r_singularity: " << r_singularity_robust << std::endl;
+    std::cout << "  L grad B: " << grid_min_L_grad_B << "  L grad grad B: " << grid_min_L_grad_grad_B << std::endl;
+    std::cout << "  B20 variation: " << B20_grid_variation << "  min(R0): " << grid_min_R0 << std::endl;
+    std::cout << "  d2 volume / d psi2: " << d2_volume_d_psi2 << std::endl;
+    std::cout << "  DMerc_times_r2: " << DMerc_times_r2 << std::endl;
+    std::cout << "  axis_length: " << axis_length << "  stddev(R): " << standard_deviation_of_R << std::endl;
+    std::cout << "  arclength_variance: " << arclength_variance << std::endl;
+      
     auto end = std::chrono::steady_clock::now();
     std::chrono::duration<double> elapsed = end - start;
     std::cout << "Time for calculate(): "

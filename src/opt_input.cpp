@@ -67,6 +67,9 @@ void Opt::input(std::string filename) {
   toml_read(varlist, indata, "weight_arclength_variance", weight_arclength_variance);
   toml_read(varlist, indata, "weight_B20_mean", weight_B20_mean);
   
+  toml_read(varlist, indata, "xtol", xtol);
+  toml_read(varlist, indata, "gtol", gtol);
+  toml_read(varlist, indata, "ftol", ftol);
   toml_read(varlist, indata, "max_iter", max_iter);
   toml_read(varlist, indata, "verbose", verbose);
   toml_read(varlist, indata, "make_names", make_names);
@@ -128,6 +131,7 @@ void Opt::input(std::string filename) {
       throw std::runtime_error("Should not get here");
     }
     std::cout << std::endl;
+    std::cout << "ftol: " << ftol << "  gtol: " << gtol << "  xtol: " << xtol << std::endl;
     
     std::cout << "vary_eta_bar: " << vary_eta_bar << std::endl;
     std::cout << "vary_sigma0: " << vary_sigma0 << std::endl;

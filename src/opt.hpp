@@ -42,6 +42,7 @@ namespace qsc {
     bool refine_angle_shift;
     diff_method_type diff_method;
     std::valarray<int> nphi;
+    double ftol, gtol, xtol;
 
     bool vary_eta_bar, vary_sigma0;
     bool vary_B2c, vary_B2s;

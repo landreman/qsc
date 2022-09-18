@@ -13,6 +13,9 @@ void Opt::defaults() {
   toml_group = "opt";
   diff_method = DIFF_METHOD_FORWARD;
   n_evals = 0;
+  ftol = 1e-8;
+  gtol = 1e-8;
+  xtol = 1e-8;
 
   vary_eta_bar = true;
   vary_sigma0 = false;
