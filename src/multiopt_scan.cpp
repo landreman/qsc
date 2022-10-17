@@ -387,6 +387,26 @@ void MultiOptScan::eval_scan_index(int j_scan) {
 	mo.opts[stage].min_DMerc_times_r2 = val;
 	if (verbose > 1) std::cout << "Setting min_DMerc_times_r2 for opt stage " << stage << " to " << val << std::endl;
 	
+      } else if (params[j].compare("eta_bar") == 0) {
+	mo.opts[stage].q.eta_bar = val;
+	if (verbose > 1) std::cout << "Setting eta_bar for opt stage " << stage << " to " << val << std::endl;
+	if (stage != 0) throw std::runtime_error("In a multiopt_scan, eta_bar should only be set at stage 0.");
+	
+      } else if (params[j].compare("p2") == 0) {
+	mo.opts[stage].q.p2 = val;
+	if (verbose > 1) std::cout << "Setting p2 for opt stage " << stage << " to " << val << std::endl;
+	if (stage != 0) throw std::runtime_error("In a multiopt_scan, p2 should only be set at stage 0.");
+	
+      } else if (params[j].compare("B2c") == 0) {
+	mo.opts[stage].q.B2c = val;
+	if (verbose > 1) std::cout << "Setting B2c for opt stage " << stage << " to " << val << std::endl;
+	if (stage != 0) throw std::runtime_error("In a multiopt_scan, B2c should only be set at stage 0.");
+
+      } else if (params[j].compare("B2s") == 0) {
+	mo.opts[stage].q.B2s = val;
+	if (verbose > 1) std::cout << "Setting B2s for opt stage " << stage << " to " << val << std::endl;
+	if (stage != 0) throw std::runtime_error("In a multiopt_scan, B2s should only be set at stage 0.");
+
       } else {
 	std::cout << "Unrecognized entry in params: " << params[j] << std::endl;
 	throw std::runtime_error("Unrecognized entry in params");
@@ -543,33 +563,37 @@ void MultiOptScan::eval_scan_index(int j_scan) {
   parameters_single[25] = mo.opts[index].q.grid_max_d2_XY2_d_varphi2;
   parameters_single[26] = mo.opts[index].q.grid_max_d2_XY3_d_varphi2;
   parameters_single[27] = mo.opts[index].q.axis_length;
+  parameters_single[28] = mo.opts[index].q.p2;
+  parameters_single[29] = mo.opts[0].iter_eta_bar[0];
+  parameters_single[30] = mo.opts[0].iter_B2c[0];
+  parameters_single[31] = mo.opts[0].iter_B2s[0];
     
-  parameters_single[28] = mo.opts[index].weight_B20;
-  parameters_single[29] = mo.opts[index].weight_iota;
-  parameters_single[30] = mo.opts[index].target_iota;
-  parameters_single[31] = mo.opts[index].weight_elongation;
-  parameters_single[32] = mo.opts[index].weight_curvature;
-  parameters_single[33] = mo.opts[index].weight_R0;
-  parameters_single[34] = mo.opts[index].min_R0;
-  parameters_single[35] = mo.opts[index].weight_d2_volume_d_psi2;
-  parameters_single[36] = mo.opts[index].max_d2_volume_d_psi2;
-  parameters_single[37] = mo.opts[index].weight_DMerc_times_r2;
-  parameters_single[38] = mo.opts[index].min_DMerc_times_r2;
-  parameters_single[39] = mo.opts[index].weight_XY2;
-  parameters_single[40] = mo.opts[index].weight_XY2Prime;
-  parameters_single[41] = mo.opts[index].weight_XY2PrimePrime;
-  parameters_single[42] = mo.opts[index].weight_Z2;
-  parameters_single[43] = mo.opts[index].weight_Z2Prime;
-  parameters_single[44] = mo.opts[index].weight_XY3;
-  parameters_single[45] = mo.opts[index].weight_XY3Prime;
-  parameters_single[46] = mo.opts[index].weight_XY3PrimePrime;
-  parameters_single[47] = mo.opts[index].weight_grad_B;
-  parameters_single[48] = mo.opts[index].weight_grad_grad_B;
-  parameters_single[49] = mo.opts[index].weight_r_singularity;
-  parameters_single[50] = mo.opts[index].weight_axis_length;
-  parameters_single[51] = mo.opts[index].target_axis_length;
-  parameters_single[52] = mo.opts[index].weight_standard_deviation_of_R;
-  parameters_single[53] = mo.opts[index].weight_B20_mean;
+  parameters_single[32] = mo.opts[index].weight_B20;
+  parameters_single[33] = mo.opts[index].weight_iota;
+  parameters_single[34] = mo.opts[index].target_iota;
+  parameters_single[35] = mo.opts[index].weight_elongation;
+  parameters_single[36] = mo.opts[index].weight_curvature;
+  parameters_single[37] = mo.opts[index].weight_R0;
+  parameters_single[38] = mo.opts[index].min_R0;
+  parameters_single[39] = mo.opts[index].weight_d2_volume_d_psi2;
+  parameters_single[40] = mo.opts[index].max_d2_volume_d_psi2;
+  parameters_single[41] = mo.opts[index].weight_DMerc_times_r2;
+  parameters_single[42] = mo.opts[index].min_DMerc_times_r2;
+  parameters_single[43] = mo.opts[index].weight_XY2;
+  parameters_single[44] = mo.opts[index].weight_XY2Prime;
+  parameters_single[45] = mo.opts[index].weight_XY2PrimePrime;
+  parameters_single[46] = mo.opts[index].weight_Z2;
+  parameters_single[47] = mo.opts[index].weight_Z2Prime;
+  parameters_single[48] = mo.opts[index].weight_XY3;
+  parameters_single[49] = mo.opts[index].weight_XY3Prime;
+  parameters_single[50] = mo.opts[index].weight_XY3PrimePrime;
+  parameters_single[51] = mo.opts[index].weight_grad_B;
+  parameters_single[52] = mo.opts[index].weight_grad_grad_B;
+  parameters_single[53] = mo.opts[index].weight_r_singularity;
+  parameters_single[54] = mo.opts[index].weight_axis_length;
+  parameters_single[55] = mo.opts[index].target_axis_length;
+  parameters_single[56] = mo.opts[index].weight_standard_deviation_of_R;
+  parameters_single[57] = mo.opts[index].weight_B20_mean;
 
   for (j = 0; j < axis_nmax_plus_1; j++) {
     parameters_single[j + 0 * axis_nmax_plus_1 + n_parameters_base] = mo.opts[index].q.R0c[j];
@@ -691,6 +715,10 @@ void MultiOptScan::filter_global_arrays() {
   scan_max_d2_XY2_d_varphi2.resize(n_scan, 0.0);
   scan_max_d2_XY3_d_varphi2.resize(n_scan, 0.0);
   scan_axis_length.resize(n_scan, 0.0);
+  scan_p2.resize(n_scan, 0.0);
+  scan_initial_eta_bar.resize(n_scan, 0.0);
+  scan_initial_B2c.resize(n_scan, 0.0);
+  scan_initial_B2s.resize(n_scan, 0.0);
 
   scan_R0c.resize(axis_nmax_plus_1, n_scan, 0.0);
   scan_R0s.resize(axis_nmax_plus_1, n_scan, 0.0);
@@ -762,33 +790,37 @@ void MultiOptScan::filter_global_arrays() {
     scan_max_d2_XY2_d_varphi2[j] = parameters(25, j_global);
     scan_max_d2_XY3_d_varphi2[j] = parameters(26, j_global);
     scan_axis_length[j]        = parameters(27, j_global);
+    scan_p2[j]                 = parameters(28, j_global);
+    scan_initial_eta_bar[j]    = parameters(29, j_global);
+    scan_initial_B2c[j]        = parameters(30, j_global);
+    scan_initial_B2s[j]        = parameters(31, j_global);
     
-    scan_weight_B20[j]                     = parameters(28, j_global);
-    scan_weight_iota[j]                    = parameters(29, j_global);
-    scan_target_iota[j]                    = parameters(30, j_global);
-    scan_weight_elongation[j]              = parameters(31, j_global);
-    scan_weight_curvature[j]               = parameters(32, j_global);
-    scan_weight_R0[j]                      = parameters(33, j_global);
-    scan_target_min_R0[j]                  = parameters(34, j_global);
-    scan_weight_d2_volume_d_psi2[j]        = parameters(35, j_global);
-    scan_max_d2_volume_d_psi2[j]           = parameters(36, j_global);
-    scan_weight_DMerc_times_r2[j]          = parameters(37, j_global);
-    scan_min_DMerc_times_r2[j]             = parameters(38, j_global);
-    scan_weight_XY2[j]                     = parameters(39, j_global);
-    scan_weight_XY2Prime[j]                = parameters(40, j_global);
-    scan_weight_XY2PrimePrime[j]           = parameters(41, j_global);
-    scan_weight_Z2[j]                      = parameters(42, j_global);
-    scan_weight_Z2Prime[j]                 = parameters(43, j_global);
-    scan_weight_XY3[j]                     = parameters(44, j_global);
-    scan_weight_XY3Prime[j]                = parameters(45, j_global);
-    scan_weight_XY3PrimePrime[j]           = parameters(46, j_global);
-    scan_weight_grad_B[j]                  = parameters(47, j_global);
-    scan_weight_grad_grad_B[j]             = parameters(48, j_global);
-    scan_weight_r_singularity[j]           = parameters(49, j_global);
-    scan_weight_axis_length[j]             = parameters(50, j_global);
-    scan_target_axis_length[j]             = parameters(51, j_global);
-    scan_weight_standard_deviation_of_R[j] = parameters(52, j_global);
-    scan_weight_B20_mean[j]                = parameters(53, j_global);
+    scan_weight_B20[j]                     = parameters(32, j_global);
+    scan_weight_iota[j]                    = parameters(33, j_global);
+    scan_target_iota[j]                    = parameters(34, j_global);
+    scan_weight_elongation[j]              = parameters(35, j_global);
+    scan_weight_curvature[j]               = parameters(36, j_global);
+    scan_weight_R0[j]                      = parameters(37, j_global);
+    scan_target_min_R0[j]                  = parameters(38, j_global);
+    scan_weight_d2_volume_d_psi2[j]        = parameters(39, j_global);
+    scan_max_d2_volume_d_psi2[j]           = parameters(40, j_global);
+    scan_weight_DMerc_times_r2[j]          = parameters(41, j_global);
+    scan_min_DMerc_times_r2[j]             = parameters(42, j_global);
+    scan_weight_XY2[j]                     = parameters(43, j_global);
+    scan_weight_XY2Prime[j]                = parameters(44, j_global);
+    scan_weight_XY2PrimePrime[j]           = parameters(45, j_global);
+    scan_weight_Z2[j]                      = parameters(46, j_global);
+    scan_weight_Z2Prime[j]                 = parameters(47, j_global);
+    scan_weight_XY3[j]                     = parameters(48, j_global);
+    scan_weight_XY3Prime[j]                = parameters(49, j_global);
+    scan_weight_XY3PrimePrime[j]           = parameters(50, j_global);
+    scan_weight_grad_B[j]                  = parameters(51, j_global);
+    scan_weight_grad_grad_B[j]             = parameters(52, j_global);
+    scan_weight_r_singularity[j]           = parameters(53, j_global);
+    scan_weight_axis_length[j]             = parameters(54, j_global);
+    scan_target_axis_length[j]             = parameters(55, j_global);
+    scan_weight_standard_deviation_of_R[j] = parameters(56, j_global);
+    scan_weight_B20_mean[j]                = parameters(57, j_global);
     
     for (k = 0; k < axis_nmax_plus_1; k++) {
       scan_R0c(k, j) = parameters(k + 0 * axis_nmax_plus_1 + n_parameters_base, j_global);

@@ -333,3 +333,111 @@ TEST_CASE("Run a small MultiOptScan with keep_all false. [mpi] [multiopt_scan]")
     }
   }
 }
+
+TEST_CASE("Check that MultiOptScan overrides the initial conditions. [mpi] [multiopt_scan]") {
+  // This example runs an optimization for QH with nfp = 4.
+  
+  if (single) return;
+
+  int n_procs;
+  MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
+  if (n_procs < 2 || n_procs > 17) return;
+      
+  MultiOptScan mos;
+
+  // Set scan parameters:
+  mos.verbose = 2;
+  mos.keep_all = true;
+
+  mos.params       = {"eta_bar",  "p2", "B2c", "B2s"};
+  mos.params_min   = {      0.3,  10.0,  -0.2,  -0.1};
+  mos.params_max   = {      1.5,  20.0,   0.3,   0.2};
+  mos.params_n     = {        2,     2,     2,     2};
+  mos.params_log   = {    false,  true, false, false};
+  mos.params_stage = {        0,     0,     0,     0};
+
+  Vector eta_bar_vals = {0.3, 1.5};
+  Vector p2_vals = {10.0, 20.0};
+  Vector B2c_vals = {-0.2, 0.3};
+  Vector B2s_vals = {-0.1, 0.2};
+  
+  // Set 1 opt stage:
+  mos.mo_ref.opts.resize(1);
+  mos.mo_ref.verbose = 2;
+
+  // Set the initial QSC configuration:
+  mos.mo_ref.opts[0].q.nfp = 4;
+  mos.mo_ref.opts[0].q.nphi = 21;
+  mos.mo_ref.opts[0].q.verbose = 0;
+  mos.mo_ref.opts[0].q.order_r_option = "r2.1";
+  mos.mo_ref.opts[0].q.eta_bar = 1.0;
+  mos.mo_ref.opts[0].q.R0c = {1.0, 0.17};
+  mos.mo_ref.opts[0].q.Z0s = {0.0, 0.17};
+  mos.mo_ref.opts[0].q.R0s = {0.0, 0.0};
+  mos.mo_ref.opts[0].q.Z0c = {0.0, 0.0};
+
+  // Set parameters for opt stage 0:
+  mos.mo_ref.opts[0].verbose = 0;
+  mos.mo_ref.opts[0].vary_eta_bar = true;
+  mos.mo_ref.opts[0].vary_B2c = true;
+  mos.mo_ref.opts[0].vary_B2s = true;
+  mos.mo_ref.opts[0].vary_R0c = {false, false};
+  mos.mo_ref.opts[0].vary_Z0s = {false, true};
+  mos.mo_ref.opts[0].vary_R0s = {false, false};
+  mos.mo_ref.opts[0].vary_Z0c = {false, false};
+  mos.mo_ref.opts[0].weight_grad_B = 1.0;
+  mos.mo_ref.opts[0].weight_B20 = 1.0;
+  
+  // Run the scan:
+  mos.init();
+  mos.scan();
+
+  // Check results. Only MPI proc 0 has the final data.
+  if (mos.proc0) {
+    REQUIRE(mos.n_scan == 16);
+    
+    std::cout << "p2: ";
+    for (int j = 0; j < 16; j++) {
+      std::cout << mos.scan_p2[j] << "  ";
+    }
+    std::cout << std::endl;
+    
+    std::cout << "initial eta_bars: ";
+    for (int j = 0; j < 16; j++) {
+      std::cout << mos.scan_initial_eta_bar[j] << "  ";
+    }
+    std::cout << std::endl;
+    
+    std::cout << "initial B2c: ";
+    for (int j = 0; j < 16; j++) {
+      std::cout << mos.scan_initial_B2c[j] << "  ";
+    }
+    std::cout << std::endl;
+    
+    std::cout << "initial B2s: ";
+    for (int j = 0; j < 16; j++) {
+      std::cout << mos.scan_initial_B2s[j] << "  ";
+    }
+    std::cout << std::endl;
+
+    int index = 0;
+    // The order of the loops here must match the order in mos.params.
+    for (int j_eta_bar = 0; j_eta_bar < 2; j_eta_bar++) {
+      for (int j_p2 = 0; j_p2 < 2; j_p2++) {
+	for (int j_B2c = 0; j_B2c < 2; j_B2c++) {
+	  for (int j_B2s = 0; j_B2s < 2; j_B2s++) {
+	    CHECK(Approx(mos.scan_p2[index]) == p2_vals[j_p2]);
+	    CHECK(Approx(mos.scan_initial_eta_bar[index]) == eta_bar_vals[j_eta_bar]);
+	    CHECK(Approx(mos.scan_initial_B2c[index]) == B2c_vals[j_B2c]);
+	    CHECK(Approx(mos.scan_initial_B2s[index]) == B2s_vals[j_B2s]);
+
+	    // Final values should differ from the initial values:
+	    CHECK(mos.scan_initial_eta_bar[index] != mos.scan_eta_bar[index]);
+	    CHECK(mos.scan_initial_B2c[index] != mos.scan_B2c[index]);
+	    index++;
+	  }
+	}
+      }
+    }
+  }
+}
