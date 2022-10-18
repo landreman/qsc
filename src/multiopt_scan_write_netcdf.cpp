@@ -132,6 +132,10 @@ void MultiOptScan::write_netcdf() {
   nc.put(n_scan_dim, "scan_max_d_XY3_d_varphi", scan_max_d_XY3_d_varphi, "Maximum over phi of the absolute values of the d/dvarphi derivatives of X3c1, Y3c1, and Y3s1", "1/meter^2");
   nc.put(n_scan_dim, "scan_max_d2_XY3_d_varphi2", scan_max_d2_XY3_d_varphi2, "Maximum over phi of the absolute values of the d^2/dvarphi^2 derivatives of X3c1, Y3c1, and Y3s1", "1/meter^2");
   nc.put(n_scan_dim, "scan_axis_length", scan_axis_length, "Actual length of the magnetic axis", "meters");
+  nc.put(n_scan_dim, "scan_p2", scan_p2, "p2 value used", "Pascal/(meter^2)");
+  nc.put(n_scan_dim, "scan_initial_eta_bar", scan_initial_eta_bar, "Value of eta_bar used for the initial condition", "1/meter");
+  nc.put(n_scan_dim, "scan_initial_B2c", scan_initial_B2c, "Value of B2c used for the initial condition", "Tesla/(meter^2)");
+  nc.put(n_scan_dim, "scan_initial_B2s", scan_initial_B2s, "Value of B2s used for the initial condition", "Tesla/(meter^2)");
   
   nc.put(n_scan_dim, "scan_weight_B20", scan_weight_B20, " ", "dimensionless");
   nc.put(n_scan_dim, "scan_weight_iota", scan_weight_iota, " ", "dimensionless");
