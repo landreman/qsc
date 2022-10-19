@@ -171,6 +171,11 @@ void MultiOptScan::write_netcdf() {
   nc.put(axis_nmax_plus_1_n_scan_dim, "scan_Z0c", &scan_Z0c(0, 0), "For each configuration kept from the scan, the amplitudes of the cos(n*phi) components of the Cartesian Z coordinate of the magnetic axis", "meter");
   nc.put(axis_nmax_plus_1_n_scan_dim, "scan_Z0s", &scan_Z0s(0, 0), "For each configuration kept from the scan, the amplitudes of the sin(n*phi) components of the Cartesian Z coordinate of the magnetic axis", "meter");
 
+  nc.put(axis_nmax_plus_1_n_scan_dim, "scan_initial_R0c", &scan_initial_R0c(0, 0), "For each configuration kept from the scan, the initial amplitudes of the cos(n*phi) components of the major radius of the magnetic axis", "meter");
+  nc.put(axis_nmax_plus_1_n_scan_dim, "scan_initial_R0s", &scan_initial_R0s(0, 0), "For each configuration kept from the scan, the initial amplitudes of the sin(n*phi) components of the major radius of the magnetic axis", "meter");
+  nc.put(axis_nmax_plus_1_n_scan_dim, "scan_initial_Z0c", &scan_initial_Z0c(0, 0), "For each configuration kept from the scan, the initial amplitudes of the cos(n*phi) components of the Cartesian Z coordinate of the magnetic axis", "meter");
+  nc.put(axis_nmax_plus_1_n_scan_dim, "scan_initial_Z0s", &scan_initial_Z0s(0, 0), "For each configuration kept from the scan, the initial amplitudes of the sin(n*phi) components of the Cartesian Z coordinate of the magnetic axis", "meter");
+
   // Done defining the NetCDF data.
   nc.write_and_close();
   

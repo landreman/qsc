@@ -15,7 +15,7 @@ params_min = [0.15, 0.1]
 params_max = [0.2, 1.0]
 params_n   = [ 2,   2]
 params_log = [false, true]
-params_stage = [-1, 1]
+params_stage = [0, 1]
 
 quit_after_init = 0
 

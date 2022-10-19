@@ -16,7 +16,7 @@ TEST_CASE("Check linear and logarithmic spacing of scan parameters. [multiopt_sc
   mos.params_max = {0.4, 1.0};
   mos.params_n = {4, 3};
   mos.params_log = {false, true};
-  mos.params_stage = {-1, -1};
+  mos.params_stage = {0, -1};
   
   mos.init();
   CHECK(mos.n_scan_all == 12);
@@ -53,7 +53,7 @@ TEST_CASE("Run a small MultiOptScan with keep_all true. [mpi] [multiopt_scan]") 
   mos.params_max   = {   0.2,          1.0};
   mos.params_n     = {     2,            2};
   mos.params_log   = { false,         true};
-  mos.params_stage = {    -1,           -1};
+  mos.params_stage = {     0,           -1};
 
   // Set 2 opt stages:
   mos.mo_ref.opts.resize(2);
@@ -466,6 +466,141 @@ TEST_CASE("Check that MultiOptScan overrides the initial conditions. [mpi] [mult
       opt.vary_Z0s = {false, true};
       opt.vary_R0s = {false, false};
       opt.vary_Z0c = {false, false};
+      opt.weight_grad_B = 1.0;
+      opt.weight_B20 = 1.0;
+
+      opt.allocate();
+      opt.optimize();
+
+      // Compare the multiopt to the standalone opt:
+      CHECK(Approx(mos.scan_eta_bar[index]) == opt.q.eta_bar);
+      CHECK(Approx(mos.scan_sigma0[index]) == opt.q.sigma0);
+      CHECK(Approx(mos.scan_B2c[index]) == opt.q.B2c);
+      CHECK(Approx(mos.scan_B2s[index]) == opt.q.B2s);
+      for (int k = 0; k < opt.q.R0c.size(); k++) {
+	CHECK(Approx(mos.scan_R0c(k, index)) == opt.q.R0c[k]);
+	CHECK(Approx(mos.scan_R0s(k, index)) == opt.q.R0s[k]);
+	CHECK(Approx(mos.scan_Z0c(k, index)) == opt.q.Z0c[k]);
+	CHECK(Approx(mos.scan_Z0s(k, index)) == opt.q.Z0s[k]);
+      }
+      CHECK(Approx(mos.scan_iota[index]) == opt.q.iota);
+      CHECK(Approx(mos.scan_B20_residual[index]) == opt.q.B20_residual);
+      CHECK(Approx(mos.scan_d2_volume_d_psi2[index]) == opt.q.d2_volume_d_psi2);
+      CHECK(Approx(mos.scan_DMerc_times_r2[index]) == opt.q.DMerc_times_r2);
+      CHECK(Approx(mos.scan_standard_deviation_of_R[index]) == opt.q.standard_deviation_of_R);
+      CHECK(Approx(mos.scan_standard_deviation_of_Z[index]) == opt.q.standard_deviation_of_Z);
+      CHECK(Approx(mos.scan_axis_length[index]) == opt.q.axis_length);
+    }
+  }
+}
+
+TEST_CASE("Check that MultiOptScan overrides the initial conditions for the axis shape. [mpi] [multiopt_scan]") {
+  // This example runs an optimization for QH with nfp = 4.
+  
+  if (single) return;
+
+  int n_procs;
+  MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
+  if (n_procs < 2 || n_procs > 17) return;
+      
+  MultiOptScan mos;
+
+  // Set scan parameters:
+  mos.verbose = 2;
+  mos.keep_all = true;
+
+  mos.params       = {"R0c1", "Z0s1", "R0c2", "Z0s2"};
+  mos.params_min   = {   0.3,    0.4, -0.002, -0.001};
+  mos.params_max   = {   0.8,    0.5,  0.003,  0.004};
+  mos.params_n     = {     2,      2,      2,      2};
+  mos.params_log   = { false,   true,  false,  false};
+  mos.params_stage = {     0,      0,      0,      0};
+
+  Vector R0c1_vals = {0.3, 0.8};
+  Vector Z0s1_vals = {0.4, 0.5};
+  Vector R0c2_vals = {-0.002, 0.003};
+  Vector Z0s2_vals = {-0.001, 0.004};
+  
+  // Set 1 opt stage:
+  mos.mo_ref.opts.resize(1);
+  mos.mo_ref.verbose = 2;
+
+  // Set the initial QSC configuration:
+  mos.mo_ref.opts[0].q.nfp = 4;
+  mos.mo_ref.opts[0].q.nphi = 21;
+  mos.mo_ref.opts[0].q.verbose = 0;
+  mos.mo_ref.opts[0].q.order_r_option = "r2.1";
+  mos.mo_ref.opts[0].q.eta_bar = 1.0;
+  mos.mo_ref.opts[0].q.R0c = {1.0, 0.17, 0.0};
+  mos.mo_ref.opts[0].q.Z0s = {0.0, 0.17, 0.0};
+  mos.mo_ref.opts[0].q.R0s = {0.0, 0.0, 0.0};
+  mos.mo_ref.opts[0].q.Z0c = {0.0, 0.0, 0.0};
+
+  // Set parameters for opt stage 0:
+  mos.mo_ref.opts[0].max_iter = 5;
+  mos.mo_ref.opts[0].verbose = 0;
+  mos.mo_ref.opts[0].vary_eta_bar = true;
+  mos.mo_ref.opts[0].vary_B2c = true;
+  mos.mo_ref.opts[0].vary_R0c = {false, true, true};
+  mos.mo_ref.opts[0].vary_Z0s = {false, true, true};
+  mos.mo_ref.opts[0].vary_R0s = {false, false, false};
+  mos.mo_ref.opts[0].vary_Z0c = {false, false, false};
+  mos.mo_ref.opts[0].weight_grad_B = 1.0;
+  mos.mo_ref.opts[0].weight_B20 = 1.0;
+  
+  // Run the scan:
+  mos.init();
+  mos.scan();
+
+  // Check results. Only MPI proc 0 has the final data.
+  if (mos.proc0) {
+    REQUIRE(mos.n_scan == 16);
+    
+    int index = 0;
+    // The order of the loops here must match the order in mos.params.
+    for (int j_R0c1 = 0; j_R0c1 < 2; j_R0c1++) {
+      for (int j_Z0s1 = 0; j_Z0s1 < 2; j_Z0s1++) {
+	for (int j_R0c2 = 0; j_R0c2 < 2; j_R0c2++) {
+	  for (int j_Z0s2 = 0; j_Z0s2 < 2; j_Z0s2++) {
+	    CHECK(Approx(mos.scan_initial_R0c(1, index)) == R0c1_vals[j_R0c1]);
+	    CHECK(Approx(mos.scan_initial_Z0s(1, index)) == Z0s1_vals[j_Z0s1]);
+	    CHECK(Approx(mos.scan_initial_R0c(2, index)) == R0c2_vals[j_R0c2]);
+	    CHECK(Approx(mos.scan_initial_Z0s(2, index)) == Z0s2_vals[j_Z0s2]);
+
+	    // Final values should differ from the initial values:
+	    CHECK(mos.scan_initial_R0c(1, index) != mos.scan_R0c(1, index));
+	    CHECK(mos.scan_initial_Z0s(1, index) != mos.scan_Z0s(1, index));
+	    CHECK(mos.scan_initial_R0c(2, index) != mos.scan_R0c(2, index));
+	    CHECK(mos.scan_initial_Z0s(2, index) != mos.scan_Z0s(2, index));
+	    index++;
+	  }
+	}
+      }
+    }
+
+    // For each index in the scan, run a plain opt and make sure that results match.
+    for (int index = 0; index < mos.n_scan; index++) {
+      Opt opt;
+
+      // All the parameters of the opt must match the corresponding ones for the multiopt_scan earlier in this test.
+      opt.q.nfp = 4;
+      opt.q.nphi = 21;
+      opt.q.verbose = 0;
+      opt.q.order_r_option = "r2.1";
+      opt.q.eta_bar = 1.0;
+      opt.q.R0c = {1.0, mos.scan_initial_R0c(1, index), mos.scan_initial_R0c(2, index)};
+      opt.q.Z0s = {0.0, mos.scan_initial_Z0s(1, index), mos.scan_initial_Z0s(2, index)};
+      opt.q.R0s = {0.0, 0.0, 0.0};
+      opt.q.Z0c = {0.0, 0.0, 0.0};
+
+      opt.max_iter = 5;
+      opt.verbose = 0;
+      opt.vary_eta_bar = true;
+      opt.vary_B2c = true;
+      opt.vary_R0c = {false, true, true};
+      opt.vary_Z0s = {false, true, true};
+      opt.vary_R0s = {false, false, false};
+      opt.vary_Z0c = {false, false, false};
       opt.weight_grad_B = 1.0;
       opt.weight_B20 = 1.0;
 

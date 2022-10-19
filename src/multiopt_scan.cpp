@@ -88,7 +88,7 @@ void MultiOptScan::init() {
 
   axis_nmax_plus_1 = mo_ref.opts[0].q.R0c.size();
   for (j = 0; j < mo_ref.opts.size(); j++) axis_nmax_plus_1 += mo_ref.opts[j].fourier_refine;
-  int n_fourier_parameters = axis_nmax_plus_1 * 4;
+  int n_fourier_parameters = axis_nmax_plus_1 * 8;
 
   n_parameters = n_parameters_base + n_fourier_parameters;
   parameters_single.resize(n_parameters);
@@ -287,14 +287,24 @@ void MultiOptScan::eval_scan_index(int j_scan) {
     }
     
     for (stage = stage_min; stage < stage_max; stage++) {
-      if (params[j].compare("R0c1") == 0) {
-	mo.opts[stage].q.R0c[1] = val;
-	if (verbose > 1) std::cout << "Setting R0c[1] for opt stage " << stage << " to " << val << std::endl;
+      bool found_param = false;
+      for (int mode_num = 1; mode_num < axis_nmax_plus_1; mode_num++) {
+	std::string mode_num_str = std::to_string(mode_num);
+	if (params[j].compare("R0c" + mode_num_str) == 0) {
+	  mo.opts[stage].q.R0c[mode_num] = val;
+	  if (verbose > 1) std::cout << "Setting R0c[" << mode_num << "] for opt stage " << stage << " to " << val << std::endl;
+	  if (stage != 0) throw std::runtime_error("In a multiopt_scan, R0c should only be set at stage 0.");
+	  found_param = true;
 	
-      } else if (params[j].compare("Z0s1") == 0) {
-	mo.opts[stage].q.Z0s[1] = val;
-	if (verbose > 1) std::cout << "Setting Z0s[1] for opt stage " << stage << " to " << val << std::endl;
-	
+	} else if (params[j].compare("Z0s" + mode_num_str) == 0) {
+	  mo.opts[stage].q.Z0s[mode_num] = val;
+	  if (verbose > 1) std::cout << "Setting Z0s[" << mode_num << "] for opt stage " << stage << " to " << val << std::endl;
+	  if (stage != 0) throw std::runtime_error("In a multiopt_scan, Z0s should only be set at stage 0.");
+	  found_param = true;
+	}
+      }
+
+      if (found_param) {
       } else if (params[j].compare("weight_iota") == 0) {
 	mo.opts[stage].weight_iota = val;
 	if (verbose > 1) std::cout << "Setting weight_iota for opt stage " << stage << " to " << val << std::endl;
@@ -601,6 +611,12 @@ void MultiOptScan::eval_scan_index(int j_scan) {
     parameters_single[j + 2 * axis_nmax_plus_1 + n_parameters_base] = mo.opts[index].q.Z0c[j];
     parameters_single[j + 3 * axis_nmax_plus_1 + n_parameters_base] = mo.opts[index].q.Z0s[j];
   }
+  for (j = 0; j < mo.opts[0].q.R0c.size(); j++) {
+    parameters_single[j + 4 * axis_nmax_plus_1 + n_parameters_base] = mo.opts[0].iter_R0c(j, 0);
+    parameters_single[j + 5 * axis_nmax_plus_1 + n_parameters_base] = mo.opts[0].iter_R0s(j, 0);
+    parameters_single[j + 6 * axis_nmax_plus_1 + n_parameters_base] = mo.opts[0].iter_Z0c(j, 0);
+    parameters_single[j + 7 * axis_nmax_plus_1 + n_parameters_base] = mo.opts[0].iter_Z0s(j, 0);
+  }
     
   end_time_single = std::chrono::steady_clock::now();
   elapsed = end_time_single - start_time_single;
@@ -724,6 +740,10 @@ void MultiOptScan::filter_global_arrays() {
   scan_R0s.resize(axis_nmax_plus_1, n_scan, 0.0);
   scan_Z0c.resize(axis_nmax_plus_1, n_scan, 0.0);
   scan_Z0s.resize(axis_nmax_plus_1, n_scan, 0.0);
+  scan_initial_R0c.resize(axis_nmax_plus_1, n_scan, 0.0);
+  scan_initial_R0s.resize(axis_nmax_plus_1, n_scan, 0.0);
+  scan_initial_Z0c.resize(axis_nmax_plus_1, n_scan, 0.0);
+  scan_initial_Z0s.resize(axis_nmax_plus_1, n_scan, 0.0);
 
   scan_weight_B20.resize(n_scan, 0.0);
   scan_weight_iota.resize(n_scan, 0.0);
@@ -827,6 +847,12 @@ void MultiOptScan::filter_global_arrays() {
       scan_R0s(k, j) = parameters(k + 1 * axis_nmax_plus_1 + n_parameters_base, j_global);
       scan_Z0c(k, j) = parameters(k + 2 * axis_nmax_plus_1 + n_parameters_base, j_global);
       scan_Z0s(k, j) = parameters(k + 3 * axis_nmax_plus_1 + n_parameters_base, j_global);
+    }
+    for (k = 0; k < axis_nmax_plus_1; k++) {
+      scan_initial_R0c(k, j) = parameters(k + 4 * axis_nmax_plus_1 + n_parameters_base, j_global);
+      scan_initial_R0s(k, j) = parameters(k + 5 * axis_nmax_plus_1 + n_parameters_base, j_global);
+      scan_initial_Z0c(k, j) = parameters(k + 6 * axis_nmax_plus_1 + n_parameters_base, j_global);
+      scan_initial_Z0s(k, j) = parameters(k + 7 * axis_nmax_plus_1 + n_parameters_base, j_global);
     }
   }
   if (j + 1 != n_scan) {
