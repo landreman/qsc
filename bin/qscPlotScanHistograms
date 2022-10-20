@@ -67,25 +67,26 @@ r_singularity = np.minimum(r_singularity, np.ones_like(r_singularity))
 
 # Further filter the results:
 mask = max_d_XYZ23_d_varphi < 1e30
+"""
+mask = helicity == 0
+mask = np.logical_and(mask, np.abs(iota) > 0.42)
+mask = np.logical_and(mask, L_grad_grad_B > 0.38)
+mask = np.logical_and(mask, r_singularity > 0.16)
+mask = np.logical_and(mask, max_XYZ23 < 5.6)
+mask = np.logical_and(mask, max_d_XYZ23_d_varphi < 15.0)
+mask = np.logical_and(mask, L_grad_B > 0.465)
 mask = np.logical_and(mask, B20_variation < 0.09)
 mask = np.logical_and(mask, axis_length > 6.28 * 2)
 mask = np.logical_and(mask, axis_length < 6.29 * 2)
-mask = np.logical_and(mask, max_d_XYZ23_d_varphi < 3.5)
-mask = np.logical_and(mask, r_singularity > 0.25)
-mask = np.logical_and(mask, max_XYZ23 < 0.6)
-"""
 #mask = helicity != 0
 mask = d2_volume_d_psi2 < 0
-mask = np.logical_and(mask, np.abs(iota) > 0.41)
 mask = np.logical_and(mask, elongation < 8)
 
-mask = np.logical_and(mask, L_grad_grad_B > 0.33)
 mask = np.logical_and(mask, B20_mean < 1)
 
 #mask = weight_axis_length >= 10
 #mask = axis_length < 1e30
 #mask = np.logical_and(mask, np.abs(iota) < 0.46)
-mask = np.logical_and(mask, L_grad_B > 0.572)
 
 #mask = max_d_XYZ23_d_varphi < 3.7
 """
@@ -235,10 +236,10 @@ def plot_row(title, logx=False):
     plt.ylabel('max_d_XYZ23_d_varphi')
 
 #plot_row('R0c1')
-#plot_row('target_iota')
-#plot_row('weight_iota', True)
-plot_row('target_axis_length')
-plot_row('weight_axis_length', True)
+plot_row('target_iota')
+plot_row('weight_iota', True)
+#plot_row('target_axis_length')
+#plot_row('weight_axis_length', True)
 plot_row('weight_B20', True)
 plot_row('weight_grad_grad_B', True)
 #plot_row('weight_elongation', True)

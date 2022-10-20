@@ -1,0 +1,159 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import numpy as np
+from scipy.io import netcdf_file
+import matplotlib.pyplot as plt
+
+print()
+print("Usage: ", os.path.basename(__file__), ' qsc_out.<extension>.nc')
+
+if len(sys.argv) != 2:
+   raise RuntimeError("A qsc_out.*.nc file must be provided as an argument")
+
+filename = sys.argv[1]
+bare_filename = os.path.basename(filename)
+s = 'qsc_out.'
+if bare_filename[:len(s)] != s or filename[-3:] != '.nc':
+   raise RuntimeError("A qsc_out.*.nc file must be provided as an argument")
+   
+f = netcdf_file(filename, 'r', mmap=False)
+n_scan = f.variables['n_scan'][()]
+iota = np.abs(f.variables['scan_iota'][()])
+eta_bar = f.variables['scan_eta_bar'][()]
+B2c = f.variables['scan_B2c'][()]
+B20_variation = f.variables['scan_B20_variation'][()]
+r_singularity = f.variables['scan_r_singularity'][()]
+d2_volume_d_psi2 = f.variables['scan_d2_volume_d_psi2'][()]
+L_grad_B = f.variables['scan_min_L_grad_B'][()]
+L_grad_grad_B = f.variables['scan_min_L_grad_grad_B'][()]
+elongation = f.variables['scan_max_elongation'][()]
+R0c = f.variables['scan_R0c'][()]
+Z0s = f.variables['scan_Z0s'][()]
+helicity = f.variables['scan_helicity'][()]
+print('R0c.shape:', R0c.shape)
+R0c1 = np.abs(R0c[:, 1])
+Z0s1 = Z0s[:, 1]
+
+# For r_singularity, replace 1e30 with 1
+r_singularity = np.minimum(r_singularity, np.ones_like(r_singularity))
+
+print("# of configs with helicity == 0:", np.sum(helicity == 0))
+print("# of configs with helicity != 0:", np.sum(helicity != 0))
+
+# Further filter the results:
+mask = np.abs(iota) >= 0.2
+mask = d2_volume_d_psi2 < 0
+"""
+mask = np.logical_and(mask, np.abs(iota) > 0.42)
+mask = np.logical_and(mask, L_grad_grad_B > 0.38)
+mask = np.logical_and(mask, r_singularity > 0.16)
+mask = np.logical_and(mask, max_XYZ23 < 5.6)
+mask = np.logical_and(mask, max_d_XYZ23_d_varphi < 15.0)
+mask = np.logical_and(mask, L_grad_B > 0.465)
+mask = np.logical_and(mask, B20_variation < 0.09)
+#mask = helicity != 0
+mask = d2_volume_d_psi2 < 0
+mask = np.logical_and(mask, elongation < 8)
+
+
+#mask = np.logical_and(mask, np.abs(iota) < 0.46)
+
+#mask = max_d_XYZ23_d_varphi < 3.7
+"""
+
+print('Scan indices that pass the mask:')
+print(np.nonzero(mask)[0])
+#print(np.where(mask)[0])
+#exit(0)
+
+"""
+fields = ['iota', 'eta_bar', 'B2c', 'B20_variation', 'r_singularity', 'd2_volume_d_psi2',
+          'L_grad_B', 'L_grad_grad_B', 'elongation', 'weight_grad_grad_B', 'weight_B20',
+          'max_XY2', 'max_Z2', 'max_XY3', 'max_d_XY2_d_varphi', 'max_d_Z2_d_varphi', 'max_d_XY3_d_varphi',
+          'R0c1', 'Z0s1']
+
+for field in fields:
+   eval(field + " = " + field + "[mask]")
+"""
+iota = iota[mask]
+eta_bar = np.abs(eta_bar[mask])
+B2c = B2c[mask]
+B20_variation = B20_variation[mask]
+r_singularity = r_singularity[mask]
+d2_volume_d_psi2 = d2_volume_d_psi2[mask]
+L_grad_B = L_grad_B[mask]
+L_grad_grad_B = L_grad_grad_B[mask]
+elongation = elongation[mask]
+helicity = helicity[mask]
+R0c1 = R0c1[mask]
+Z0s1 = Z0s1[mask]
+
+n_scan = len(iota)
+print('Number of points passing filters:', n_scan)
+
+print("R0c1:", R0c1)
+print("Z0s1:", Z0s1)
+print("iota:", iota)
+print("B20_variation:", B20_variation)
+
+well = (d2_volume_d_psi2 < 0)
+hill = (d2_volume_d_psi2 >= 0)
+
+def loghist(x, bins=10, **kwargs):
+   abs_x = np.abs(x)
+   hist, bins = np.histogram(abs_x, bins=bins)
+   logbins = np.logspace(np.log10(bins[0]), np.log10(bins[-1]), len(bins))
+   plt.hist(abs_x, bins=logbins, **kwargs)
+   plt.xscale('log')
+
+#exit(0)
+
+plt.rc('font', size=8)
+fig = plt.figure(figsize=(15, 8))
+
+nrows = 3
+ncols = 4
+jplot = 1
+bins = 20
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+loghist(eta_bar, bins=bins)
+plt.xlabel('eta_bar')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+loghist(B2c, bins=bins)
+plt.xlabel('B2c')
+
+for n in range(1, 4):
+   plt.subplot(nrows, ncols, jplot); jplot += 1
+   loghist(R0c[:, n], bins=bins)
+   plt.xlabel(f'R0c{n}')
+
+   plt.subplot(nrows, ncols, jplot); jplot += 1
+   loghist(Z0s[:, n], bins=bins)
+   plt.xlabel(f'Z0s{n}')
+
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.hist(iota, bins=bins)
+plt.xlabel('iota')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.hist(d2_volume_d_psi2, bins=bins)
+plt.xlabel('V"')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.hist(r_singularity, bins=bins)
+plt.xlabel('r_singularity')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+loghist(r_singularity, bins=bins)
+plt.xlabel('r_singularity')
+
+plt.figtext(0.5, 0.998, os.path.abspath(filename), ha='center', va='top', fontsize=6)
+plt.figtext(0.5, 0.002, 'Plotted by ' + os.path.abspath(__file__), ha='center', va='bottom', fontsize=6)
+
+plt.tight_layout()
+plt.show()
