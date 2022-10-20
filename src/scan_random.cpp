@@ -150,6 +150,15 @@ void Scan::random() {
       filters_local[REJECTED_DUE_TO_R0]++;
       continue;
     }
+    if (!keep_all) {
+      // If helicity_to_keep == 0, only helicity == 0 will be kept.
+      // If helicity_to_keep == 1, only helicity == 1 or -1 will be kept.
+      // For any other value of helicity_to_keep, all helicity values will be kept.
+      if ((helicity_to_keep == 0 && q.helicity != 0) || (helicity_to_keep == 1 && std::abs(q.helicity) != 1)) {
+	filters_local[REJECTED_DUE_TO_HELICITY]++;
+	continue;
+      }
+    }
     if (!keep_all && 1.0 / q.grid_max_curvature < min_L_grad_B_to_keep) {
       filters_local[REJECTED_DUE_TO_CURVATURE]++;
       continue;

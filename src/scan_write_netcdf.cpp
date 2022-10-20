@@ -65,6 +65,7 @@ void Scan::write_netcdf() {
   nc.put("n_r2_solves", filters[N_R2_SOLVES], "Number of times the O(r^2) equations were solved during the scan", "dimensionless");
   nc.put("rejected_due_to_R0_crude", filters[REJECTED_DUE_TO_R0_CRUDE], "Number of configurations in the scan that were rejected due to R0 becoming <= 0 at toroidal angle 0 or half field period", "dimensionless");
   nc.put("rejected_due_to_R0", filters[REJECTED_DUE_TO_R0], "Number of configurations in the scan that were rejected due to R0 becoming <= 0", "dimensionless");
+  nc.put("rejected_due_to_helicity", filters[REJECTED_DUE_TO_HELICITY], "Number of configurations in the scan that were rejected due to helicity", "dimensionless");
   nc.put("rejected_due_to_curvature", filters[REJECTED_DUE_TO_CURVATURE], "Number of configurations in the scan that were rejected due to the curvature of the magnetic axis exceeding 1 / min_L_grad_B_to_keep", "dimensionless");
   nc.put("rejected_due_to_iota", filters[REJECTED_DUE_TO_IOTA], "Number of configurations in the scan that were rejected due to the min_iota_to_keep filter", "dimensionless");
   nc.put("rejected_due_to_elongation", filters[REJECTED_DUE_TO_ELONGATION], "Number of configurations in the scan that were rejected due to the max_elongation_to_keep filter", "dimensionless");
@@ -97,6 +98,7 @@ void Scan::write_netcdf() {
   nc.put("deterministic", deterministic_int, "1 if a deterministic pseudo-random number generator and seed were used, 1 if a random seed based on the time was used.", "dimensionless");
   if (!keep_all) {
     nc.put("min_R0_to_keep", min_R0_to_keep, "Configurations were kept in the scan only if the major radius of the magnetic axis was at least this value", "meter");
+    nc.put("helicity_to_keep", helicity_to_keep, "If 0, only quasi-axisymmetric configurations are kept. If 1, only quasi-helically symmetric configurations with helicity 1 or -1 are kept. Otherwise, all values of helicity are kept.", "dimensionless");
     nc.put("min_iota_to_keep", min_iota_to_keep, "Configurations were kept in the scan only if the absolute value of the on-axis rotational transform was at least this value", "dimensionless");
     nc.put("max_elongation_to_keep", max_elongation_to_keep, "Configurations were kept in the scan only if the elongation (in the plane perpendicular to the magnetic axis) was no greater than this value at all toroidal angles", "dimensionless");
     nc.put("min_L_grad_B_to_keep", min_L_grad_B_to_keep, "Configurations were kept in the scan only if the scale length L_grad_B (eq (3.1) in Landreman J Plasma Physics (2021)) is at least this value at each toroidal angle", "meter");

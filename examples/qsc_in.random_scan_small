@@ -32,3 +32,5 @@ max_seconds = 2.2
 save_period = 0.5
 max_attempts_per_proc = 100000
 max_keep_per_proc = 100000
+
+helicity_to_keep = 0

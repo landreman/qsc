@@ -23,6 +23,7 @@ namespace qsc {
     KEPT,
     REJECTED_DUE_TO_R0_CRUDE,
     REJECTED_DUE_TO_R0,
+    REJECTED_DUE_TO_HELICITY,
     REJECTED_DUE_TO_CURVATURE,
     REJECTED_DUE_TO_IOTA,
     REJECTED_DUE_TO_ELONGATION,
@@ -75,6 +76,7 @@ namespace qsc {
     qscfloat max_B20_variation_to_keep, min_r_singularity_to_keep;
     qscfloat max_d2_volume_d_psi2_to_keep, min_DMerc_times_r2_to_keep;
     qscfloat min_beta_to_keep;
+    int helicity_to_keep;
     bool keep_all, deterministic;
     int verbose;
     std::string outfilename;

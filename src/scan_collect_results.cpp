@@ -198,6 +198,8 @@ void Scan::collect_results(int n_parameters,
 	      << " (" << filter_fractions[REJECTED_DUE_TO_R0_CRUDE] << ")" << std::endl;
     std::cout << "  Rejected due to min_R0:            " << std::setw(width) << filters[REJECTED_DUE_TO_R0]
 	      << " (" << filter_fractions[REJECTED_DUE_TO_R0] << ")" << std::endl;
+    std::cout << "  Rejected due to helicity:          " << std::setw(width) << filters[REJECTED_DUE_TO_HELICITY]
+	      << " (" << filter_fractions[REJECTED_DUE_TO_HELICITY] << ")" << std::endl;
     std::cout << "  Rejected due to max curvature:     " << std::setw(width) << filters[REJECTED_DUE_TO_CURVATURE]
 	      << " (" << filter_fractions[REJECTED_DUE_TO_CURVATURE] << ")" << std::endl;
     std::cout << "  Rejected due to min iota:          " << std::setw(width) << filters[REJECTED_DUE_TO_IOTA]

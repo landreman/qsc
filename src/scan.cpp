@@ -51,6 +51,7 @@ void Scan::defaults() {
   max_d2_volume_d_psi2_to_keep = 1.0e+30;
   min_DMerc_times_r2_to_keep = -1.0e+30;
   min_beta_to_keep = -1.0;
+  helicity_to_keep = -1;
 }
 
 Scan::Scan() {
