@@ -71,6 +71,9 @@ TEST_CASE("Each scan result should match a standalone Qsc. [mpi]") {
       scan.B2s_min = -1.0;
       scan.B2s_max = 1.0;
       
+      scan.p2_min = -1.0e3;
+      scan.p2_max = 0.0;
+      
       scan.max_attempts_per_proc = 5;
       scan.max_keep_per_proc = 20;
       scan.max_seconds = 30;
@@ -90,7 +93,6 @@ TEST_CASE("Each scan result should match a standalone Qsc. [mpi]") {
 	q.verbose = scan.q.verbose;
 	q.nfp = scan.q.nfp;
 	q.nphi = scan.q.nphi;
-	q.p2 = scan.q.p2;
 	q.order_r_option = scan.q.order_r_option;
 	q.R0c.resize(nf, 0.0);
 	q.R0s.resize(nf, 0.0);
@@ -105,6 +107,7 @@ TEST_CASE("Each scan result should match a standalone Qsc. [mpi]") {
 	  q.sigma0 = scan.scan_sigma0[j];
 	  q.B2s = scan.scan_B2s[j];
 	  q.B2c = scan.scan_B2c[j];
+	  q.p2 = scan.scan_p2[j];
 	  for (k = 0; k < nf; k++) {
 	    q.R0c[k] = scan.scan_R0c(k, j);
 	    q.R0s[k] = scan.scan_R0s(k, j);
@@ -126,6 +129,7 @@ TEST_CASE("Each scan result should match a standalone Qsc. [mpi]") {
 	  CHECK(Approx(q.d2_volume_d_psi2) == scan.scan_d2_volume_d_psi2[j]);
 	  CHECK(Approx(q.DMerc_times_r2) == scan.scan_DMerc_times_r2[j]);
 	  CHECK(Approx(q.B20_grid_variation) == scan.scan_B20_variation[j]);
+	  CHECK(Approx(q.beta) == scan.scan_beta[j]);
 	}
       }
     }
@@ -184,9 +188,6 @@ TEST_CASE("Verify results of a deterministic scan are independent of number of m
   
   scan1.q.verbose = 0;
   scan2.q.verbose = scan1.q.verbose;
-  
-  scan1.q.p2 = -1.0e+4; // Include nonzero pressure so DMerc is nonzero.
-  scan2.q.p2 = scan1.q.p2;
   
   int nf = 2;
   scan1.R0c_min.resize(nf, 0.0);
@@ -273,6 +274,12 @@ TEST_CASE("Verify results of a deterministic scan are independent of number of m
       scan1.B2s_max = 1.0;
       scan2.B2s_min = scan1.B2s_min;
       scan2.B2s_max = scan1.B2s_max;
+      
+      // Include nonzero pressure so DMerc is nonzero.
+      scan1.p2_min = -1.0e3;
+      scan1.p2_max = -1.0e2;
+      scan2.p2_min = scan1.p2_min;
+      scan2.p2_max = scan1.p2_max;
             
       scan1.keep_all = (bool) j_keep_all;
       scan2.keep_all = scan1.keep_all;
@@ -299,6 +306,7 @@ TEST_CASE("Verify results of a deterministic scan are independent of number of m
 	  CHECK(Approx(scan1.scan_sigma0[j]) == scan2.scan_sigma0[j]);
 	  CHECK(Approx(scan1.scan_B2s[j]) == scan2.scan_B2s[j]);
 	  CHECK(Approx(scan1.scan_B2c[j]) == scan2.scan_B2c[j]);
+	  CHECK(Approx(scan1.scan_p2[j]) == scan2.scan_p2[j]);
 	  CHECK(Approx(scan1.scan_min_R0[j]) == scan2.scan_min_R0[j]);
 	  CHECK(Approx(scan1.scan_max_curvature[j]) == scan2.scan_max_curvature[j]);
 	  CHECK(Approx(scan1.scan_iota[j]) == scan2.scan_iota[j]);
@@ -309,6 +317,7 @@ TEST_CASE("Verify results of a deterministic scan are independent of number of m
 	  CHECK(Approx(scan1.scan_B20_variation[j]) == scan2.scan_B20_variation[j]);
 	  CHECK(Approx(scan1.scan_d2_volume_d_psi2[j]) == scan2.scan_d2_volume_d_psi2[j]);
 	  CHECK(Approx(scan1.scan_DMerc_times_r2[j]) == scan2.scan_DMerc_times_r2[j]);
+	  CHECK(Approx(scan1.scan_beta[j]) == scan2.scan_beta[j]);
 	  
 	  CHECK(scan1.scan_helicity[j] == scan2.scan_helicity[j]);
 	  
@@ -371,9 +380,6 @@ TEST_CASE("Verify scan results with and without filters are related as expected.
   scan1.q.verbose = 0;
   scan2.q.verbose = scan1.q.verbose;
   
-  scan1.q.p2 = -1.0e+4; // Include nonzero pressure so DMerc is nonzero.
-  scan2.q.p2 = scan1.q.p2;
-  
   int nf = 2;
   scan1.R0c_min.resize(nf, 0.0);
   scan1.R0c_max.resize(nf, 0.0);
@@ -412,6 +418,12 @@ TEST_CASE("Verify scan results with and without filters are related as expected.
   scan1.B2s_max = 1.0;
   scan2.B2s_min = scan1.B2s_min;
   scan2.B2s_max = scan1.B2s_max;
+            
+  // Include nonzero pressure so DMerc is nonzero.
+  scan1.p2_min = -1.0e3;
+  scan1.p2_max = -1.0e2;
+  scan2.p2_min = scan1.p2_min;
+  scan2.p2_max = scan1.p2_max;
             
   // Try both O(r^1) and O(r^2):
   for (int order = 1; order < 3; order++) {
@@ -550,6 +562,7 @@ TEST_CASE("Verify scan results with and without filters are related as expected.
 	    CHECK(Approx(scan1.scan_sigma0[j]) == scan2.scan_sigma0[n]);
 	    CHECK(Approx(scan1.scan_B2s[j]) == scan2.scan_B2s[n]);
 	    CHECK(Approx(scan1.scan_B2c[j]) == scan2.scan_B2c[n]);
+	    CHECK(Approx(scan1.scan_p2[j]) == scan2.scan_p2[n]);
 	    CHECK(Approx(scan1.scan_min_R0[j]) == scan2.scan_min_R0[n]);
 	    CHECK(Approx(scan1.scan_max_curvature[j]) == scan2.scan_max_curvature[n]);
 	    CHECK(Approx(scan1.scan_iota[j]) == scan2.scan_iota[n]);
@@ -560,6 +573,7 @@ TEST_CASE("Verify scan results with and without filters are related as expected.
 	    CHECK(Approx(scan1.scan_B20_variation[j]) == scan2.scan_B20_variation[n]);
 	    CHECK(Approx(scan1.scan_d2_volume_d_psi2[j]) == scan2.scan_d2_volume_d_psi2[n]);
 	    CHECK(Approx(scan1.scan_DMerc_times_r2[j]) == scan2.scan_DMerc_times_r2[n]);
+	    CHECK(Approx(scan1.scan_beta[j]) == scan2.scan_beta[n]);
 	  
 	    CHECK(scan1.scan_helicity[j] == scan2.scan_helicity[n]);
 	  
@@ -597,7 +611,6 @@ TEST_CASE("Verify the number of configurations attempted or kept in a scan match
   scan.q.nfp = 3;  
   scan.q.nphi = 31;
   scan.q.verbose = 0;  
-  scan.q.p2 = -1.0e+4; // Include nonzero pressure so DMerc is nonzero.
   
   int nf = 2;
   scan.R0c_min.resize(nf, 0.0);
@@ -653,6 +666,9 @@ TEST_CASE("Verify the number of configurations attempted or kept in a scan match
       scan.B2s_min = -0.3;
       scan.B2s_max = 0.3;
             
+      scan.p2_min = -1.0e3;
+      scan.p2_max = -1.0e0;
+            
       scan.keep_all = (bool) j_keep_all;
 
       for (int j_constraint = 0; j_constraint < 2; j_constraint++) {
@@ -664,6 +680,7 @@ TEST_CASE("Verify the number of configurations attempted or kept in a scan match
 	  scan.max_d2_volume_d_psi2_to_keep = 1.0e+30;
 	  scan.min_DMerc_times_r2_to_keep = -1.0e+30;
 	  scan.min_L_grad_grad_B_to_keep = -1.0;
+	  scan.min_beta_to_keep = 1.0e-6;
 	} else {
 	  // Constraints should be active
 	  scan.max_elongation_to_keep = 2.8;

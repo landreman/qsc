@@ -91,7 +91,7 @@ namespace qsc {
     Vector d2_Y20_d_varphi2, d2_Y2s_d_varphi2, d2_Y2c_d_varphi2;
     Vector d2_Z20_d_varphi2, d2_Z2s_d_varphi2, d2_Z2c_d_varphi2;
     qscfloat d2_volume_d_psi2, DGeod_times_r2, DWell_times_r2, DMerc_times_r2;
-    qscfloat r_singularity_robust;
+    qscfloat r_singularity_robust, beta;
     Vector r_hat_singularity_robust;
     int newton_result;
     Vector X3c1, X3c3, X3s1, X3s3, Y3c1, Y3c3, Y3s1, Y3s3;

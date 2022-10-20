@@ -127,6 +127,7 @@ void Scan::collect_results(int n_parameters,
     scan_sigma0.resize(n_scan, 0.0);
     scan_B2c.resize(n_scan, 0.0);
     scan_B2s.resize(n_scan, 0.0);
+    scan_p2.resize(n_scan, 0.0);
     scan_min_R0.resize(n_scan, 0.0);
     scan_max_curvature.resize(n_scan, 0.0);
     scan_iota.resize(n_scan, 0.0);
@@ -140,6 +141,7 @@ void Scan::collect_results(int n_parameters,
     scan_B20_residual.resize(n_scan, 0.0);
     scan_standard_deviation_of_R.resize(n_scan, 0.0);
     scan_standard_deviation_of_Z.resize(n_scan, 0.0);
+    scan_beta.resize(n_scan, 0.0);
 
     scan_helicity.resize(n_scan * n_int_parameters, 0);
 
@@ -154,19 +156,21 @@ void Scan::collect_results(int n_parameters,
       scan_sigma0[j]            = parameters( 1, j);
       scan_B2c[j]               = parameters( 2, j);
       scan_B2s[j]               = parameters( 3, j);
-      scan_min_R0[j]            = parameters( 4, j);
-      scan_max_curvature[j]     = parameters( 5, j);
-      scan_iota[j]              = parameters( 6, j);
-      scan_max_elongation[j]    = parameters( 7, j);
-      scan_min_L_grad_B[j]      = parameters( 8, j);
-      scan_min_L_grad_grad_B[j] = parameters( 9, j);
-      scan_r_singularity[j]     = parameters(10, j);
-      scan_d2_volume_d_psi2[j]  = parameters(11, j);
-      scan_DMerc_times_r2[j]    = parameters(12, j);
-      scan_B20_variation[j]     = parameters(13, j);
-      scan_B20_residual[j]      = parameters(14, j);
-      scan_standard_deviation_of_R[j] = parameters(15, j);
-      scan_standard_deviation_of_Z[j] = parameters(16, j);
+      scan_p2[j]                = parameters( 4, j);
+      scan_min_R0[j]            = parameters( 5, j);
+      scan_max_curvature[j]     = parameters( 6, j);
+      scan_iota[j]              = parameters( 7, j);
+      scan_max_elongation[j]    = parameters( 8, j);
+      scan_min_L_grad_B[j]      = parameters( 9, j);
+      scan_min_L_grad_grad_B[j] = parameters(10, j);
+      scan_r_singularity[j]     = parameters(11, j);
+      scan_d2_volume_d_psi2[j]  = parameters(12, j);
+      scan_DMerc_times_r2[j]    = parameters(13, j);
+      scan_B20_variation[j]     = parameters(14, j);
+      scan_B20_residual[j]      = parameters(15, j);
+      scan_standard_deviation_of_R[j] = parameters(16, j);
+      scan_standard_deviation_of_Z[j] = parameters(17, j);
+      scan_beta[j]              = parameters(18, j);
       
       scan_helicity[j] = int_parameters[0 + j * n_int_parameters];
       
@@ -212,6 +216,8 @@ void Scan::collect_results(int n_parameters,
 	      << " (" << filter_fractions[REJECTED_DUE_TO_DMERC] << ")" << std::endl;
     std::cout << "  Rejected due to r_singularity:     " << std::setw(width) << filters[REJECTED_DUE_TO_R_SINGULARITY]
 	      << " (" << filter_fractions[REJECTED_DUE_TO_R_SINGULARITY] << ")" << std::endl;
+    std::cout << "  Rejected due to beta:              " << std::setw(width) << filters[REJECTED_DUE_TO_BETA]
+	      << " (" << filter_fractions[REJECTED_DUE_TO_BETA] << ")" << std::endl;
     std::cout << "  Total rejected:                    " << std::setw(width) << total_rejected
 	      << " (" << ((qscfloat)total_rejected) / filters[ATTEMPTS] << ")" << std::endl;
     std::cout << "  Kept:                              " << std::setw(width) << n_scan

@@ -42,6 +42,7 @@ void Scan::write_netcdf() {
   if (q.at_least_order_r2) {
     nc.put("B2c_scan_option", B2c_scan_option, "Whether a linear vs logarithmic distribution was used for choosing B2c in the scan");
     nc.put("B2s_scan_option", B2s_scan_option, "Whether a linear vs logarithmic distribution was used for choosing B2s in the scan");
+    nc.put("p2_scan_option", p2_scan_option, "Whether a linear vs logarithmic distribution was used for choosing p2 in the scan");
   }
 
   nc.put("eta_bar_min", eta_bar_min, "Minimum value for eta_bar in the scan", "1/meter");
@@ -53,6 +54,8 @@ void Scan::write_netcdf() {
     nc.put("B2c_max", B2c_max, "Maximum value for B2c in the scan", "1/meter");
     nc.put("B2s_min", B2s_min, "Minimum value for B2s in the scan", "1/meter");
     nc.put("B2s_max", B2s_max, "Maximum value for B2s in the scan", "1/meter");
+    nc.put("p2_min", p2_min, "Minimum value for p2 in the scan", "Pascal/(meter^2)");
+    nc.put("p2_max", p2_max, "Maximum value for p2 in the scan", "Pascal/(meter^2)");
   }
   
   int n_scan_int = (int)n_scan;
@@ -71,6 +74,7 @@ void Scan::write_netcdf() {
   nc.put("rejected_due_to_d2_volume_d_psi2", filters[REJECTED_DUE_TO_D2_VOLUME_D_PSI2], "Number of configurations in the scan that were rejected due to the max_d2_volume_d_psi2_to_keep filter", "dimensionless");
   nc.put("rejected_due_to_DMerc", filters[REJECTED_DUE_TO_DMERC], "Number of configurations in the scan that were rejected due to the min_DMerc_times_r2_to_keep filter", "dimensionless");
   nc.put("rejected_due_to_r_singularity", filters[REJECTED_DUE_TO_R_SINGULARITY], "Number of configurations in the scan that were rejected due to the min_r_singularity_to_keep filter", "dimensionless");
+  nc.put("rejected_due_to_beta", filters[REJECTED_DUE_TO_BETA], "Number of configurations in the scan that were rejected due to the min_beta_to_keep filter", "dimensionless");
 
   nc.put("fraction_kept", filter_fractions[KEPT], "Fraction of the attempted configurations from the scan that were kept and saved in this file", "dimensionless");
   nc.put("fraction_sigma_eq_solves", filter_fractions[N_SIGMA_EQ_SOLVES], "Fraction of the attempted configurations for which the sigma equation was solved during the scan", "dimensionless");
@@ -132,6 +136,7 @@ void Scan::write_netcdf() {
   if (q.at_least_order_r2) {
     nc.put(n_scan_dim, "scan_B2c", scan_B2c, "For each configuration kept from the scan, the r^2 * cos(2*theta) term in |B|", "Tesla/(meter^2)");
     nc.put(n_scan_dim, "scan_B2s", scan_B2s, "For each configuration kept from the scan, the r^2 * sin(2*theta) term in |B|", "Tesla/(meter^2)");
+    nc.put(n_scan_dim, "scan_p2", scan_p2, "p2 for each configuration kept from the scan", "Pascal/(meter^2)");
   }
   nc.put(n_scan_dim, "scan_iota", scan_iota, "For each configuration kept from the scan, the rotational transform on axis", "dimensionless");
   nc.put(n_scan_dim, "scan_min_R0", scan_min_R0, "For each configuration kept from the scan, the minimum value of R0, the major radius of the magnetic axis. This variable corresponds to grid_min_R0 in a single Qsc calculation.", "meter");
@@ -148,6 +153,7 @@ void Scan::write_netcdf() {
     nc.put(n_scan_dim, "scan_r_singularity", scan_r_singularity, "For each configuration kept from the scan, the value of r_singularity_robust. r_singularity_robust is the robust estimate of the minor radius at which the flux surface shapes become singular, r_c, as detailed in section 4.2 of Landreman, J Plasma Physics (2021)", "meter");
     nc.put(n_scan_dim, "scan_d2_volume_d_psi2", scan_d2_volume_d_psi2, "For each configuration kept from the scan, the value of magnetic well d2_volume_d_psi2, the second derivative of flux surface volume with respect to psi, where 2*pi*psi is the toroidal flux.", "Tesla^{-2} meter^{-1}");
     nc.put(n_scan_dim, "scan_DMerc_times_r2", scan_DMerc_times_r2, "For each configuration kept from the scan, the overall Mercier stability criterion times the square of the effective minor radius r. This quantity corresponds to DMerc_times_r2 for a single Qsc run. DMerc (without the r^2) corresponds to the quantity DMerc in VMEC, and to DMerc in Landreman and Jorge, J Plasma Phys (2020).", "Tesla^{-2} meter^{-2}");
+    nc.put(n_scan_dim, "scan_beta", scan_beta, "For each configuration kept from the scan, the maximum beta", "dimensionless");
 
   }
 

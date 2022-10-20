@@ -20,6 +20,7 @@ void Scan::input(std::string filename) {
   toml_read(varlist, indata, "sigma0_scan_option", sigma0_scan_option);
   toml_read(varlist, indata, "B2c_scan_option", B2c_scan_option);
   toml_read(varlist, indata, "B2s_scan_option", B2s_scan_option);
+  toml_read(varlist, indata, "p2_scan_option", p2_scan_option);
   toml_read(varlist, indata, "fourier_scan_option", fourier_scan_option);
   
   toml_read(varlist, indata, "eta_bar_min", eta_bar_min);
@@ -30,6 +31,8 @@ void Scan::input(std::string filename) {
   toml_read(varlist, indata, "B2c_max", B2c_max);
   toml_read(varlist, indata, "B2s_min", B2s_min);
   toml_read(varlist, indata, "B2s_max", B2s_max);
+  toml_read(varlist, indata, "p2_min", p2_min);
+  toml_read(varlist, indata, "p2_max", p2_max);
 
   toml_read(varlist, indata, "R0c_min", R0c_min);
   toml_read(varlist, indata, "R0c_max", R0c_max);
@@ -56,6 +59,7 @@ void Scan::input(std::string filename) {
   toml_read(varlist, indata, "min_r_singularity_to_keep", min_r_singularity_to_keep);
   toml_read(varlist, indata, "min_DMerc_times_r2_to_keep", min_DMerc_times_r2_to_keep);
   toml_read(varlist, indata, "max_d2_volume_d_psi2_to_keep", max_d2_volume_d_psi2_to_keep);
+  toml_read(varlist, indata, "min_beta_to_keep", min_beta_to_keep);
 
   toml_unused(varlist, indata);
   
@@ -83,6 +87,7 @@ void Scan::input(std::string filename) {
   std::cout << "sigma0 range: " << sigma0_min << " to " << sigma0_max << std::endl;
   std::cout << "B2c range: " << B2c_min << " to " << B2c_max << std::endl;
   std::cout << "B2s range: " << B2s_min << " to " << B2s_max << std::endl;
+  std::cout << "p2 range: " << p2_min << " to " << p2_max << std::endl;
 
   std::cout << "R0c_min: " << R0c_min << std::endl;
   std::cout << "R0c_max: " << R0c_max << std::endl;
@@ -97,6 +102,7 @@ void Scan::input(std::string filename) {
   std::cout << "sigma0_scan_option: " << sigma0_scan_option << std::endl;
   std::cout << "B2c_scan_option: " << B2c_scan_option << std::endl;
   std::cout << "B2s_scan_option: " << B2s_scan_option << std::endl;
+  std::cout << "p2_scan_option: " << p2_scan_option << std::endl;
   std::cout << "fourier_scan_option: " << fourier_scan_option << std::endl;
 
   std::cout << "save_period: " << save_period << std::endl;
@@ -114,5 +120,6 @@ void Scan::input(std::string filename) {
     std::cout << "min_r_singularity_to_keep: " << min_r_singularity_to_keep << std::endl;
     std::cout << "max_d2_volume_d_psi2_to_keep: " << max_d2_volume_d_psi2_to_keep << std::endl;
     std::cout << "min_DMerc_times_r2_to_keep: " << min_DMerc_times_r2_to_keep << std::endl;
+    std::cout << "min_beta_to_keep: " << min_beta_to_keep << std::endl;
   }
 }

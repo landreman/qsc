@@ -51,6 +51,7 @@ Qsc::Qsc() {
   L_grad_grad_B = 0.0;
   grid_min_L_grad_grad_B = 0.0;
   r_singularity_robust = 0.0;
+  beta = 0.0;
   r_hat_singularity_robust = 0.0;
   helicity = 0;
   B20_grid_variation = 0.0;

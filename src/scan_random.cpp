@@ -10,7 +10,7 @@
 using namespace qsc;
 
 void Scan::random() {
-  const int n_parameters = 17;
+  const int n_parameters = 19;
   const int n_int_parameters = 1;
   const int axis_nmax_plus_1 = R0c_max.size();
   const int n_fourier_parameters = axis_nmax_plus_1 * 4;
@@ -33,10 +33,12 @@ void Scan::random() {
   Random random_sigma0(deterministic, sigma0_scan_option, sigma0_min, sigma0_max);
   Random random_B2c(deterministic, B2c_scan_option, B2c_min, B2c_max);
   Random random_B2s(deterministic, B2s_scan_option, B2s_min, B2s_max);
+  Random random_p2(deterministic, p2_scan_option, p2_min, p2_max);
   random_eta_bar.set_to_nth(mpi_rank * max_attempts_per_proc + 0);
   random_sigma0.set_to_nth(mpi_rank * max_attempts_per_proc + 1);
   random_B2c.set_to_nth(mpi_rank * max_attempts_per_proc + 2);
   random_B2s.set_to_nth(mpi_rank * max_attempts_per_proc + 3);
+  random_p2.set_to_nth(mpi_rank * max_attempts_per_proc + 4);
   Random* random_R0c[axis_nmax_plus_1];
   Random* random_R0s[axis_nmax_plus_1];
   Random* random_Z0c[axis_nmax_plus_1];
@@ -113,6 +115,7 @@ void Scan::random() {
     if (q.at_least_order_r2) {
       q.B2c = random_B2c.get();
       q.B2s = random_B2s.get();
+      q.p2 = random_p2.get();
     }
     // Initialize axis, and do a crude check of whether R0 goes negative:
     R0_at_half_period = 0;
@@ -226,6 +229,10 @@ void Scan::random() {
 	filters_local[REJECTED_DUE_TO_R_SINGULARITY]++;
 	continue;
       }
+      if (!keep_all && q.beta < min_beta_to_keep) {
+	filters_local[REJECTED_DUE_TO_BETA]++;
+	continue;
+      }
     } // if at_least_order_r2
 
     // If we made it this far, then we found a keeper.
@@ -233,19 +240,21 @@ void Scan::random() {
     parameters_local(1 , j_scan) = q.sigma0;
     parameters_local(2 , j_scan) = q.B2c;
     parameters_local(3 , j_scan) = q.B2s;
-    parameters_local(4 , j_scan) = q.grid_min_R0;
-    parameters_local(5 , j_scan) = q.grid_max_curvature;
-    parameters_local(6 , j_scan) = q.iota;
-    parameters_local(7 , j_scan) = q.grid_max_elongation;
-    parameters_local(8 , j_scan) = q.grid_min_L_grad_B;
-    parameters_local(9 , j_scan) = q.grid_min_L_grad_grad_B;
-    parameters_local(10, j_scan) = q.r_singularity_robust;
-    parameters_local(11, j_scan) = q.d2_volume_d_psi2;
-    parameters_local(12, j_scan) = q.DMerc_times_r2;
-    parameters_local(13, j_scan) = q.B20_grid_variation;
-    parameters_local(14, j_scan) = q.B20_residual;
-    parameters_local(15, j_scan) = q.standard_deviation_of_R;
-    parameters_local(16, j_scan) = q.standard_deviation_of_Z;
+    parameters_local(4 , j_scan) = q.p2;
+    parameters_local(5 , j_scan) = q.grid_min_R0;
+    parameters_local(6 , j_scan) = q.grid_max_curvature;
+    parameters_local(7 , j_scan) = q.iota;
+    parameters_local(8 , j_scan) = q.grid_max_elongation;
+    parameters_local(9 , j_scan) = q.grid_min_L_grad_B;
+    parameters_local(10, j_scan) = q.grid_min_L_grad_grad_B;
+    parameters_local(11, j_scan) = q.r_singularity_robust;
+    parameters_local(12, j_scan) = q.d2_volume_d_psi2;
+    parameters_local(13, j_scan) = q.DMerc_times_r2;
+    parameters_local(14, j_scan) = q.B20_grid_variation;
+    parameters_local(15, j_scan) = q.B20_residual;
+    parameters_local(16, j_scan) = q.standard_deviation_of_R;
+    parameters_local(17, j_scan) = q.standard_deviation_of_Z;
+    parameters_local(18, j_scan) = q.beta;
 
     int_parameters_local[0 + n_int_parameters * j_scan] = q.helicity;
     

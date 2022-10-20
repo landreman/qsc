@@ -400,6 +400,7 @@ void Qsc::calculate_r_singularity() {
   } // loop over nphi
   
   r_singularity_robust = r_hat_singularity_robust.min();
+  beta = -p2 * r_singularity_robust * r_singularity_robust;
   
   if (verbose > 0) {
     auto end = std::chrono::steady_clock::now();    

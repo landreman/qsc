@@ -21,6 +21,8 @@ void Scan::defaults() {
   B2c_max = 0.0;
   B2s_min = 0.0;
   B2s_max = 0.0;
+  p2_min = 0.0;
+  p2_max = 0.0;
     
   R0c_min.resize(1, 1.0);
   R0c_max.resize(1, 1.0);
@@ -35,6 +37,7 @@ void Scan::defaults() {
   sigma0_scan_option = SCAN_OPTION_LINEAR;
   B2c_scan_option = SCAN_OPTION_LINEAR;
   B2s_scan_option = SCAN_OPTION_LINEAR;
+  p2_scan_option = SCAN_OPTION_LINEAR;
   fourier_scan_option = SCAN_OPTION_LINEAR;
 
   keep_all = true;
@@ -47,6 +50,7 @@ void Scan::defaults() {
   min_r_singularity_to_keep = -1.0;
   max_d2_volume_d_psi2_to_keep = 1.0e+30;
   min_DMerc_times_r2_to_keep = -1.0e+30;
+  min_beta_to_keep = -1.0;
 }
 
 Scan::Scan() {
