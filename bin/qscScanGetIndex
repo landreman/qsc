@@ -29,7 +29,10 @@ except:
 p2 = f.variables['p2'][()]
 I2 = f.variables['I2'][()]
 iota = f.variables['scan_iota'][()]
-axis_length = f.variables['scan_axis_length'][()]
+try:
+   axis_length = f.variables['scan_axis_length'][()]
+except:
+   axis_length = np.zeros_like(iota)
 B20_variation = f.variables['scan_B20_variation'][()]
 r_singularity = f.variables['scan_r_singularity'][()]
 d2_volume_d_psi2 = f.variables['scan_d2_volume_d_psi2'][()]

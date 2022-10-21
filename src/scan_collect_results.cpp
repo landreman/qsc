@@ -128,6 +128,7 @@ void Scan::collect_results(int n_parameters,
     scan_B2c.resize(n_scan, 0.0);
     scan_B2s.resize(n_scan, 0.0);
     scan_p2.resize(n_scan, 0.0);
+    scan_axis_length.resize(n_scan, 0.0);
     scan_min_R0.resize(n_scan, 0.0);
     scan_max_curvature.resize(n_scan, 0.0);
     scan_iota.resize(n_scan, 0.0);
@@ -157,20 +158,21 @@ void Scan::collect_results(int n_parameters,
       scan_B2c[j]               = parameters( 2, j);
       scan_B2s[j]               = parameters( 3, j);
       scan_p2[j]                = parameters( 4, j);
-      scan_min_R0[j]            = parameters( 5, j);
-      scan_max_curvature[j]     = parameters( 6, j);
-      scan_iota[j]              = parameters( 7, j);
-      scan_max_elongation[j]    = parameters( 8, j);
-      scan_min_L_grad_B[j]      = parameters( 9, j);
-      scan_min_L_grad_grad_B[j] = parameters(10, j);
-      scan_r_singularity[j]     = parameters(11, j);
-      scan_d2_volume_d_psi2[j]  = parameters(12, j);
-      scan_DMerc_times_r2[j]    = parameters(13, j);
-      scan_B20_variation[j]     = parameters(14, j);
-      scan_B20_residual[j]      = parameters(15, j);
-      scan_standard_deviation_of_R[j] = parameters(16, j);
-      scan_standard_deviation_of_Z[j] = parameters(17, j);
-      scan_beta[j]              = parameters(18, j);
+      scan_axis_length[j]       = parameters( 5, j);
+      scan_min_R0[j]            = parameters( 6, j);
+      scan_max_curvature[j]     = parameters( 7, j);
+      scan_iota[j]              = parameters( 8, j);
+      scan_max_elongation[j]    = parameters( 9, j);
+      scan_min_L_grad_B[j]      = parameters(10, j);
+      scan_min_L_grad_grad_B[j] = parameters(11, j);
+      scan_r_singularity[j]     = parameters(12, j);
+      scan_d2_volume_d_psi2[j]  = parameters(13, j);
+      scan_DMerc_times_r2[j]    = parameters(14, j);
+      scan_B20_variation[j]     = parameters(15, j);
+      scan_B20_residual[j]      = parameters(16, j);
+      scan_standard_deviation_of_R[j] = parameters(17, j);
+      scan_standard_deviation_of_Z[j] = parameters(18, j);
+      scan_beta[j]              = parameters(19, j);
       
       scan_helicity[j] = int_parameters[0 + j * n_int_parameters];
       

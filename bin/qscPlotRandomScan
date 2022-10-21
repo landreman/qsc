@@ -26,6 +26,8 @@ B2c = f.variables['scan_B2c'][()]
 B20_variation = f.variables['scan_B20_variation'][()]
 r_singularity = f.variables['scan_r_singularity'][()]
 d2_volume_d_psi2 = f.variables['scan_d2_volume_d_psi2'][()]
+DMerc_times_r2 = f.variables['scan_DMerc_times_r2'][()]
+beta = f.variables["scan_beta"][()]
 L_grad_B = f.variables['scan_min_L_grad_B'][()]
 L_grad_grad_B = f.variables['scan_min_L_grad_grad_B'][()]
 elongation = f.variables['scan_max_elongation'][()]
@@ -38,16 +40,19 @@ Z0s1 = Z0s[:, 1]
 
 # For r_singularity, replace 1e30 with 1
 r_singularity = np.minimum(r_singularity, np.ones_like(r_singularity))
+beta[beta >= 1.0e30] = np.NAN
 
 print("# of configs with helicity == 0:", np.sum(helicity == 0))
 print("# of configs with helicity != 0:", np.sum(helicity != 0))
 
 # Further filter the results:
 mask = np.abs(iota) >= 0.2
-mask = d2_volume_d_psi2 < 0
+#mask = d2_volume_d_psi2 < 0
+mask = DMerc_times_r2 > 0.5
+mask = np.logical_and(mask, beta > 3.0e4)
+mask = np.logical_and(mask, L_grad_grad_B > 0.39)
 """
 mask = np.logical_and(mask, np.abs(iota) > 0.42)
-mask = np.logical_and(mask, L_grad_grad_B > 0.38)
 mask = np.logical_and(mask, r_singularity > 0.16)
 mask = np.logical_and(mask, max_XYZ23 < 5.6)
 mask = np.logical_and(mask, max_d_XYZ23_d_varphi < 15.0)
@@ -83,12 +88,16 @@ B2c = B2c[mask]
 B20_variation = B20_variation[mask]
 r_singularity = r_singularity[mask]
 d2_volume_d_psi2 = d2_volume_d_psi2[mask]
+DMerc_times_r2 = DMerc_times_r2[mask]
+beta = beta[mask]
 L_grad_B = L_grad_B[mask]
 L_grad_grad_B = L_grad_grad_B[mask]
 elongation = elongation[mask]
 helicity = helicity[mask]
 R0c1 = R0c1[mask]
 Z0s1 = Z0s1[mask]
+R0c = R0c[mask, :]
+Z0s = Z0s[mask, :]
 
 n_scan = len(iota)
 print('Number of points passing filters:', n_scan)
@@ -113,8 +122,8 @@ def loghist(x, bins=10, **kwargs):
 plt.rc('font', size=8)
 fig = plt.figure(figsize=(15, 8))
 
-nrows = 3
-ncols = 4
+nrows = 4
+ncols = 5
 jplot = 1
 bins = 20
 
@@ -145,12 +154,43 @@ plt.hist(d2_volume_d_psi2, bins=bins)
 plt.xlabel('V"')
 
 plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.hist(DMerc_times_r2, bins=bins)
+plt.xlabel('DMerc_times_r2')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.hist(beta, bins=bins)
+plt.xlabel('beta')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.plot(beta, DMerc_times_r2, '.', ms=1)
+plt.xlabel('beta')
+plt.ylabel('DMerc_times_r2')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
 plt.hist(r_singularity, bins=bins)
 plt.xlabel('r_singularity')
 
 plt.subplot(nrows, ncols, jplot); jplot += 1
 loghist(r_singularity, bins=bins)
 plt.xlabel('r_singularity')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.hist(L_grad_B, bins=bins)
+plt.xlabel('L_grad_B')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.hist(L_grad_grad_B, bins=bins)
+plt.xlabel('L_grad_grad_B')
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.plot(L_grad_grad_B, DMerc_times_r2, '.', ms=1)
+plt.xlabel('L_grad_grad_B')
+plt.ylabel("DMerc_times_r2")
+
+plt.subplot(nrows, ncols, jplot); jplot += 1
+plt.plot(L_grad_grad_B, beta, '.', ms=1)
+plt.xlabel('L_grad_grad_B')
+plt.ylabel("beta")
 
 plt.figtext(0.5, 0.998, os.path.abspath(filename), ha='center', va='top', fontsize=6)
 plt.figtext(0.5, 0.002, 'Plotted by ' + os.path.abspath(__file__), ha='center', va='bottom', fontsize=6)

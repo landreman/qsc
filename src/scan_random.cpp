@@ -10,7 +10,7 @@
 using namespace qsc;
 
 void Scan::random() {
-  const int n_parameters = 19;
+  const int n_parameters = 20;
   const int n_int_parameters = 1;
   const int axis_nmax_plus_1 = R0c_max.size();
   const int n_fourier_parameters = axis_nmax_plus_1 * 4;
@@ -250,20 +250,21 @@ void Scan::random() {
     parameters_local(2 , j_scan) = q.B2c;
     parameters_local(3 , j_scan) = q.B2s;
     parameters_local(4 , j_scan) = q.p2;
-    parameters_local(5 , j_scan) = q.grid_min_R0;
-    parameters_local(6 , j_scan) = q.grid_max_curvature;
-    parameters_local(7 , j_scan) = q.iota;
-    parameters_local(8 , j_scan) = q.grid_max_elongation;
-    parameters_local(9 , j_scan) = q.grid_min_L_grad_B;
-    parameters_local(10, j_scan) = q.grid_min_L_grad_grad_B;
-    parameters_local(11, j_scan) = q.r_singularity_robust;
-    parameters_local(12, j_scan) = q.d2_volume_d_psi2;
-    parameters_local(13, j_scan) = q.DMerc_times_r2;
-    parameters_local(14, j_scan) = q.B20_grid_variation;
-    parameters_local(15, j_scan) = q.B20_residual;
-    parameters_local(16, j_scan) = q.standard_deviation_of_R;
-    parameters_local(17, j_scan) = q.standard_deviation_of_Z;
-    parameters_local(18, j_scan) = q.beta;
+    parameters_local(5 , j_scan) = q.axis_length;
+    parameters_local(6 , j_scan) = q.grid_min_R0;
+    parameters_local(7 , j_scan) = q.grid_max_curvature;
+    parameters_local(8 , j_scan) = q.iota;
+    parameters_local(9 , j_scan) = q.grid_max_elongation;
+    parameters_local(10, j_scan) = q.grid_min_L_grad_B;
+    parameters_local(11, j_scan) = q.grid_min_L_grad_grad_B;
+    parameters_local(12, j_scan) = q.r_singularity_robust;
+    parameters_local(13, j_scan) = q.d2_volume_d_psi2;
+    parameters_local(14, j_scan) = q.DMerc_times_r2;
+    parameters_local(15, j_scan) = q.B20_grid_variation;
+    parameters_local(16, j_scan) = q.B20_residual;
+    parameters_local(17, j_scan) = q.standard_deviation_of_R;
+    parameters_local(18, j_scan) = q.standard_deviation_of_Z;
+    parameters_local(19, j_scan) = q.beta;
 
     int_parameters_local[0 + n_int_parameters * j_scan] = q.helicity;
     

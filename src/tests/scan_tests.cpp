@@ -130,6 +130,7 @@ TEST_CASE("Each scan result should match a standalone Qsc. [mpi]") {
 	  CHECK(Approx(q.DMerc_times_r2) == scan.scan_DMerc_times_r2[j]);
 	  CHECK(Approx(q.B20_grid_variation) == scan.scan_B20_variation[j]);
 	  CHECK(Approx(q.beta) == scan.scan_beta[j]);
+	  CHECK(Approx(q.axis_length) == scan.scan_axis_length[j]);
 	}
       }
     }
@@ -318,6 +319,7 @@ TEST_CASE("Verify results of a deterministic scan are independent of number of m
 	  CHECK(Approx(scan1.scan_d2_volume_d_psi2[j]) == scan2.scan_d2_volume_d_psi2[j]);
 	  CHECK(Approx(scan1.scan_DMerc_times_r2[j]) == scan2.scan_DMerc_times_r2[j]);
 	  CHECK(Approx(scan1.scan_beta[j]) == scan2.scan_beta[j]);
+	  CHECK(Approx(scan1.scan_axis_length[j]) == scan2.scan_axis_length[j]);
 	  
 	  CHECK(scan1.scan_helicity[j] == scan2.scan_helicity[j]);
 	  
@@ -574,6 +576,7 @@ TEST_CASE("Verify scan results with and without filters are related as expected.
 	    CHECK(Approx(scan1.scan_d2_volume_d_psi2[j]) == scan2.scan_d2_volume_d_psi2[n]);
 	    CHECK(Approx(scan1.scan_DMerc_times_r2[j]) == scan2.scan_DMerc_times_r2[n]);
 	    CHECK(Approx(scan1.scan_beta[j]) == scan2.scan_beta[n]);
+	    CHECK(Approx(scan1.scan_axis_length[j]) == scan2.scan_axis_length[n]);
 	  
 	    CHECK(scan1.scan_helicity[j] == scan2.scan_helicity[n]);
 	  

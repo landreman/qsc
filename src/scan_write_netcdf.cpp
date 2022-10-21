@@ -140,6 +140,7 @@ void Scan::write_netcdf() {
     nc.put(n_scan_dim, "scan_B2s", scan_B2s, "For each configuration kept from the scan, the r^2 * sin(2*theta) term in |B|", "Tesla/(meter^2)");
     nc.put(n_scan_dim, "scan_p2", scan_p2, "p2 for each configuration kept from the scan", "Pascal/(meter^2)");
   }
+  nc.put(n_scan_dim, "scan_axis_length", scan_axis_length, "For each configuration kept from the scan, the length of the magnetic axis", "meter");
   nc.put(n_scan_dim, "scan_iota", scan_iota, "For each configuration kept from the scan, the rotational transform on axis", "dimensionless");
   nc.put(n_scan_dim, "scan_min_R0", scan_min_R0, "For each configuration kept from the scan, the minimum value of R0, the major radius of the magnetic axis. This variable corresponds to grid_min_R0 in a single Qsc calculation.", "meter");
   nc.put(n_scan_dim, "scan_max_curvature", scan_max_curvature, "For each configuration kept from the scan, the maximum curvature of the magnetic axis", "1/meter");

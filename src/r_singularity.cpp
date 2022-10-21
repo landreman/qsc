@@ -400,7 +400,7 @@ void Qsc::calculate_r_singularity() {
   } // loop over nphi
   
   r_singularity_robust = r_hat_singularity_robust.min();
-  beta = -p2 * r_singularity_robust * r_singularity_robust;
+  beta = -mu0 * p2 * r_singularity_robust * r_singularity_robust / (B0 * B0);
   if (beta > 1.0e30) beta = 1.0e30;  // This line is to handle overflow when in single-precision.
   
   if (verbose > 0) {
