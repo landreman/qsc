@@ -15,7 +15,7 @@ echo Hello from install_doctest.sh
 
 pwd
 
-mkdir doctest
+mkdir -p doctest
 cd doctest
 # The following command gets the latest version:
 wget https://raw.githubusercontent.com/onqtam/doctest/master/doctest/doctest.h
