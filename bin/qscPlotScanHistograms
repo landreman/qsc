@@ -3,7 +3,7 @@
 import os
 import sys
 import numpy as np
-from scipy.io import netcdf
+from scipy.io import netcdf_file
 import matplotlib.pyplot as plt
 import matplotlib
 
@@ -19,7 +19,7 @@ s = 'qsc_out.'
 if bare_filename[:len(s)] != s or filename[-3:] != '.nc':
    raise RuntimeError("A qsc_out.*.nc file must be provided as an argument")
    
-f = netcdf.netcdf_file(filename, 'r', mmap=False)
+f = netcdf_file(filename, 'r', mmap=False)
 n_scan = f.variables['n_scan'][()]
 iota = np.abs(f.variables['scan_iota'][()])
 axis_length = f.variables['scan_axis_length'][()]
@@ -67,11 +67,11 @@ r_singularity = np.minimum(r_singularity, np.ones_like(r_singularity))
 
 # Further filter the results:
 mask = max_d_XYZ23_d_varphi < 1e30
+#mask = helicity == 0
+#mask = np.logical_and(mask, r_singularity > 0.111)
 """
-mask = helicity == 0
 mask = np.logical_and(mask, np.abs(iota) > 0.42)
 mask = np.logical_and(mask, L_grad_grad_B > 0.38)
-mask = np.logical_and(mask, r_singularity > 0.16)
 mask = np.logical_and(mask, max_XYZ23 < 5.6)
 mask = np.logical_and(mask, max_d_XYZ23_d_varphi < 15.0)
 mask = np.logical_and(mask, L_grad_B > 0.465)
